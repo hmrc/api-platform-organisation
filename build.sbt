@@ -22,11 +22,14 @@ lazy val microservice = Project("api-platform-organisation", file("."))
   .settings(resolvers += Resolver.jcenterRepo)
   .settings(CodeCoverageSettings.settings: _*)
 
-lazy val it = project
+lazy val it = (project in file("it"))
   .enablePlugins(PlayScala)
   .dependsOn(microservice % "test->test")
   .settings(DefaultBuildSettings.itSettings())
-  .settings(libraryDependencies ++= AppDependencies.it)
+  .settings(
+    name := "integration-tests",
+    Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-eT"),
+  )
 
 commands ++= Seq(
   Command.command("cleanAll") { state => "clean" :: "it/clean" :: state },
