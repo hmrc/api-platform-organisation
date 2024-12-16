@@ -1,7 +1,7 @@
 
-# api-platform-organisation
+# API Platform Organisation
 
-This is a placeholder README.md for a new repository
+Service to serve as the backend for the organisations functionality
 
 ### License
 
