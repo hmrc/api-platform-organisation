@@ -21,8 +21,7 @@ lazy val microservice = Project("api-platform-organisation", file("."))
     // https://www.scala-lang.org/2021/01/12/configuring-and-suppressing-warnings.html
     // suppress warnings in generated routes files
     scalacOptions += "-Wconf:src=routes/.*:s",
-    scalacOptions += "-Wconf:cat=unused-imports&src=html/.*:s",
-    pipelineStages := Seq(gzip),
+    scalacOptions += "-Wconf:cat=unused-imports&src=html/.*:s"
   )
   .settings(resolvers += Resolver.jcenterRepo)
   .settings(CodeCoverageSettings.settings: _*)
