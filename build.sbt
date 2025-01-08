@@ -22,6 +22,10 @@ lazy val microservice = Project("api-platform-organisation", file("."))
     // suppress warnings in generated routes files
     scalacOptions += "-Wconf:src=routes/.*:s"
   )
+  .settings(
+    Test / unmanagedSourceDirectories += baseDirectory.value / "test-utils",
+    Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-eT")
+  )
   .settings(resolvers += Resolver.jcenterRepo)
   .settings(CodeCoverageSettings.settings: _*)
 

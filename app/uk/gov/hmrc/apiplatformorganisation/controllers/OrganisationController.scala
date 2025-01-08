@@ -17,16 +17,19 @@
 package uk.gov.hmrc.apiplatformorganisation.controllers
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import scala.concurrent.ExecutionContext
 
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import play.api.libs.json.Json
+import play.api.mvc.{Action, ControllerComponents}
+import uk.gov.hmrc.apiplatformorganisation.models.CreateOrganisationRequest
+import uk.gov.hmrc.apiplatformorganisation.services.OrganisationService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 @Singleton()
-class MicroserviceHelloWorldController @Inject() (cc: ControllerComponents)
+class OrganisationController @Inject() (cc: ControllerComponents, organisationService: OrganisationService)(implicit val ec: ExecutionContext)
     extends BackendController(cc) {
 
-  def hello(): Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok("Hello world"))
+  def create(): Action[CreateOrganisationRequest] = Action.async(parse.json[CreateOrganisationRequest]) { implicit request =>
+    organisationService.create(request.body).map(org => Ok(Json.toJson(org)))
   }
 }

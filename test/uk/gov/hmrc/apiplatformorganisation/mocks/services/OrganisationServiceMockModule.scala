@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apiplatformorganisation.config
+package uk.gov.hmrc.apiplatformorganisation.mocks.services
 
-import java.time.Clock
+import scala.concurrent.Future
 
-import com.google.inject.AbstractModule
+import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
-class Module extends AbstractModule {
+import uk.gov.hmrc.apiplatformorganisation.models._
+import uk.gov.hmrc.apiplatformorganisation.services.OrganisationService
 
-  override def configure(): Unit = {
+trait OrganisationServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
 
-    bind(classOf[AppConfig]).asEagerSingleton()
-    bind(classOf[Clock]).toInstance(Clock.systemUTC())
+  object OrganisationServiceMock {
+    val aMock = mock[OrganisationService]
+
+    object CreateOrganisation {
+      def willReturn(org: Organisation) = when(aMock.create(*)(*)).thenReturn(Future.successful(org))
+    }
   }
 }
