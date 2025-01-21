@@ -20,6 +20,7 @@ import scala.util.Random
 
 import cats.data.NonEmptyList
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationId
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.AskWhen.Context.Keys
@@ -89,17 +90,20 @@ trait SubmissionsTestData extends QuestionBuilder with QuestionnaireTestData wit
 
   val organisationId = OrganisationId.random
   val submissionId   = SubmissionId.random
+  val userId         = UserId.random
 
   val standardContext: AskWhen.Context = Map(
     AskWhen.Context.Keys.IN_HOUSE_SOFTWARE       -> "No",
     AskWhen.Context.Keys.VAT_OR_ITSA             -> "No",
     AskWhen.Context.Keys.NEW_TERMS_OF_USE_UPLIFT -> "No"
   )
-  val aSubmission                      = Submission.create("bob@example.com", submissionId, Some(organisationId), instant, testGroups, testQuestionIdsOfInterest, standardContext)
+  val aSubmission                      = Submission.create("bob@example.com", submissionId, Some(organisationId), instant, userId, testGroups, testQuestionIdsOfInterest, standardContext)
 
   val altSubmissionId = SubmissionId.random
   require(altSubmissionId != submissionId)
-  val altSubmission   = Submission.create("bob@example.com", altSubmissionId, Some(organisationId), instant.plusSeconds(100), testGroups, testQuestionIdsOfInterest, standardContext)
+
+  val altSubmission =
+    Submission.create("bob@example.com", altSubmissionId, Some(organisationId), instant.plusSeconds(100), userId, testGroups, testQuestionIdsOfInterest, standardContext)
 
   val completedSubmissionId = SubmissionId.random
   require(completedSubmissionId != submissionId)
@@ -138,6 +142,7 @@ trait SubmissionsTestData extends QuestionBuilder with QuestionnaireTestData wit
   def buildSubmissionWithQuestions(): Submission = {
     val subId = SubmissionId.random
     val orgId = OrganisationId.random
+    val usrId = UserId.random
 
     val question1               = yesNoQuestion(1)
     val questionRIRequester     = yesNoQuestion(2)
@@ -183,6 +188,7 @@ trait SubmissionsTestData extends QuestionBuilder with QuestionnaireTestData wit
       subId,
       Some(orgId),
       instant,
+      usrId,
       questionnaireGroups,
       QuestionIdsOfInterest(
         questionName.id,

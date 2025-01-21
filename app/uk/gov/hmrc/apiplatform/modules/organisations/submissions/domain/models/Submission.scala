@@ -22,6 +22,7 @@ import cats.data.NonEmptyList
 
 import play.api.libs.json.EnvReads
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.common.domain.services.{InstantJsonFormatter, NonEmptyListFormatters}
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationId
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionId
@@ -72,14 +73,15 @@ object Submission extends EnvReads with NonEmptyListFormatters {
       SubmissionId,
       Option[OrganisationId],
       Instant,
+      UserId,
       NonEmptyList[GroupOfQuestionnaires],
       QuestionIdsOfInterest,
       AskWhen.Context
-    ) => Submission = (requestedBy, id, organisationId, timestamp, groups, questionIdsOfInterest, context) => {
+    ) => Submission = (requestedBy, id, organisationId, timestamp, user, groups, questionIdsOfInterest, context) => {
 
     val initialStatus    = Submission.Status.Created(timestamp, requestedBy)
     val initialInstances = NonEmptyList.of(Submission.Instance(0, Map.empty, NonEmptyList.of(initialStatus)))
-    Submission(id, organisationId, timestamp, groups, questionIdsOfInterest, initialInstances, context)
+    Submission(id, organisationId, timestamp, user, groups, questionIdsOfInterest, initialInstances, context)
   }
 
   val addInstance: (Submission.AnswersToQuestions, Submission.Status) => Submission => Submission = (answers, status) =>
@@ -382,6 +384,7 @@ case class Submission(
     id: SubmissionId,
     organisationId: Option[OrganisationId],
     startedOn: Instant,
+    startedBy: UserId,
     groups: NonEmptyList[GroupOfQuestionnaires],
     questionIdsOfInterest: QuestionIdsOfInterest,
     instances: NonEmptyList[Submission.Instance],
