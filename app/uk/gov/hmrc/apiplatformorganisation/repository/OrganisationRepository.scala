@@ -23,9 +23,10 @@ import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.{IndexModel, IndexOptions}
 
-import uk.gov.hmrc.apiplatformorganisation.models.StoredOrganisation
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
+
+import uk.gov.hmrc.apiplatformorganisation.models.StoredOrganisation
 
 @Singleton
 class OrganisationRepository @Inject() (mongo: MongoComponent)(implicit val ec: ExecutionContext)
