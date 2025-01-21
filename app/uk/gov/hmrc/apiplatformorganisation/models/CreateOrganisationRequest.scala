@@ -16,30 +16,10 @@
 
 package uk.gov.hmrc.apiplatformorganisation.models
 
-import java.util.UUID
-import java.{util => ju}
+import play.api.libs.json.{Json, OFormat}
 
-import play.api.libs.json.{Format, Json, OFormat}
+import uk.gov.hmrc.apiplatform.modules.organisations._
 
-final case class OrganisationId(value: UUID) extends AnyVal {
-  override def toString: String = value.toString
-}
-
-object OrganisationId {
-  implicit val orgNameFormat: Format[OrganisationId] = Json.valueFormat[OrganisationId]
-
-  // $COVERAGE-OFF$
-  def random: OrganisationId = OrganisationId(ju.UUID.randomUUID)
-  // $COVERAGE-ON$
-}
-
-final case class OrganisationName(value: String) extends AnyVal {
-  override def toString: String = value
-}
-
-object OrganisationName {
-  implicit val orgNameFormat: Format[OrganisationName] = Json.valueFormat[OrganisationName]
-}
 case class Organisation(id: OrganisationId, organisationName: OrganisationName)
 
 object Organisation {

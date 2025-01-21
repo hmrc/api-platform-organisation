@@ -19,6 +19,7 @@ package uk.gov.hmrc.apiplatformorganisation
 import uk.gov.hmrc.apiplatformorganisation.models._
 
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
+import uk.gov.hmrc.apiplatform.modules.organisations._
 
 object OrganisationIdData {
   val one: OrganisationId = OrganisationId.random
