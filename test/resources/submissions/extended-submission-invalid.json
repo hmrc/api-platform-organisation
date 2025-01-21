@@ -1,7 +1,7 @@
 {
   "submission" : {
     "id" : "123a1dd3-09cf-46a0-bc73-350a385de678",
-    "applicationId" : "426a1df9-09cf-46a0-bc73-350a385ea461",
+    "organisationId" : "426a1df9-09cf-46a0-bc73-350a385ea461",
     "startedOn" : "2020-01-02T03:04:05.006Z",
     "groups" : [ {
       "heading" : "Your processes",

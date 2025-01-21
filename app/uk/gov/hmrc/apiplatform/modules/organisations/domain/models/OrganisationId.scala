@@ -28,6 +28,8 @@ final case class OrganisationId(value: UUID) extends AnyVal {
 object OrganisationId {
   implicit val orgNameFormat: Format[OrganisationId] = Json.valueFormat[OrganisationId]
 
+  def unsafeApply(raw: String): OrganisationId = OrganisationId(UUID.fromString(raw))
+
   // $COVERAGE-OFF$
   def random: OrganisationId = OrganisationId(ju.UUID.randomUUID)
   // $COVERAGE-ON$

@@ -20,8 +20,8 @@ import scala.util.Random
 
 import cats.data.NonEmptyList
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationId
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.AskWhen.Context.Keys
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, _}
 
@@ -87,19 +87,19 @@ trait ProgressTestDataHelper {
 
 trait SubmissionsTestData extends QuestionBuilder with QuestionnaireTestData with ProgressTestDataHelper with StatusTestDataHelper with FixedClock {
 
-  val applicationId = ApplicationId.random
-  val submissionId  = SubmissionId.random
+  val organisationId = OrganisationId.random
+  val submissionId   = SubmissionId.random
 
   val standardContext: AskWhen.Context = Map(
     AskWhen.Context.Keys.IN_HOUSE_SOFTWARE       -> "No",
     AskWhen.Context.Keys.VAT_OR_ITSA             -> "No",
     AskWhen.Context.Keys.NEW_TERMS_OF_USE_UPLIFT -> "No"
   )
-  val aSubmission                      = Submission.create("bob@example.com", submissionId, applicationId, instant, testGroups, testQuestionIdsOfInterest, standardContext)
+  val aSubmission                      = Submission.create("bob@example.com", submissionId, Some(organisationId), instant, testGroups, testQuestionIdsOfInterest, standardContext)
 
   val altSubmissionId = SubmissionId.random
   require(altSubmissionId != submissionId)
-  val altSubmission   = Submission.create("bob@example.com", altSubmissionId, applicationId, instant.plusSeconds(100), testGroups, testQuestionIdsOfInterest, standardContext)
+  val altSubmission   = Submission.create("bob@example.com", altSubmissionId, Some(organisationId), instant.plusSeconds(100), testGroups, testQuestionIdsOfInterest, standardContext)
 
   val completedSubmissionId = SubmissionId.random
   require(completedSubmissionId != submissionId)
@@ -137,7 +137,7 @@ trait SubmissionsTestData extends QuestionBuilder with QuestionnaireTestData wit
 
   def buildSubmissionWithQuestions(): Submission = {
     val subId = SubmissionId.random
-    val appId = ApplicationId.random
+    val orgId = OrganisationId.random
 
     val question1               = yesNoQuestion(1)
     val questionRIRequester     = yesNoQuestion(2)
@@ -181,7 +181,7 @@ trait SubmissionsTestData extends QuestionBuilder with QuestionnaireTestData wit
     Submission.create(
       "bob@example.com",
       subId,
-      appId,
+      Some(orgId),
       instant,
       questionnaireGroups,
       QuestionIdsOfInterest(

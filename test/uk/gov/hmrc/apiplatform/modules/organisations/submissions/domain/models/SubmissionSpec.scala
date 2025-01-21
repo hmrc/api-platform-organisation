@@ -20,8 +20,8 @@ import scala.io.Source
 
 import play.api.libs.json._
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.ApplicationId
 import uk.gov.hmrc.apiplatform.modules.common.utils.BaseJsonFormattersSpec
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationId
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionId
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.SubmissionsTestData
 
@@ -31,7 +31,7 @@ class SubmissionSpec extends BaseJsonFormattersSpec with SubmissionsTestData {
 
   val submission         = partiallyAnsweredExtendedSubmission.submission.copy(
     id = SubmissionId.unsafeApply("123a1dd3-09cf-46a0-bc73-350a385de678"),
-    applicationId = ApplicationId.unsafeApply("426a1df9-09cf-46a0-bc73-350a385ea461")
+    organisationId = Some(OrganisationId.unsafeApply("426a1df9-09cf-46a0-bc73-350a385ea461"))
   )
   val extendedSubmission = partiallyAnsweredExtendedSubmission.copy(submission = submission)
 
