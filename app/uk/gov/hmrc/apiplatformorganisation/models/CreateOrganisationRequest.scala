@@ -18,7 +18,7 @@ package uk.gov.hmrc.apiplatformorganisation.models
 
 import play.api.libs.json.{Json, OFormat}
 
-import uk.gov.hmrc.apiplatform.modules.organisations._
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{OrganisationId, OrganisationName}
 
 case class Organisation(id: OrganisationId, organisationName: OrganisationName)
 

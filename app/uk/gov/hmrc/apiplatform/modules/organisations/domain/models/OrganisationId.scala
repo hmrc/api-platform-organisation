@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apiplatform.modules.organisations
+package uk.gov.hmrc.apiplatform.modules.organisations.domain.models
 
 import java.util.UUID
 import java.{util => ju}

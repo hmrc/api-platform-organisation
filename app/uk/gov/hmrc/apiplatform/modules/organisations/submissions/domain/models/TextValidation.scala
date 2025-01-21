@@ -22,7 +22,7 @@ import org.apache.commons.validator.routines.EmailValidator
 
 import play.api.libs.json.{Json, OFormat}
 
-import uk.gov.hmrc.apiplatform.modules.organisations.ValidatedOrganisationName
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.ValidatedOrganisationName
 
 sealed trait TextValidation {
   def isValid(text: String): Boolean = this.validate(text).isRight

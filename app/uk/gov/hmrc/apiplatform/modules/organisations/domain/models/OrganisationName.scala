@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apiplatform.modules.organisations
+package uk.gov.hmrc.apiplatform.modules.organisations.domain.models
 
 import cats.data.Validated._
 import cats.data._
@@ -67,6 +67,8 @@ final case class OrganisationName(value: String) extends AnyVal {
 }
 
 object OrganisationName {
+  def apply(value: String): OrganisationName = new OrganisationName(value.trim())
+
   implicit val orgNameFormat: Format[OrganisationName] = Json.valueFormat[OrganisationName]
 }
 
