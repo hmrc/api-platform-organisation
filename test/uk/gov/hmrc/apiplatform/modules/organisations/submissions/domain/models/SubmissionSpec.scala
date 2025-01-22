@@ -37,10 +37,10 @@ class SubmissionSpec extends BaseJsonFormattersSpec with SubmissionsTestData {
   )
   val extendedSubmission = partiallyAnsweredExtendedSubmission.copy(submission = submission)
 
-  "submission questionIdsOfInterest app name" in {
+  "submission questionIdsOfInterest org name" in {
     Submission.updateLatestAnswersTo(samplePassAnswersToQuestions)(aSubmission).latestInstance.answersToQuestions(
-      aSubmission.questionIdsOfInterest.applicationNameId
-    ) shouldBe ActualAnswer.TextAnswer("name of software")
+      aSubmission.questionIdsOfInterest.organisationNameId
+    ) shouldBe ActualAnswer.TextAnswer("Bobs Burgers")
   }
 
   "submission instance state history" in {
@@ -69,7 +69,7 @@ class SubmissionSpec extends BaseJsonFormattersSpec with SubmissionsTestData {
   }
 
   "submission findQuestionnaireContaining" in {
-    aSubmission.findQuestionnaireContaining(aSubmission.questionIdsOfInterest.applicationNameId) shouldBe Some(CustomersAuthorisingYourSoftware.questionnaire)
+    aSubmission.findQuestionnaireContaining(aSubmission.questionIdsOfInterest.organisationNameId) shouldBe Some(OrganisationDetails.questionnaire)
   }
 
   "submission setLatestAnswers" in {
@@ -128,7 +128,7 @@ class SubmissionSpec extends BaseJsonFormattersSpec with SubmissionsTestData {
   "shouldAsk" in {
     AskWhen.shouldAsk(standardContext, answersToQuestions)(OrganisationDetails.questionnaire.questions.head.askWhen) shouldBe true
     AskWhen.shouldAsk(standardContext, answersToQuestions)(OrganisationDetails.questionnaire.questions.tail.head.askWhen) shouldBe true
-    AskWhen.shouldAsk(standardContext, answersToQuestions)(CustomersAuthorisingYourSoftware.questionnaire.questions.tail.tail.head.askWhen) shouldBe true
+    AskWhen.shouldAsk(standardContext, answersToQuestions)(ResponsibleIndividualDetails.questionnaire.questions.tail.tail.head.askWhen) shouldBe true
   }
 
   "submission status isOpenToAnswers" in {

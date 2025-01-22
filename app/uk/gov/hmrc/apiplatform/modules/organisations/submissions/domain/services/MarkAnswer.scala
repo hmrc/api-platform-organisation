@@ -44,7 +44,7 @@ object MarkAnswer {
       case (q: Question.MultiChoiceQuestion, a: ActualAnswer.MultipleChoiceAnswer) => markMultiChoiceAnswer(q, a)
       case (q: Question.SingleChoiceQuestion, a: ActualAnswer.SingleChoiceAnswer)  => markSingleChoiceAnswer(q, a)
       case (q: Question.AcknowledgementOnly, ActualAnswer.AcknowledgedAnswer)      => Mark.Pass
-      case _                                                                       => throw new IllegalArgumentException("Unexpectely the answer is not valid")
+      case _                                                                       => throw new IllegalArgumentException(s"Unexpectely the answer is not valid - ${question.wording.value}")
     }
   }
 

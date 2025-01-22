@@ -98,9 +98,15 @@ class SubmissionsRepository @Inject() (mongo: MongoComponent)(implicit val ec: E
       domainFormat = SubmissionsRepository.MongoFormats.submissionFormat,
       indexes = Seq(
         IndexModel(
-          ascending("applicationId"),
+          ascending("organisationId"),
           IndexOptions()
-            .name("applicationIdIndex")
+            .name("organisationIdIndex")
+            .background(true)
+        ),
+        IndexModel(
+          ascending("startedBy"),
+          IndexOptions()
+            .name("startedByIndex")
             .background(true)
         ),
         IndexModel(

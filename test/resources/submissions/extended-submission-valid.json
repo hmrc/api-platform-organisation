@@ -5,278 +5,143 @@
     "startedOn" : "2020-01-02T03:04:05.006Z",
     "startedBy" : "193316a2-e3b4-4aed-9001-a318e841cbb3",
     "groups" : [ {
-      "heading" : "Your processes",
-      "links" : [ {
-        "id" : "796336a5-f7b4-4dad-8003-a818e342cbb4",
-        "label" : "Development practices",
-        "questions" : [ {
-          "question" : {
-            "id" : "653d2ee4-09cf-46a0-bc73-350a385ae860",
-            "wording" : "Do your development practices follow our guidance?",
-            "statement" : {
-              "fragments" : [ {
-                "fragments" : [ {
-                  "text" : "You must develop software following our",
-                  "statementType" : "text"
-                }, {
-                  "text" : "development practices (opens in a new tab)",
-                  "url" : "https://developer.service.hmrc.gov.uk/api-documentation/docs/development-practices",
-                  "statementType" : "link"
-                }, {
-                  "text" : ".",
-                  "statementType" : "text"
-                } ],
-                "statementType" : "compound"
-              } ]
-            },
-            "yesMarking" : "pass",
-            "noMarking" : "warn",
-            "questionType" : "yesNo"
-          },
-          "askWhen" : {
-            "askWhen" : "alwaysAsk"
-          }
-        }, {
-          "question" : {
-            "id" : "6139f57d-36ab-4338-85b3-a2079d6cf376",
-            "wording" : "Does your error handling meet our specification?",
-            "statement" : {
-              "fragments" : [ {
-                "fragments" : [ {
-                  "text" : "We will check for evidence that you comply with our",
-                  "statementType" : "text"
-                }, {
-                  "text" : "error handling specification (opens in new tab)",
-                  "url" : "https://developer.service.hmrc.gov.uk/api-documentation/docs/reference-guide#errors",
-                  "statementType" : "link"
-                }, {
-                  "text" : ".",
-                  "statementType" : "text"
-                } ],
-                "statementType" : "compound"
-              } ]
-            },
-            "yesMarking" : "pass",
-            "noMarking" : "fail",
-            "questionType" : "yesNo"
-          },
-          "askWhen" : {
-            "askWhen" : "alwaysAsk"
-          }
-        }, {
-          "question" : {
-            "id" : "3c5cd29d-bec2-463f-8593-cd5412fab1e5",
-            "wording" : "Does your software meet accessibility standards?",
-            "statement" : {
-              "fragments" : [ {
-                "fragments" : [ {
-                  "text" : "Web-based software must meet level AA of the",
-                  "statementType" : "text"
-                }, {
-                  "text" : "Web Content Accessibility Guidelines (WCAG) (opens in new tab)",
-                  "url" : "https://www.w3.org/WAI/standards-guidelines/wcag/",
-                  "statementType" : "link"
-                }, {
-                  "text" : ". Desktop software should follow equivalent offline standards.",
-                  "statementType" : "text"
-                } ],
-                "statementType" : "compound"
-              } ]
-            },
-            "yesMarking" : "pass",
-            "noMarking" : "warn",
-            "questionType" : "yesNo"
-          },
-          "askWhen" : {
-            "askWhen" : "alwaysAsk"
-          }
-        } ]
-      } ]
-    }, {
-      "heading" : "Your software",
-      "links" : [ {
-        "id" : "3a7f3369-8e28-447c-bd47-efbabeb6d93f",
-        "label" : "Customers authorising your software",
-        "questions" : [ {
-          "question" : {
-            "id" : "95da25e8-af3a-4e05-a621-4a5f4ca788f6",
-            "wording" : "Customers authorising your software",
-            "statement" : {
-              "fragments" : [ {
-                "text" : "Your customers will see the information you provide here when they authorise your software to interact with HMRC.",
-                "statementType" : "text"
-              }, {
-                "text" : "Before you continue, you will need:",
-                "statementType" : "text"
-              }, {
-                "bullets" : [ {
-                  "text" : "the name of your software",
-                  "statementType" : "text"
-                }, {
-                  "text" : "the location of your servers which store customer data",
-                  "statementType" : "text"
-                }, {
-                  "text" : "a link to your privacy policy",
-                  "statementType" : "text"
-                }, {
-                  "text" : "a link to your terms and conditions",
-                  "statementType" : "text"
-                } ],
-                "statementType" : "bullets"
-              } ]
-            },
-            "questionType" : "acknowledgement"
-          },
-          "askWhen" : {
-            "askWhen" : "alwaysAsk"
-          }
-        }, {
-          "question" : {
-            "id" : "4d5a41c8-8727-4d09-96c0-e2ce1bc222d3",
-            "wording" : "Confirm the name of your software",
-            "statement" : {
-              "fragments" : [ {
-                "text" : "We show this name to your users when they authorise your software to interact with HMRC.",
-                "statementType" : "text"
-              }, {
-                "fragments" : [ {
-                  "text" : "It must comply with our ",
-                  "statementType" : "text"
-                }, {
-                  "text" : "naming guidelines (opens in a new tab)",
-                  "url" : "https://developer.service.hmrc.gov.uk/api-documentation/docs/using-the-hub/name-guidelines",
-                  "statementType" : "link"
-                }, {
-                  "text" : ".",
-                  "statementType" : "text"
-                } ],
-                "statementType" : "compound"
-              }, {
-                "text" : "Application name",
-                "statementType" : "text"
-              } ]
-            },
-            "questionType" : "text"
-          },
-          "askWhen" : {
-            "askWhen" : "alwaysAsk"
-          }
-        }, {
-          "question" : {
-            "id" : "57d706ad-c0b8-462b-a4f8-90e7aa58e57a",
-            "wording" : "Where are your servers that store customer information?",
-            "statement" : {
-              "fragments" : [ {
-                "text" : "Select all that apply.",
-                "statementType" : "text"
-              } ]
-            },
-            "marking" : [ {
-              "In the UK" : "pass"
-            }, {
-              "In the European Economic Area (EEA)" : "pass"
-            }, {
-              "Outside the European Economic Area" : "warn"
-            } ],
-            "questionType" : "multi"
-          },
-          "askWhen" : {
-            "contextKey" : "IN_HOUSE_SOFTWARE",
-            "expectedValue" : "No",
-            "askWhen" : "askWhenContext"
-          }
-        }, {
-          "question" : {
-            "id" : "b0ae9d71-e6a7-4cf6-abd4-7eb7ba992bc6",
-            "wording" : "Do you have a privacy policy URL for your software?",
-            "statement" : {
-              "fragments" : [ {
-                "text" : "You need a privacy policy covering the software you request production credentials for.",
-                "statementType" : "text"
-              } ]
-            },
-            "marking" : [ {
-              "Yes" : "pass"
-            }, {
-              "No" : "fail"
-            }, {
-              "The privacy policy is in desktop software" : "pass"
-            } ],
-            "questionType" : "choose"
-          },
-          "askWhen" : {
-            "askWhen" : "alwaysAsk"
-          }
-        }, {
-          "question" : {
-            "id" : "c0e4b068-23c9-4d51-a1fa-2513f50e428f",
-            "wording" : "What is your privacy policy URL?",
-            "statement" : {
-              "fragments" : [ {
-                "text" : "For example https://example.com/privacy-policy",
-                "statementType" : "text"
-              } ]
-            },
-            "validation" : {
-              "validationType" : "url"
-            },
-            "questionType" : "text"
-          },
-          "askWhen" : {
-            "questionId" : "b0ae9d71-e6a7-4cf6-abd4-7eb7ba992bc6",
-            "expectedValue" : {
-              "value" : "Yes"
-            },
-            "askWhen" : "askWhenAnswer"
-          }
-        }, {
-          "question" : {
-            "id" : "ca6af382-4007-4228-a781-1446231578b9",
-            "wording" : "Do you have a terms and conditions URL for your software?",
-            "statement" : {
-              "fragments" : [ {
-                "text" : "You need terms and conditions covering the software you request production credentials for.",
-                "statementType" : "text"
-              } ]
-            },
-            "marking" : [ {
-              "Yes" : "pass"
-            }, {
-              "No" : "fail"
-            }, {
-              "The terms and conditions are in desktop software" : "pass"
-            } ],
-            "questionType" : "choose"
-          },
-          "askWhen" : {
-            "askWhen" : "alwaysAsk"
-          }
-        }, {
-          "question" : {
-            "id" : "0a6d6973-c49a-49c3-93ff-de58daa1b90c",
-            "wording" : "What is your terms and conditions URL?",
-            "statement" : {
-              "fragments" : [ {
-                "text" : "For example https://example.com/terms-conditions",
-                "statementType" : "text"
-              } ]
-            },
-            "questionType" : "text"
-          },
-          "askWhen" : {
-            "questionId" : "ca6af382-4007-4228-a781-1446231578b9",
-            "expectedValue" : {
-              "value" : "Yes"
-            },
-            "askWhen" : "askWhenAnswer"
-          }
-        } ]
-      } ]
-    }, {
-      "heading" : "Your details",
+      "heading" : "About your organisation",
       "links" : [ {
         "id" : "ac69b129-524a-4d10-89a5-7bfa46ed95c7",
-        "label" : "Organisation details",
+        "label" : "Enter organisation details",
+        "questions" : [ {
+          "question" : {
+            "id" : "cbdf264f-be39-4638-92ff-6ecd2259c662",
+            "wording" : "What is your organisation type?",
+            "marking" : [ {
+              "UK limited company" : "pass"
+            }, {
+              "Sole trader" : "pass"
+            }, {
+              "Partnership" : "pass"
+            }, {
+              "Registered society" : "pass"
+            }, {
+              "Charitable Incorporated Organisation (CIO)" : "pass"
+            }, {
+              "Trust" : "pass"
+            }, {
+              "Non-UK company with a branch or place of business in the UK" : "warn"
+            }, {
+              "Non-UK company without a branch or place of business in the UK" : "fail"
+            } ],
+            "errorInfo" : {
+              "summary" : "Select your organisation type"
+            },
+            "questionType" : "choose"
+          },
+          "askWhen" : {
+            "askWhen" : "alwaysAsk"
+          }
+        }, {
+          "question" : {
+            "id" : "4e148791-1a07-4f28-8fe4-ba3e18cdc118",
+            "wording" : "What is the company registration number?",
+            "statement" : {
+              "fragments" : [ {
+                "fragments" : [ {
+                  "text" : "You can ",
+                  "statementType" : "text"
+                }, {
+                  "text" : "search Companies House for your company registration number (opens in new tab)",
+                  "url" : "https://find-and-update.company-information.service.gov.uk/",
+                  "statementType" : "link"
+                }, {
+                  "text" : ".",
+                  "statementType" : "text"
+                } ],
+                "statementType" : "compound"
+              } ]
+            },
+            "hintText" : {
+              "text" : "It is 8 characters. For example, 01234567 or AC012345.",
+              "statementType" : "text"
+            },
+            "absence" : [ "My organisation doesn't have a company registration", "fail" ],
+            "errorInfo" : {
+              "summary" : "Your company registration number cannot be blank",
+              "message" : "Enter your company registration number, like 01234567"
+            },
+            "questionType" : "text"
+          },
+          "askWhen" : {
+            "questionId" : "cbdf264f-be39-4638-92ff-6ecd2259c662",
+            "expectedValue" : {
+              "value" : "UK limited company"
+            },
+            "askWhen" : "askWhenAnswer"
+          }
+        }, {
+          "question" : {
+            "id" : "a2dbf1a7-e31b-4c89-a755-21f0652ca9cc",
+            "wording" : "What is your organisation’s name?",
+            "validation" : {
+              "validationType" : "organisationName"
+            },
+            "errorInfo" : {
+              "summary" : "Your organsation name cannot be blank",
+              "message" : "Enter your organisation name"
+            },
+            "questionType" : "text"
+          },
+          "askWhen" : {
+            "askWhen" : "alwaysAsk"
+          }
+        }, {
+          "question" : {
+            "id" : "e1dbf1a3-e28b-1c83-a739-86f1319ca8cc",
+            "wording" : "What is your organisation’s address?",
+            "errorInfo" : {
+              "summary" : "Your organsation address cannot be blank",
+              "message" : "Enter your organisation address"
+            },
+            "questionType" : "text"
+          },
+          "askWhen" : {
+            "askWhen" : "alwaysAsk"
+          }
+        }, {
+          "question" : {
+            "id" : "6be23951-ac69-47bf-aa56-86d3d690ee0b",
+            "wording" : "What is your Corporation Tax Unique Taxpayer Reference (UTR)?",
+            "statement" : {
+              "fragments" : [ {
+                "fragments" : [ {
+                  "text" : "It will be on tax returns and other letters about Corporation Tax. It may be called ‘reference’, ‘UTR’ or ‘official use’. You can ",
+                  "statementType" : "text"
+                }, {
+                  "text" : "find a lost UTR number (opens in new tab)",
+                  "url" : "https://www.gov.uk/find-lost-utr-number",
+                  "statementType" : "link"
+                }, {
+                  "text" : ".",
+                  "statementType" : "text"
+                } ],
+                "statementType" : "compound"
+              } ]
+            },
+            "hintText" : {
+              "text" : "Your UTR can be 10 or 13 digits long.",
+              "statementType" : "text"
+            },
+            "errorInfo" : {
+              "summary" : "Your Corporation Tax Unique Taxpayer Reference cannot be blank",
+              "message" : "Enter your Corporation Tax Unique Taxpayer Reference, like 1234567890"
+            },
+            "questionType" : "text"
+          },
+          "askWhen" : {
+            "askWhen" : "alwaysAsk"
+          }
+        } ]
+      }, {
+        "id" : "ac69b129-524a-4d10-89a5-7bfa46ed95c7",
+        "label" : "Enter responsible individual details",
         "questions" : [ {
           "question" : {
             "id" : "99d9362d-e365-4af1-aa46-88e95f9858f7",
@@ -340,14 +205,28 @@
           }
         }, {
           "question" : {
+            "id" : "18b4e672-43fc-8b33-9f83-7d324908496",
+            "wording" : "What is the responsible individual's job title in your organisation?",
+            "label" : "Job title",
+            "errorInfo" : {
+              "summary" : "Enter a job title",
+              "message" : "Job title cannot be blank"
+            },
+            "questionType" : "text"
+          },
+          "askWhen" : {
+            "askWhen" : "alwaysAsk"
+          }
+        }, {
+          "question" : {
             "id" : "fb9b8036-cc88-4f4e-ad84-c02caa4cebae",
             "wording" : "Give us the email address of the individual responsible for the software",
-            "afterStatement" : {
+            "statement" : {
               "fragments" : [ {
-                "text" : "We will email a verification link to the responsible individual that expires in 10 working days.",
+                "text" : "We will use this email to invite the responsible individual to create an account on the Developer Hub.",
                 "statementType" : "text"
               }, {
-                "text" : "The responsible individual must verify before we can process your request for production credentials.",
+                "text" : "The responsible individual must verify before your registration can be completed.",
                 "statementType" : "text"
               } ]
             },
@@ -374,8 +253,32 @@
           }
         }, {
           "question" : {
-            "id" : "b9dbf0a5-e72b-4c89-a735-26f0858ca6cc",
-            "wording" : "What is your organisation’s URL?",
+            "id" : "a27b8039-cc32-4f2e-ad88-c96caa1cebae",
+            "wording" : "Give us the telephone number of the individual responsible for the software",
+            "statement" : {
+              "fragments" : [ {
+                "text" : "We'll only use this to contact you about your organisation's Developer Hub account.",
+                "statementType" : "text"
+              } ]
+            },
+            "label" : "Telephone",
+            "hintText" : {
+              "text" : "You can enter an organisation, personal or extension number. Include the country code for international numbers.",
+              "statementType" : "text"
+            },
+            "errorInfo" : {
+              "summary" : "Enter a telephone number",
+              "message" : "Telephone number cannot be blank"
+            },
+            "questionType" : "text"
+          },
+          "askWhen" : {
+            "askWhen" : "alwaysAsk"
+          }
+        }, {
+          "question" : {
+            "id" : "b2dbf6a1-e39b-4c38-a524-19f0854ca1cc",
+            "wording" : "What is your organisation’s website address?",
             "hintText" : {
               "text" : "For example https://example.com",
               "statementType" : "text"
@@ -385,254 +288,31 @@
             },
             "absence" : [ "My organisation doesn't have a website", "fail" ],
             "errorInfo" : {
-              "summary" : "Enter a URL in the correct format, like https://example.com"
+              "summary" : "Enter a website address in the correct format, like https://example.com",
+              "message" : "Enter a URL in the correct format, like https://example.com"
             },
             "questionType" : "text"
           },
           "askWhen" : {
             "askWhen" : "alwaysAsk"
-          }
-        }, {
-          "question" : {
-            "id" : "cbdf264f-be39-4638-92ff-6ecd2259c662",
-            "wording" : "Identify your organisation",
-            "statement" : {
-              "fragments" : [ {
-                "text" : "Provide evidence that you or your organisation is officially registered in the UK. Choose one option.",
-                "statementType" : "text"
-              } ]
-            },
-            "marking" : [ {
-              "Unique Taxpayer Reference (UTR)" : "pass"
-            }, {
-              "VAT registration number" : "pass"
-            }, {
-              "Corporation Tax Unique Taxpayer Reference (UTR)" : "pass"
-            }, {
-              "PAYE reference" : "pass"
-            }, {
-              "My organisation is in the UK and doesn't have any of these" : "pass"
-            }, {
-              "My organisation is outside the UK and doesn't have any of these" : "warn"
-            } ],
-            "errorInfo" : {
-              "summary" : "Select a way to identify your organisation"
-            },
-            "questionType" : "choose"
-          },
-          "askWhen" : {
-            "askWhen" : "alwaysAsk"
-          }
-        }, {
-          "question" : {
-            "id" : "4e148791-1a07-4f28-8fe4-ba3e18cdc118",
-            "wording" : "What is your company registration number?",
-            "statement" : {
-              "fragments" : [ {
-                "fragments" : [ {
-                  "text" : "You can ",
-                  "statementType" : "text"
-                }, {
-                  "text" : "search Companies House for your company registration number (opens in new tab)",
-                  "url" : "https://find-and-update.company-information.service.gov.uk/",
-                  "statementType" : "link"
-                }, {
-                  "text" : ".",
-                  "statementType" : "text"
-                } ],
-                "statementType" : "compound"
-              } ]
-            },
-            "hintText" : {
-              "text" : "It is 8 characters. For example, 01234567 or AC012345.",
-              "statementType" : "text"
-            },
-            "absence" : [ "My organisation doesn't have a company registration", "fail" ],
-            "errorInfo" : {
-              "summary" : "Your company registration number cannot be blank",
-              "message" : "Enter your company registration number, like 01234567"
-            },
-            "questionType" : "text"
-          },
-          "askWhen" : {
-            "questionId" : "cbdf264f-be39-4638-92ff-6ecd2259c662",
-            "expectedValue" : {
-              "value" : "My organisation is in the UK and doesn't have any of these"
-            },
-            "askWhen" : "askWhenAnswer"
-          }
-        }, {
-          "question" : {
-            "id" : "55da0b97-178c-45b5-a139-b61ad7b9ca84",
-            "wording" : "What is your Self Assessment Unique Taxpayer Reference?",
-            "hintText" : {
-              "fragments" : [ {
-                "text" : "This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Self Assessment. It may be called ‘reference’, ‘UTR’ or ‘official use’. You can ",
-                "statementType" : "text"
-              }, {
-                "text" : "find a lost UTR number (opens in new tab)",
-                "url" : "https://www.gov.uk/find-lost-utr-number",
-                "statementType" : "link"
-              }, {
-                "text" : ".",
-                "statementType" : "text"
-              } ],
-              "statementType" : "compound"
-            },
-            "errorInfo" : {
-              "summary" : "Your Self Assessment Unique Taxpayer Reference cannot be blank",
-              "message" : "Enter your Self Assessment Unique Taxpayer Reference, like 1234567890"
-            },
-            "questionType" : "text"
-          },
-          "askWhen" : {
-            "questionId" : "cbdf264f-be39-4638-92ff-6ecd2259c662",
-            "expectedValue" : {
-              "value" : "Unique Taxpayer Reference (UTR)"
-            },
-            "askWhen" : "askWhenAnswer"
-          }
-        }, {
-          "question" : {
-            "id" : "dd12fd8b-907b-4ba1-95d3-ef6317f36199",
-            "wording" : "What is your company’s VAT registration number?",
-            "hintText" : {
-              "text" : "This is 9 numbers, sometimes with ‘GB’ at the start, for example 123456789 or GB123456789. You can find it on your company’s VAT registration certificate.",
-              "statementType" : "text"
-            },
-            "errorInfo" : {
-              "summary" : "Your company's VAT registration number cannot be blank",
-              "message" : "Enter your company's VAT registration number, like 123456789"
-            },
-            "questionType" : "text"
-          },
-          "askWhen" : {
-            "questionId" : "cbdf264f-be39-4638-92ff-6ecd2259c662",
-            "expectedValue" : {
-              "value" : "VAT registration number"
-            },
-            "askWhen" : "askWhenAnswer"
-          }
-        }, {
-          "question" : {
-            "id" : "6be23951-ac69-47bf-aa56-86d3d690ee0b",
-            "wording" : "What is your Corporation Tax Unique Taxpayer Reference?",
-            "hintText" : {
-              "fragments" : [ {
-                "text" : "This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Corporation Tax. It may be called ‘reference’, ‘UTR’ or ‘official use’. You can ",
-                "statementType" : "text"
-              }, {
-                "text" : "find a lost UTR number (opens in new tab)",
-                "url" : "https://www.gov.uk/find-lost-utr-number",
-                "statementType" : "link"
-              }, {
-                "text" : ".",
-                "statementType" : "text"
-              } ],
-              "statementType" : "compound"
-            },
-            "errorInfo" : {
-              "summary" : "Your Corporation Tax Unique Taxpayer Reference cannot be blank",
-              "message" : "Enter your Corporation Tax Unique Taxpayer Reference, like 1234567890"
-            },
-            "questionType" : "text"
-          },
-          "askWhen" : {
-            "questionId" : "cbdf264f-be39-4638-92ff-6ecd2259c662",
-            "expectedValue" : {
-              "value" : "Corporation Tax Unique Taxpayer Reference (UTR)"
-            },
-            "askWhen" : "askWhenAnswer"
-          }
-        }, {
-          "question" : {
-            "id" : "a143760e-72f3-423b-a6b4-558db37a3453",
-            "wording" : "What is your company’s employer PAYE reference?",
-            "hintText" : {
-              "text" : "This is a 3 digit tax office number, a forward slash, and a tax office employer reference, like 123/AB456. It may be called ‘Employer PAYE reference’ or ‘PAYE reference’. It will be on your P60.",
-              "statementType" : "text"
-            },
-            "errorInfo" : {
-              "summary" : "Your company's employer PAYE reference number cannot be blank",
-              "message" : "Enter your company's employer PAYE reference number, like 123/AB456"
-            },
-            "questionType" : "text"
-          },
-          "askWhen" : {
-            "questionId" : "cbdf264f-be39-4638-92ff-6ecd2259c662",
-            "expectedValue" : {
-              "value" : "PAYE reference"
-            },
-            "askWhen" : "askWhenAnswer"
-          }
-        }, {
-          "question" : {
-            "id" : "a12f314e-bc12-4e0d-87ba-1326acb31008",
-            "wording" : "Provide evidence of your organisation’s registration",
-            "statement" : {
-              "fragments" : [ {
-                "text" : "You will need to provide evidence that your organisation is officially registered in a country outside of the UK.",
-                "statementType" : "text"
-              }, {
-                "text" : "You will be asked for a digital copy of the official registration document.",
-                "statementType" : "text"
-              } ]
-            },
-            "questionType" : "acknowledgement"
-          },
-          "askWhen" : {
-            "questionId" : "cbdf264f-be39-4638-92ff-6ecd2259c662",
-            "expectedValue" : {
-              "value" : "My organisation is outside the UK and doesn't have any of these"
-            },
-            "askWhen" : "askWhenAnswer"
           }
         } ]
       } ]
     } ],
     "questionIdsOfInterest" : {
-      "applicationNameId" : "4d5a41c8-8727-4d09-96c0-e2ce1bc222d3",
-      "privacyPolicyId" : "b0ae9d71-e6a7-4cf6-abd4-7eb7ba992bc6",
-      "privacyPolicyUrlId" : "c0e4b068-23c9-4d51-a1fa-2513f50e428f",
-      "termsAndConditionsId" : "ca6af382-4007-4228-a781-1446231578b9",
-      "termsAndConditionsUrlId" : "0a6d6973-c49a-49c3-93ff-de58daa1b90c",
-      "organisationUrlId" : "b9dbf0a5-e72b-4c89-a735-26f0858ca6cc",
-      "responsibleIndividualIsRequesterId" : "99d9362d-e365-4af1-aa46-88e95f9858f7",
-      "responsibleIndividualNameId" : "36b7e670-83fc-4b31-8f85-4d3394908495",
-      "responsibleIndividualEmailId" : "fb9b8036-cc88-4f4e-ad84-c02caa4cebae",
-      "identifyYourOrganisationId" : "cbdf264f-be39-4638-92ff-6ecd2259c662",
-      "serverLocationsId" : "57d706ad-c0b8-462b-a4f8-90e7aa58e57a"
+      "organisationTypeId" : "cbdf264f-be39-4638-92ff-6ecd2259c662",
+      "organisationNameId" : "a2dbf1a7-e31b-4c89-a755-21f0652ca9cc"
     },
     "instances" : [ {
       "index" : 0,
       "answersToQuestions" : {
-        "fb9b8036-cc88-4f4e-ad84-c02caa4cebae" : {
-          "value" : "bob@example.com",
-          "answerType" : "text"
-        },
-        "36b7e670-83fc-4b31-8f85-4d3394908495" : {
-          "value" : "Bob Cratchett",
-          "answerType" : "text"
-        },
-        "4d5a41c8-8727-4d09-96c0-e2ce1bc222d3" : {
-          "value" : "expectedAppName",
-          "answerType" : "text"
-        },
-        "99d9362d-e365-4af1-aa46-88e95f9858f7" : {
-          "value" : "No",
+        "cbdf264f-be39-4638-92ff-6ecd2259c662" : {
+          "value" : "UK limited company",
           "answerType" : "singleChoice"
         },
-        "b0ae9d71-e6a7-4cf6-abd4-7eb7ba992bc6" : {
-          "value" : "No",
-          "answerType" : "singleChoice"
-        },
-        "ca6af382-4007-4228-a781-1446231578b9" : {
-          "value" : "No",
-          "answerType" : "singleChoice"
-        },
-        "57d706ad-c0b8-462b-a4f8-90e7aa58e57a" : {
-          "values" : [ "In the UK", "Outside the EEA with adequacy agreements" ],
-          "answerType" : "multipleChoice"
+        "a2dbf1a7-e31b-4c89-a755-21f0652ca9cc" : {
+          "value" : "Bobs Burgers",
+          "answerType" : "text"
         }
       },
       "statusHistory" : [ {
@@ -652,17 +332,9 @@
     }
   },
   "questionnaireProgress" : {
-    "796336a5-f7b4-4dad-8003-a818e342cbb4" : {
-      "state" : "NotStarted",
-      "questionsToAsk" : [ "653d2ee4-09cf-46a0-bc73-350a385ae860", "6139f57d-36ab-4338-85b3-a2079d6cf376", "3c5cd29d-bec2-463f-8593-cd5412fab1e5" ]
-    },
     "ac69b129-524a-4d10-89a5-7bfa46ed95c7" : {
       "state" : "InProgress",
-      "questionsToAsk" : [ "b9dbf0a5-e72b-4c89-a735-26f0858ca6cc", "a12f314e-bc12-4e0d-87ba-1326acb31008" ]
-    },
-    "3a7f3369-8e28-447c-bd47-efbabeb6d93f" : {
-      "state" : "Completed",
-      "questionsToAsk" : [ ]
+      "questionsToAsk" : [ "cbdf264f-be39-4638-92ff-6ecd2259c662", "e1dbf1a3-e28b-1c83-a739-86f1319ca8cc" ]
     },
     "1e4a1369-8e28-447c-bd47-efbabec1a43b" : {
       "state" : "NotApplicable",

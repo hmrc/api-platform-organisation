@@ -21,69 +21,89 @@ import scala.collection.immutable.ListMap
 import cats.data.NonEmptyList
 import cats.implicits._
 
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.AskWhen.Context.Keys
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
 
 trait QuestionnaireTestData {
 
-  object DevelopmentPractices {
+  object OrganisationDetails {
 
-    val question1 = Question.YesNoQuestion(
-      Question.Id("653d2ee4-09cf-46a0-bc73-350a385ae860"),
-      Wording("Do your development practices follow our guidance?"),
-      Some(Statement(
-        CompoundFragment(
-          StatementText("You must develop software following our"),
-          StatementLink("development practices (opens in a new tab)", "https://developer.service.hmrc.gov.uk/api-documentation/docs/development-practices"),
-          StatementText(".")
-        )
-      )),
-      yesMarking = Mark.Pass,
-      noMarking = Mark.Warn
+    val question1 = Question.ChooseOneOfQuestion(
+      Question.Id("cbdf264f-be39-4638-92ff-6ecd2259c662"),
+      Wording("What is your organisation type?"),
+      statement = None,
+      marking = ListMap(
+        (PossibleAnswer("UK limited company")                                             -> Mark.Pass),
+        (PossibleAnswer("Sole trader")                                                    -> Mark.Pass),
+        (PossibleAnswer("Partnership")                                                    -> Mark.Pass),
+        (PossibleAnswer("Registered society")                                             -> Mark.Pass),
+        (PossibleAnswer("Charitable Incorporated Organisation (CIO)")                     -> Mark.Pass),
+        (PossibleAnswer("Trust")                                                          -> Mark.Pass),
+        (PossibleAnswer("Non-UK company with a branch or place of business in the UK")    -> Mark.Warn),
+        (PossibleAnswer("Non-UK company without a branch or place of business in the UK") -> Mark.Fail)
+      ),
+      errorInfo = ErrorInfo("Select your organisation type").some
     )
 
-    val question2 = Question.YesNoQuestion(
-      Question.Id("6139f57d-36ab-4338-85b3-a2079d6cf376"),
-      Wording("Does your error handling meet our specification?"),
-      Some(Statement(
+    val question2a = Question.TextQuestion(
+      Question.Id("4e148791-1a07-4f28-8fe4-ba3e18cdc118"),
+      Wording("What is the company registration number?"),
+      statement = Statement(
         CompoundFragment(
-          StatementText("We will check for evidence that you comply with our"),
-          StatementLink("error handling specification (opens in new tab)", "https://developer.service.hmrc.gov.uk/api-documentation/docs/reference-guide#errors"),
+          StatementText("You can "),
+          StatementLink("search Companies House for your company registration number (opens in new tab)", "https://find-and-update.company-information.service.gov.uk/"),
           StatementText(".")
         )
-      )),
-      yesMarking = Mark.Pass,
-      noMarking = Mark.Fail
+      ).some,
+      hintText = StatementText("It is 8 characters. For example, 01234567 or AC012345.").some,
+      absence = Tuple2("My organisation doesn't have a company registration", Mark.Fail).some,
+      errorInfo = ErrorInfo("Your company registration number cannot be blank", "Enter your company registration number, like 01234567").some
     )
 
-    val question3 = Question.YesNoQuestion(
-      Question.Id("3c5cd29d-bec2-463f-8593-cd5412fab1e5"),
-      Wording("Does your software meet accessibility standards?"),
-      Some(Statement(
+    val question2b = Question.TextQuestion(
+      Question.Id("a2dbf1a7-e31b-4c89-a755-21f0652ca9cc"),
+      Wording("What is your organisation’s name?"),
+      statement = None,
+      validation = TextValidation.OrganisationName.some,
+      errorInfo = ErrorInfo("Your organsation name cannot be blank", "Enter your organisation name").some
+    )
+
+    val question2c = Question.TextQuestion(
+      Question.Id("e1dbf1a3-e28b-1c83-a739-86f1319ca8cc"),
+      Wording("What is your organisation’s address?"),
+      statement = None,
+      errorInfo = ErrorInfo("Your organsation address cannot be blank", "Enter your organisation address").some
+    )
+
+    val question2d = Question.TextQuestion(
+      Question.Id("6be23951-ac69-47bf-aa56-86d3d690ee0b"),
+      Wording("What is your Corporation Tax Unique Taxpayer Reference (UTR)?"),
+      statement = Statement(
         CompoundFragment(
-          StatementText("Web-based software must meet level AA of the"),
-          StatementLink("Web Content Accessibility Guidelines (WCAG) (opens in new tab)", "https://www.w3.org/WAI/standards-guidelines/wcag/"),
-          StatementText(". Desktop software should follow equivalent offline standards.")
+          StatementText("It will be on tax returns and other letters about Corporation Tax. It may be called ‘reference’, ‘UTR’ or ‘official use’. You can "),
+          StatementLink("find a lost UTR number (opens in new tab)", "https://www.gov.uk/find-lost-utr-number"),
+          StatementText(".")
         )
-      )),
-      yesMarking = Mark.Pass,
-      noMarking = Mark.Warn
+      ).some,
+      hintText = StatementText("Your UTR can be 10 or 13 digits long.").some,
+      errorInfo = ErrorInfo("Your Corporation Tax Unique Taxpayer Reference cannot be blank", "Enter your Corporation Tax Unique Taxpayer Reference, like 1234567890").some
     )
 
     val questionnaire = Questionnaire(
-      id = Questionnaire.Id("796336a5-f7b4-4dad-8003-a818e342cbb4"),
-      label = Questionnaire.Label("Development practices"),
+      id = Questionnaire.Id("ac69b129-524a-4d10-89a5-7bfa46ed95c7"),
+      label = Questionnaire.Label("Enter organisation details"),
       questions = NonEmptyList.of(
         QuestionItem(question1),
-        QuestionItem(question2),
-        QuestionItem(question3)
+        QuestionItem(question2a, AskWhen.AskWhenAnswer(question1, "UK limited company")),
+        QuestionItem(question2b),
+        QuestionItem(question2c),
+        QuestionItem(question2d)
       )
     )
   }
 
-  object OrganisationDetails {
+  object ResponsibleIndividualDetails {
 
-    val questionRI1 = Question.YesNoQuestion(
+    val question1 = Question.YesNoQuestion(
       Question.Id("99d9362d-e365-4af1-aa46-88e95f9858f7"),
       Wording("Are you the individual responsible for the software in your organisation?"),
       statement = Statement(
@@ -104,7 +124,7 @@ trait QuestionnaireTestData {
       errorInfo = ErrorInfo("Select Yes if you are the individual responsible for the software in your organisation").some
     )
 
-    val questionRI2 = Question.TextQuestion(
+    val question2 = Question.TextQuestion(
       Question.Id("36b7e670-83fc-4b31-8f85-4d3394908495"),
       Wording("Who is responsible for the software in your organisation?"),
       statement = None,
@@ -112,13 +132,20 @@ trait QuestionnaireTestData {
       errorInfo = ErrorInfo("Enter a first and last name", "First and last name cannot be blank").some
     )
 
-    val questionRI3 = Question.TextQuestion(
+    val question3 = Question.TextQuestion(
+      Question.Id("18b4e672-43fc-8b33-9f83-7d324908496"),
+      Wording("What is the responsible individual's job title in your organisation?"),
+      statement = None,
+      label = Question.Label("Job title").some,
+      errorInfo = ErrorInfo("Enter a job title", "Job title cannot be blank").some
+    )
+
+    val question4 = Question.TextQuestion(
       Question.Id("fb9b8036-cc88-4f4e-ad84-c02caa4cebae"),
       Wording("Give us the email address of the individual responsible for the software"),
-      statement = None,
-      afterStatement = Statement(
-        StatementText("We will email a verification link to the responsible individual that expires in 10 working days."),
-        StatementText("The responsible individual must verify before we can process your request for production credentials.")
+      statement = Statement(
+        StatementText("We will use this email to invite the responsible individual to create an account on the Developer Hub."),
+        StatementText("The responsible individual must verify before your registration can be completed.")
       ).some,
       label = Question.Label("Email address").some,
       hintText = StatementText("Cannot be a shared mailbox").some,
@@ -126,219 +153,37 @@ trait QuestionnaireTestData {
       errorInfo = ErrorInfo("Enter an email address in the correct format, like yourname@example.com", "Email address cannot be blank").some
     )
 
-    val question1 = Question.TextQuestion(
-      Question.Id("b9dbf0a5-e72b-4c89-a735-26f0858ca6cc"),
-      Wording("What is your organisation’s URL?"),
+    val question5 = Question.TextQuestion(
+      Question.Id("a27b8039-cc32-4f2e-ad88-c96caa1cebae"),
+      Wording("Give us the telephone number of the individual responsible for the software"),
+      statement = Statement(
+        StatementText("We'll only use this to contact you about your organisation's Developer Hub account.")
+      ).some,
+      label = Question.Label("Telephone").some,
+      hintText = StatementText("You can enter an organisation, personal or extension number. Include the country code for international numbers.").some,
+      errorInfo = ErrorInfo("Enter a telephone number", "Telephone number cannot be blank").some
+    )
+
+    val question6 = Question.TextQuestion(
+      Question.Id("b2dbf6a1-e39b-4c38-a524-19f0854ca1cc"),
+      Wording("What is your organisation’s website address?"),
       statement = None,
       hintText = StatementText("For example https://example.com").some,
       absence = ("My organisation doesn't have a website", Mark.Fail).some,
       validation = TextValidation.Url.some,
-      errorInfo = ErrorInfo("Enter a URL in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some
-    )
-
-    val question2 = Question.ChooseOneOfQuestion(
-      Question.Id("cbdf264f-be39-4638-92ff-6ecd2259c662"),
-      Wording("Identify your organisation"),
-      statement = Statement(
-        StatementText("Provide evidence that you or your organisation is officially registered in the UK. Choose one option.")
-      ).some,
-      marking = ListMap(
-        (PossibleAnswer("Unique Taxpayer Reference (UTR)")                                 -> Mark.Pass),
-        (PossibleAnswer("VAT registration number")                                         -> Mark.Pass),
-        (PossibleAnswer("Corporation Tax Unique Taxpayer Reference (UTR)")                 -> Mark.Pass),
-        (PossibleAnswer("PAYE reference")                                                  -> Mark.Pass),
-        (PossibleAnswer("My organisation is in the UK and doesn't have any of these")      -> Mark.Pass),
-        (PossibleAnswer("My organisation is outside the UK and doesn't have any of these") -> Mark.Warn)
-      ),
-      errorInfo = ErrorInfo("Select a way to identify your organisation").some
-    )
-
-    val question2a = Question.TextQuestion(
-      Question.Id("4e148791-1a07-4f28-8fe4-ba3e18cdc118"),
-      Wording("What is your company registration number?"),
-      statement = Statement(
-        CompoundFragment(
-          StatementText("You can "),
-          StatementLink("search Companies House for your company registration number (opens in new tab)", "https://find-and-update.company-information.service.gov.uk/"),
-          StatementText(".")
-        )
-      ).some,
-      hintText = StatementText("It is 8 characters. For example, 01234567 or AC012345.").some,
-      absence = Tuple2("My organisation doesn't have a company registration", Mark.Fail).some,
-      errorInfo = ErrorInfo("Your company registration number cannot be blank", "Enter your company registration number, like 01234567").some
-    )
-
-    val question2b = Question.TextQuestion(
-      Question.Id("55da0b97-178c-45b5-a139-b61ad7b9ca84"),
-      Wording("What is your Self Assessment Unique Taxpayer Reference?"),
-      statement = None,
-      hintText =
-        CompoundFragment(
-          StatementText("This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Self Assessment. It may be called ‘reference’, ‘UTR’ or ‘official use’. You can "),
-          StatementLink("find a lost UTR number (opens in new tab)", "https://www.gov.uk/find-lost-utr-number"),
-          StatementText(".")
-        ).some,
-      errorInfo = ErrorInfo("Your Self Assessment Unique Taxpayer Reference cannot be blank", "Enter your Self Assessment Unique Taxpayer Reference, like 1234567890").some
-    )
-
-    val question2c = Question.TextQuestion(
-      Question.Id("dd12fd8b-907b-4ba1-95d3-ef6317f36199"),
-      Wording("What is your company’s VAT registration number?"),
-      statement = None,
-      hintText =
-        StatementText("This is 9 numbers, sometimes with ‘GB’ at the start, for example 123456789 or GB123456789. You can find it on your company’s VAT registration certificate.").some,
-      errorInfo = ErrorInfo("Your company's VAT registration number cannot be blank", "Enter your company's VAT registration number, like 123456789").some
-    )
-
-    val question2d = Question.TextQuestion(
-      Question.Id("6be23951-ac69-47bf-aa56-86d3d690ee0b"),
-      Wording("What is your Corporation Tax Unique Taxpayer Reference?"),
-      statement = None,
-      hintText =
-        CompoundFragment(
-          StatementText("This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Corporation Tax. It may be called ‘reference’, ‘UTR’ or ‘official use’. You can "),
-          StatementLink("find a lost UTR number (opens in new tab)", "https://www.gov.uk/find-lost-utr-number"),
-          StatementText(".")
-        ).some,
-      errorInfo = ErrorInfo("Your Corporation Tax Unique Taxpayer Reference cannot be blank", "Enter your Corporation Tax Unique Taxpayer Reference, like 1234567890").some
-    )
-
-    val question2e = Question.TextQuestion(
-      Question.Id("a143760e-72f3-423b-a6b4-558db37a3453"),
-      Wording("What is your company’s employer PAYE reference?"),
-      statement = None,
-      hintText = StatementText(
-        "This is a 3 digit tax office number, a forward slash, and a tax office employer reference, like 123/AB456. It may be called ‘Employer PAYE reference’ or ‘PAYE reference’. It will be on your P60."
-      ).some,
-      errorInfo = ErrorInfo("Your company's employer PAYE reference number cannot be blank", "Enter your company's employer PAYE reference number, like 123/AB456").some
-    )
-
-    val question3 = Question.AcknowledgementOnly(
-      Question.Id("a12f314e-bc12-4e0d-87ba-1326acb31008"),
-      Wording("Provide evidence of your organisation’s registration"),
-      statement = Statement(
-        StatementText("You will need to provide evidence that your organisation is officially registered in a country outside of the UK."),
-        StatementText("You will be asked for a digital copy of the official registration document.")
-      ).some
+      errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some
     )
 
     val questionnaire = Questionnaire(
       id = Questionnaire.Id("ac69b129-524a-4d10-89a5-7bfa46ed95c7"),
-      label = Questionnaire.Label("Organisation details"),
-      questions = NonEmptyList.of(
-        QuestionItem(questionRI1),
-        QuestionItem(questionRI2, AskWhen.AskWhenAnswer(questionRI1, "No")),
-        QuestionItem(questionRI3, AskWhen.AskWhenAnswer(questionRI1, "No")),
-        QuestionItem(question1),
-        QuestionItem(question2),
-        QuestionItem(question2a, AskWhen.AskWhenAnswer(question2, "My organisation is in the UK and doesn't have any of these")),
-        QuestionItem(question2b, AskWhen.AskWhenAnswer(question2, "Unique Taxpayer Reference (UTR)")),
-        QuestionItem(question2c, AskWhen.AskWhenAnswer(question2, "VAT registration number")),
-        QuestionItem(question2d, AskWhen.AskWhenAnswer(question2, "Corporation Tax Unique Taxpayer Reference (UTR)")),
-        QuestionItem(question2e, AskWhen.AskWhenAnswer(question2, "PAYE reference")),
-        QuestionItem(question3, AskWhen.AskWhenAnswer(question2, "My organisation is outside the UK and doesn't have any of these"))
-      )
-    )
-  }
-
-  object CustomersAuthorisingYourSoftware {
-
-    val question1 = Question.AcknowledgementOnly(
-      Question.Id("95da25e8-af3a-4e05-a621-4a5f4ca788f6"),
-      Wording("Customers authorising your software"),
-      Some(Statement(
-        StatementText("Your customers will see the information you provide here when they authorise your software to interact with HMRC."),
-        StatementText("Before you continue, you will need:"),
-        StatementBullets(
-          StatementText("the name of your software"),
-          StatementText("the location of your servers which store customer data"),
-          StatementText("a link to your privacy policy"),
-          StatementText("a link to your terms and conditions")
-        )
-      ))
-    )
-
-    val question2 = Question.TextQuestion(
-      Question.Id("4d5a41c8-8727-4d09-96c0-e2ce1bc222d3"),
-      Wording("Confirm the name of your software"),
-      Some(Statement(
-        StatementText("We show this name to your users when they authorise your software to interact with HMRC."),
-        CompoundFragment(
-          StatementText("It must comply with our "),
-          StatementLink("naming guidelines (opens in a new tab)", "https://developer.service.hmrc.gov.uk/api-documentation/docs/using-the-hub/name-guidelines"),
-          StatementText(".")
-        ),
-        StatementText("Application name")
-      ))
-    )
-
-    val question3 = Question.MultiChoiceQuestion(
-      Question.Id("57d706ad-c0b8-462b-a4f8-90e7aa58e57a"),
-      Wording("Where are your servers that store customer information?"),
-      Some(Statement(
-        StatementText("Select all that apply.")
-      )),
-      marking = ListMap(
-        (PossibleAnswer("In the UK")                           -> Mark.Pass),
-        (PossibleAnswer("In the European Economic Area (EEA)") -> Mark.Pass),
-        (PossibleAnswer("Outside the European Economic Area")  -> Mark.Warn)
-      )
-    )
-
-    val question4 = Question.ChooseOneOfQuestion(
-      Question.Id("b0ae9d71-e6a7-4cf6-abd4-7eb7ba992bc6"),
-      Wording("Do you have a privacy policy URL for your software?"),
-      Some(Statement(
-        StatementText("You need a privacy policy covering the software you request production credentials for.")
-      )),
-      marking = ListMap(
-        (PossibleAnswer("Yes")                                       -> Mark.Pass),
-        (PossibleAnswer("No")                                        -> Mark.Fail),
-        (PossibleAnswer("The privacy policy is in desktop software") -> Mark.Pass)
-      )
-    )
-
-    val question5 = Question.TextQuestion(
-      Question.Id("c0e4b068-23c9-4d51-a1fa-2513f50e428f"),
-      Wording("What is your privacy policy URL?"),
-      Some(Statement(
-        StatementText("For example https://example.com/privacy-policy")
-      )),
-      validation = TextValidation.Url.some
-    )
-
-    val question6 = Question.ChooseOneOfQuestion(
-      Question.Id("ca6af382-4007-4228-a781-1446231578b9"),
-      Wording("Do you have a terms and conditions URL for your software?"),
-      Some(Statement(
-        StatementText("You need terms and conditions covering the software you request production credentials for.")
-      )),
-      marking = ListMap(
-        (PossibleAnswer("Yes")                                              -> Mark.Pass),
-        (PossibleAnswer("No")                                               -> Mark.Fail),
-        (PossibleAnswer("The terms and conditions are in desktop software") -> Mark.Pass)
-      )
-    )
-
-    val question7 = Question.TextQuestion(
-      Question.Id("0a6d6973-c49a-49c3-93ff-de58daa1b90c"),
-      Wording("What is your terms and conditions URL?"),
-      Some(Statement(
-        StatementText("For example https://example.com/terms-conditions")
-      ))
-    )
-
-    val questionnaire = Questionnaire(
-      id = Questionnaire.Id("3a7f3369-8e28-447c-bd47-efbabeb6d93f"),
-      label = Questionnaire.Label("Customers authorising your software"),
+      label = Questionnaire.Label("Enter responsible individual details"),
       questions = NonEmptyList.of(
         QuestionItem(question1),
-        QuestionItem(question2),
-        QuestionItem(question3, AskWhen.AskWhenContext(Keys.IN_HOUSE_SOFTWARE, "No")),
-        QuestionItem(question4),
-        QuestionItem(question5, AskWhen.AskWhenAnswer(question4, "Yes")),
-        QuestionItem(question6),
-        QuestionItem(question7, AskWhen.AskWhenAnswer(question6, "Yes"))
+        QuestionItem(question2, AskWhen.AskWhenAnswer(question1, "No")),
+        QuestionItem(question3),
+        QuestionItem(question4, AskWhen.AskWhenAnswer(question1, "No")),
+        QuestionItem(question5),
+        QuestionItem(question6)
       )
     )
   }
@@ -346,40 +191,20 @@ trait QuestionnaireTestData {
   val testGroups =
     NonEmptyList.of(
       GroupOfQuestionnaires(
-        heading = "Your processes",
+        heading = "About your organisation",
         links = NonEmptyList.of(
-          DevelopmentPractices.questionnaire
-        )
-      ),
-      GroupOfQuestionnaires(
-        heading = "Your software",
-        links = NonEmptyList.of(
-          CustomersAuthorisingYourSoftware.questionnaire
-        )
-      ),
-      GroupOfQuestionnaires(
-        heading = "Your details",
-        links = NonEmptyList.of(
-          OrganisationDetails.questionnaire
+          OrganisationDetails.questionnaire,
+          ResponsibleIndividualDetails.questionnaire
         )
       )
     )
 
   val testQuestionIdsOfInterest = QuestionIdsOfInterest(
-    responsibleIndividualIsRequesterId = OrganisationDetails.questionRI1.id,
-    responsibleIndividualNameId = OrganisationDetails.questionRI2.id,
-    responsibleIndividualEmailId = OrganisationDetails.questionRI3.id,
-    applicationNameId = CustomersAuthorisingYourSoftware.question2.id,
-    privacyPolicyId = CustomersAuthorisingYourSoftware.question4.id,
-    privacyPolicyUrlId = CustomersAuthorisingYourSoftware.question5.id,
-    termsAndConditionsId = CustomersAuthorisingYourSoftware.question6.id,
-    termsAndConditionsUrlId = CustomersAuthorisingYourSoftware.question7.id,
-    organisationUrlId = OrganisationDetails.question1.id,
-    identifyYourOrganisationId = OrganisationDetails.question2.id,
-    serverLocationsId = CustomersAuthorisingYourSoftware.question3.id
+    organisationTypeId = OrganisationDetails.question1.id,
+    organisationNameId = OrganisationDetails.question2b.id
   )
 
-  val questionnaire      = DevelopmentPractices.questionnaire
+  val questionnaire      = ResponsibleIndividualDetails.questionnaire
   val questionnaireId    = questionnaire.id
   val question           = questionnaire.questions.head.question
   val questionId         = question.id
@@ -396,64 +221,50 @@ trait QuestionnaireTestData {
 
   val answersToQuestions: Submission.AnswersToQuestions =
     Map(
-      testQuestionIdsOfInterest.applicationNameId                  -> ActualAnswer.TextAnswer(expectedAppName),
-      testQuestionIdsOfInterest.responsibleIndividualEmailId       -> ActualAnswer.TextAnswer("bob@example.com"),
-      testQuestionIdsOfInterest.responsibleIndividualIsRequesterId -> ActualAnswer.SingleChoiceAnswer("No"),
-      testQuestionIdsOfInterest.responsibleIndividualNameId        -> ActualAnswer.TextAnswer("Bob Cratchett"),
-      testQuestionIdsOfInterest.serverLocationsId                  -> ActualAnswer.MultipleChoiceAnswer(Set("In the UK", "Outside the EEA with adequacy agreements")),
-      testQuestionIdsOfInterest.termsAndConditionsId               -> ActualAnswer.SingleChoiceAnswer("No"),
-      testQuestionIdsOfInterest.privacyPolicyId                    -> ActualAnswer.SingleChoiceAnswer("No")
+      testQuestionIdsOfInterest.organisationTypeId -> ActualAnswer.SingleChoiceAnswer("UK limited company"),
+      testQuestionIdsOfInterest.organisationNameId -> ActualAnswer.TextAnswer("Bobs Burgers")
     )
 
   val samplePassAnswersToQuestions = Map(
-    (DevelopmentPractices.question1.id             -> ActualAnswer.SingleChoiceAnswer("Yes")),
-    (DevelopmentPractices.question2.id             -> ActualAnswer.SingleChoiceAnswer("Yes")),
-    (DevelopmentPractices.question3.id             -> ActualAnswer.SingleChoiceAnswer("Yes")),
-    (OrganisationDetails.question1.id              -> ActualAnswer.TextAnswer("https://example.com")),
-    (OrganisationDetails.questionRI1.id            -> ActualAnswer.SingleChoiceAnswer("No")),
-    (OrganisationDetails.questionRI2.id            -> ActualAnswer.TextAnswer("Bob Cratchett")),
-    (OrganisationDetails.questionRI3.id            -> ActualAnswer.TextAnswer("bob@example.com")),
-    (CustomersAuthorisingYourSoftware.question1.id -> ActualAnswer.AcknowledgedAnswer),
-    (CustomersAuthorisingYourSoftware.question2.id -> ActualAnswer.TextAnswer("name of software")),
-    (CustomersAuthorisingYourSoftware.question3.id -> ActualAnswer.MultipleChoiceAnswer(Set("In the UK"))),
-    (CustomersAuthorisingYourSoftware.question4.id -> ActualAnswer.SingleChoiceAnswer("Yes")),
-    (CustomersAuthorisingYourSoftware.question5.id -> ActualAnswer.TextAnswer("https://example.com/privacy-policy")),
-    (CustomersAuthorisingYourSoftware.question6.id -> ActualAnswer.SingleChoiceAnswer("Yes")),
-    (CustomersAuthorisingYourSoftware.question7.id -> ActualAnswer.TextAnswer("https://example.com/terms-and-conds"))
+    (OrganisationDetails.question1.id          -> ActualAnswer.SingleChoiceAnswer("UK limited company")),
+    (OrganisationDetails.question2a.id         -> ActualAnswer.TextAnswer("12345678")),
+    (OrganisationDetails.question2b.id         -> ActualAnswer.TextAnswer("Bobs Burgers")),
+    (OrganisationDetails.question2c.id         -> ActualAnswer.TextAnswer("1 High Street, London")),
+    (OrganisationDetails.question2d.id         -> ActualAnswer.TextAnswer("1234567890")),
+    (ResponsibleIndividualDetails.question1.id -> ActualAnswer.SingleChoiceAnswer("No")),
+    (ResponsibleIndividualDetails.question2.id -> ActualAnswer.TextAnswer("Bob Fleming")),
+    (ResponsibleIndividualDetails.question3.id -> ActualAnswer.TextAnswer("Managing Director")),
+    (ResponsibleIndividualDetails.question4.id -> ActualAnswer.TextAnswer("bob@burgers.com")),
+    (ResponsibleIndividualDetails.question5.id -> ActualAnswer.TextAnswer("01234 567890")),
+    (ResponsibleIndividualDetails.question6.id -> ActualAnswer.TextAnswer("https://www.bobsburgers.com"))
   )
 
   val sampleFailAnswersToQuestions = Map(
-    (DevelopmentPractices.question1.id             -> ActualAnswer.SingleChoiceAnswer("Yes")),
-    (DevelopmentPractices.question2.id             -> ActualAnswer.SingleChoiceAnswer("No")),
-    (DevelopmentPractices.question3.id             -> ActualAnswer.SingleChoiceAnswer("Yes")),
-    (OrganisationDetails.question1.id              -> ActualAnswer.TextAnswer("https://example.com")),
-    (OrganisationDetails.questionRI1.id            -> ActualAnswer.SingleChoiceAnswer("No")),
-    (OrganisationDetails.questionRI2.id            -> ActualAnswer.TextAnswer("Bob Cratchett")),
-    (OrganisationDetails.questionRI3.id            -> ActualAnswer.TextAnswer("bob@example.com")),
-    (CustomersAuthorisingYourSoftware.question1.id -> ActualAnswer.AcknowledgedAnswer),
-    (CustomersAuthorisingYourSoftware.question2.id -> ActualAnswer.TextAnswer("name of software")),
-    (CustomersAuthorisingYourSoftware.question3.id -> ActualAnswer.MultipleChoiceAnswer(Set("In the UK"))),
-    (CustomersAuthorisingYourSoftware.question4.id -> ActualAnswer.SingleChoiceAnswer("Yes")),
-    (CustomersAuthorisingYourSoftware.question5.id -> ActualAnswer.TextAnswer("https://example.com/privacy-policy")),
-    (CustomersAuthorisingYourSoftware.question6.id -> ActualAnswer.SingleChoiceAnswer("Yes")),
-    (CustomersAuthorisingYourSoftware.question7.id -> ActualAnswer.TextAnswer("https://example.com/terms-and-conds"))
+    (OrganisationDetails.question1.id          -> ActualAnswer.SingleChoiceAnswer("Non-UK company without a branch or place of business in the UK")),
+    (OrganisationDetails.question2a.id         -> ActualAnswer.TextAnswer("12345678")),
+    (OrganisationDetails.question2b.id         -> ActualAnswer.TextAnswer("Bobs Burgers")),
+    (OrganisationDetails.question2c.id         -> ActualAnswer.TextAnswer("1 High Street, London")),
+    (OrganisationDetails.question2d.id         -> ActualAnswer.TextAnswer("1234567890")),
+    (ResponsibleIndividualDetails.question1.id -> ActualAnswer.SingleChoiceAnswer("No")),
+    (ResponsibleIndividualDetails.question2.id -> ActualAnswer.TextAnswer("Bob Fleming")),
+    (ResponsibleIndividualDetails.question3.id -> ActualAnswer.TextAnswer("Managing Director")),
+    (ResponsibleIndividualDetails.question4.id -> ActualAnswer.TextAnswer("bob@burgers.com")),
+    (ResponsibleIndividualDetails.question5.id -> ActualAnswer.TextAnswer("01234 567890")),
+    (ResponsibleIndividualDetails.question6.id -> ActualAnswer.TextAnswer("https://www.bobsburgers.com"))
   )
 
   val sampleWarningsAnswersToQuestions = Map(
-    (DevelopmentPractices.question1.id             -> ActualAnswer.SingleChoiceAnswer("No")),
-    (DevelopmentPractices.question2.id             -> ActualAnswer.SingleChoiceAnswer("Yes")),
-    (DevelopmentPractices.question3.id             -> ActualAnswer.SingleChoiceAnswer("No")),
-    (OrganisationDetails.question1.id              -> ActualAnswer.TextAnswer("https://example.com")),
-    (OrganisationDetails.questionRI1.id            -> ActualAnswer.SingleChoiceAnswer("No")),
-    (OrganisationDetails.questionRI2.id            -> ActualAnswer.TextAnswer("Bob Cratchett")),
-    (OrganisationDetails.questionRI3.id            -> ActualAnswer.TextAnswer("bob@example.com")),
-    (CustomersAuthorisingYourSoftware.question1.id -> ActualAnswer.AcknowledgedAnswer),
-    (CustomersAuthorisingYourSoftware.question2.id -> ActualAnswer.TextAnswer("name of software")),
-    (CustomersAuthorisingYourSoftware.question3.id -> ActualAnswer.MultipleChoiceAnswer(Set("In the UK"))),
-    (CustomersAuthorisingYourSoftware.question4.id -> ActualAnswer.SingleChoiceAnswer("Yes")),
-    (CustomersAuthorisingYourSoftware.question5.id -> ActualAnswer.TextAnswer("https://example.com/privacy-policy")),
-    (CustomersAuthorisingYourSoftware.question6.id -> ActualAnswer.SingleChoiceAnswer("Yes")),
-    (CustomersAuthorisingYourSoftware.question7.id -> ActualAnswer.TextAnswer("https://example.com/terms-and-conds"))
+    (OrganisationDetails.question1.id          -> ActualAnswer.SingleChoiceAnswer("Non-UK company with a branch or place of business in the UK")),
+    (OrganisationDetails.question2a.id         -> ActualAnswer.TextAnswer("12345678")),
+    (OrganisationDetails.question2b.id         -> ActualAnswer.TextAnswer("Bobs Burgers")),
+    (OrganisationDetails.question2c.id         -> ActualAnswer.TextAnswer("1 High Street, London")),
+    (OrganisationDetails.question2d.id         -> ActualAnswer.TextAnswer("1234567890")),
+    (ResponsibleIndividualDetails.question1.id -> ActualAnswer.SingleChoiceAnswer("No")),
+    (ResponsibleIndividualDetails.question2.id -> ActualAnswer.TextAnswer("Bob Fleming")),
+    (ResponsibleIndividualDetails.question3.id -> ActualAnswer.TextAnswer("Managing Director")),
+    (ResponsibleIndividualDetails.question4.id -> ActualAnswer.TextAnswer("bob@burgers.com")),
+    (ResponsibleIndividualDetails.question5.id -> ActualAnswer.TextAnswer("01234 567890")),
+    (ResponsibleIndividualDetails.question6.id -> ActualAnswer.TextAnswer("https://www.bobsburgers.com"))
   )
 
   def firstQuestion(questionnaire: Questionnaire) = questionnaire.questions.head.question.id

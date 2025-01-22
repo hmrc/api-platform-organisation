@@ -129,12 +129,11 @@ trait SubmissionsTestData extends QuestionBuilder with QuestionnaireTestData wit
   val failSubmission                = Submission.fail(instant, "bob@example.com")(submittedSubmission)
 
   val partialQuestionnaireProgress        = Map(
-    DevelopmentPractices.questionnaire.id                    -> QuestionnaireProgress(
+    ResponsibleIndividualDetails.questionnaire.id            -> QuestionnaireProgress(
       QuestionnaireState.NotStarted,
-      List(DevelopmentPractices.question1.id, DevelopmentPractices.question2.id, DevelopmentPractices.question3.id)
+      List(ResponsibleIndividualDetails.question1.id, ResponsibleIndividualDetails.question2.id, ResponsibleIndividualDetails.question3.id)
     ),
-    OrganisationDetails.questionnaire.id                     -> QuestionnaireProgress(QuestionnaireState.InProgress, List(OrganisationDetails.question1.id, OrganisationDetails.question3.id)),
-    CustomersAuthorisingYourSoftware.questionnaire.id        -> QuestionnaireProgress(QuestionnaireState.Completed, List.empty),
+    OrganisationDetails.questionnaire.id                     -> QuestionnaireProgress(QuestionnaireState.InProgress, List(OrganisationDetails.question1.id, OrganisationDetails.question2c.id)),
     Questionnaire.Id("1e4a1369-8e28-447c-bd47-efbabec1a43b") -> QuestionnaireProgress(QuestionnaireState.NotApplicable, List.empty)
   )
   val partiallyAnsweredExtendedSubmission = ExtendedSubmission(answeringSubmission, partialQuestionnaireProgress)
@@ -144,19 +143,13 @@ trait SubmissionsTestData extends QuestionBuilder with QuestionnaireTestData wit
     val orgId = OrganisationId.random
     val usrId = UserId.random
 
-    val question1               = yesNoQuestion(1)
-    val questionRIRequester     = yesNoQuestion(2)
-    val questionRIName          = textQuestion(3)
-    val questionRIEmail         = textQuestion(4)
+    val question1               = chooseOneOfQuestion(1, "a", "b", "c")
     val questionName            = textQuestion(5)
     val questionPrivacyUrl      = textQuestion(6)
     val questionTermsUrl        = textQuestion(7)
     val questionWeb             = textQuestion(8)
     val question2               = acknowledgementOnly(9)
     val question3               = multichoiceQuestion(10, "a1", "b", "c")
-    val questionIdentifyOrg     = chooseOneOfQuestion(11, "a2", "b", "c")
-    val questionPrivacy         = textQuestion(12)
-    val questionTerms           = textQuestion(13)
     val questionServerLocations = multichoiceQuestion(14, "In the UK", "Outside the EEA with adequacy agreements")
 
     val questionnaire1 = Questionnaire(
@@ -191,17 +184,8 @@ trait SubmissionsTestData extends QuestionBuilder with QuestionnaireTestData wit
       usrId,
       questionnaireGroups,
       QuestionIdsOfInterest(
-        questionName.id,
-        questionPrivacy.id,
-        questionPrivacyUrl.id,
-        questionTerms.id,
-        questionTermsUrl.id,
-        questionWeb.id,
-        questionRIRequester.id,
-        questionRIName.id,
-        questionRIEmail.id,
-        questionIdentifyOrg.id,
-        questionServerLocations.id
+        question1.id,
+        questionName.id
       ),
       standardContext
     )
@@ -323,15 +307,12 @@ object AnsweringQuestionsHelper extends AnsweringQuestionsHelper
 trait MarkedSubmissionsTestData extends SubmissionsTestData with AnsweringQuestionsHelper {
 
   val markedAnswers: Map[Question.Id, Mark] = Map(
-    (DevelopmentPractices.question1.id             -> Mark.Pass),
-    (DevelopmentPractices.question2.id             -> Mark.Fail),
-    (DevelopmentPractices.question3.id             -> Mark.Warn),
-    (OrganisationDetails.question1.id              -> Mark.Pass),
-    (OrganisationDetails.questionRI1.id            -> Mark.Pass),
-    (OrganisationDetails.questionRI2.id            -> Mark.Pass),
-    (CustomersAuthorisingYourSoftware.question3.id -> Mark.Pass),
-    (CustomersAuthorisingYourSoftware.question4.id -> Mark.Pass),
-    (CustomersAuthorisingYourSoftware.question6.id -> Mark.Fail)
+    (OrganisationDetails.question1.id          -> Mark.Pass),
+    (OrganisationDetails.question2a.id         -> Mark.Pass),
+    (OrganisationDetails.question2b.id         -> Mark.Pass),
+    (ResponsibleIndividualDetails.question3.id -> Mark.Pass),
+    (ResponsibleIndividualDetails.question4.id -> Mark.Pass),
+    (ResponsibleIndividualDetails.question6.id -> Mark.Fail)
   )
 
   val markedSubmission = MarkedSubmission(submittedSubmission, markedAnswers)
