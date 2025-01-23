@@ -91,14 +91,14 @@ object QuestionnaireDAO {
         Wording("What is your organisation’s name?"),
         statement = None,
         validation = TextValidation.OrganisationName.some,
-        errorInfo = ErrorInfo("Your organsation name cannot be blank", "Enter your organisation name").some
+        errorInfo = ErrorInfo("Your organisation name cannot be blank", "Enter your organisation name").some
       )
 
       val question2c = Question.TextQuestion(
         Question.Id("e1dbf1a3-e28b-1c83-a739-86f1319ca8cc"),
         Wording("What is your organisation’s address?"),
         statement = None,
-        errorInfo = ErrorInfo("Your organsation address cannot be blank", "Enter your organisation address").some
+        errorInfo = ErrorInfo("Your organisation address cannot be blank", "Enter your organisation address").some
       )
 
       val question2d = Question.TextQuestion(
@@ -203,7 +203,7 @@ object QuestionnaireDAO {
 
       val questionnaire = Questionnaire(
         id = Questionnaire.Id("ac69b129-524a-4d10-89a5-7bfa46ed95c7"),
-        label = Questionnaire.Label("Enter organisation details"),
+        label = Questionnaire.Label("Enter responsible individual details"),
         questions = NonEmptyList.of(
           QuestionItem(question1),
           QuestionItem(question2, AskWhen.AskWhenAnswer(question1, "No")),
