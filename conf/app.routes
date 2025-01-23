@@ -1,3 +1,15 @@
 # microservice specific routes
 
-POST        /create             uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationController.create
+POST        /create                                 uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationController.create
+
+POST        /submission/user/:uid                   uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.createSubmissionFor(uid: UserId)
+GET         /submission/user/:uid                   uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchLatestByUserId(uid: UserId)
+GET         /submission/user/:uid/extended          uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchLatestExtendedByUserId(uid: UserId)
+GET         /submission/marked/user/:uid            uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchLatestMarkedSubmissionByUserId(uid: UserId)
+
+GET         /submission/organisation/:oid           uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchLatestByOrganisationId(oid: OrganisationId)
+GET         /submission/organisation/:oid/extended  uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchLatestExtendedByOrganisationId(oid: OrganisationId)
+GET         /submission/marked/organisation/:oid    uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchLatestMarkedSubmissionByOrganisationId(oid: OrganisationId)
+
+GET         /submission/:sid                        uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchSubmission(sid: SubmissionId)
+POST        /submission/:sid/question/:qid          uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.recordAnswers(sid: SubmissionId, qid: Question.Id)
