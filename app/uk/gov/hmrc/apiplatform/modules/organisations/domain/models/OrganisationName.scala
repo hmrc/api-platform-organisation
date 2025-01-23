@@ -55,8 +55,8 @@ object ValidatedOrganisationName {
   def unsafeApply(raw: String): ValidatedOrganisationName =
     validate(raw).getOrElse(throw new RuntimeException(s"$raw is not a valid OrganisationName"))
 
-  def validate(applicationName: String): ValidationResult[ValidatedOrganisationName] = {
-    (validateCharacters(applicationName), validateLength(applicationName)).mapN((_, _) => new ValidatedOrganisationName(applicationName))
+  def validate(organisationName: String): ValidationResult[ValidatedOrganisationName] = {
+    (validateCharacters(organisationName), validateLength(organisationName)).mapN((_, _) => new ValidatedOrganisationName(organisationName))
   }
 
   implicit val format: Format[ValidatedOrganisationName] = Json.valueFormat[ValidatedOrganisationName]
