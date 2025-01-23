@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apiplatformorganisation.models
+package uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models
+
+import cats.data.NonEmptyList
 
 import play.api.libs.json.{Json, OFormat}
 
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{OrganisationId, OrganisationName}
+import uk.gov.hmrc.apiplatform.modules.common.domain.services.NonEmptyListFormatters
 
-case class Organisation(id: OrganisationId, organisationName: OrganisationName)
+case class GroupOfQuestionnaires(
+    heading: String,
+    links: NonEmptyList[Questionnaire]
+  )
 
-object Organisation {
-  implicit val orgFormat: OFormat[Organisation] = Json.format[Organisation]
-}
-
-case class CreateOrganisationRequest(organisationName: OrganisationName)
-
-object CreateOrganisationRequest {
-  implicit val createOrgFormat: OFormat[CreateOrganisationRequest] = Json.format[CreateOrganisationRequest]
+object GroupOfQuestionnaires extends NonEmptyListFormatters {
+  import Questionnaire._
+  implicit val groupOfQuestionnairesJsonFormat: OFormat[GroupOfQuestionnaires] = Json.format[GroupOfQuestionnaires]
 }

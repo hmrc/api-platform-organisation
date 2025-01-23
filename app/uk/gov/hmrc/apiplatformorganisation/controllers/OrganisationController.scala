@@ -21,9 +21,10 @@ import scala.concurrent.ExecutionContext
 
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+
 import uk.gov.hmrc.apiplatformorganisation.models.CreateOrganisationRequest
 import uk.gov.hmrc.apiplatformorganisation.services.OrganisationService
-import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 @Singleton()
 class OrganisationController @Inject() (cc: ControllerComponents, organisationService: OrganisationService)(implicit val ec: ExecutionContext)

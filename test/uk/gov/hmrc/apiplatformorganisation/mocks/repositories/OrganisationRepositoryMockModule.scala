@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apiplatformorganisation.mocks.repository
+package uk.gov.hmrc.apiplatformorganisation.mocks.repositories
 
 import scala.concurrent.Future
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatformorganisation.models._
-import uk.gov.hmrc.apiplatformorganisation.repository.OrganisationRepository
+import uk.gov.hmrc.apiplatformorganisation.repositories.OrganisationRepository
 
 trait OrganisationRepositoryMockModule extends MockitoSugar with ArgumentMatchersSugar {
 

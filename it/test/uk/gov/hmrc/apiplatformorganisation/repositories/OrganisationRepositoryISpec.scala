@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apiplatformorganisation.repository
+package uk.gov.hmrc.apiplatformorganisation.repositories
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -23,10 +23,13 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
-import uk.gov.hmrc.apiplatformorganisation.OrganisationFixtures
-import uk.gov.hmrc.apiplatformorganisation.models.{OrganisationName, StoredOrganisation}
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
+
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
+import uk.gov.hmrc.apiplatformorganisation.OrganisationFixtures
+import uk.gov.hmrc.apiplatformorganisation.models.StoredOrganisation
+import uk.gov.hmrc.apiplatformorganisation.repositories.OrganisationRepository
 
 class OrganisationRepositoryISpec extends AnyWordSpec
     with Matchers

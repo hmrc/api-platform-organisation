@@ -20,7 +20,12 @@ lazy val microservice = Project("api-platform-organisation", file("."))
     retrieveManaged := true,
     // https://www.scala-lang.org/2021/01/12/configuring-and-suppressing-warnings.html
     // suppress warnings in generated routes files
-    scalacOptions += "-Wconf:src=routes/.*:s"
+    scalacOptions += "-Wconf:src=routes/.*:s",
+    routesImport ++= Seq(
+      "uk.gov.hmrc.apiplatform.modules.common.domain.models._",
+      "uk.gov.hmrc.apiplatform.modules.organisations.domain.models._",
+      "uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._"
+    )
   )
   .settings(
     Test / unmanagedSourceDirectories += baseDirectory.value / "test-utils",

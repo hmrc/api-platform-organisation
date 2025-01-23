@@ -20,10 +20,9 @@ import java.time.Clock
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-import uk.gov.hmrc.apiplatformorganisation.models._
-import uk.gov.hmrc.apiplatformorganisation.repository.OrganisationRepository
-
 import uk.gov.hmrc.apiplatform.modules.common.services.ClockNow
+import uk.gov.hmrc.apiplatformorganisation.models._
+import uk.gov.hmrc.apiplatformorganisation.repositories.OrganisationRepository
 
 @Singleton
 class OrganisationService @Inject() (organisationRepository: OrganisationRepository, val clock: Clock) extends ClockNow {

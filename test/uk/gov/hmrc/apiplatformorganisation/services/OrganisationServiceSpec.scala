@@ -22,10 +22,10 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
-import uk.gov.hmrc.apiplatformorganisation.OrganisationFixtures
-import uk.gov.hmrc.apiplatformorganisation.mocks.repository.OrganisationRepositoryMockModule
 
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
+import uk.gov.hmrc.apiplatformorganisation.OrganisationFixtures
+import uk.gov.hmrc.apiplatformorganisation.mocks.repositories.OrganisationRepositoryMockModule
 
 class OrganisationServiceSpec extends AnyWordSpec
     with Matchers

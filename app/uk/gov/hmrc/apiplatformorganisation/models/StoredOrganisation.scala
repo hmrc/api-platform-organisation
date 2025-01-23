@@ -20,6 +20,8 @@ import java.time.Instant
 
 import play.api.libs.json._
 
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{OrganisationId, OrganisationName}
+
 case class StoredOrganisation(id: OrganisationId, name: OrganisationName, createdDatetime: Instant)
 
 object StoredOrganisation {
