@@ -212,7 +212,7 @@ trait QuestionnaireTestData {
   val questionnaireAlt   = OrganisationDetails.questionnaire
   val questionnaireAltId = questionnaireAlt.id
   val questionAltId      = questionnaireAlt.questions.head.question.id
-  val optionalQuestion   = OrganisationDetails.question1
+  val optionalQuestion   = ResponsibleIndividualDetails.question6
   val optionalQuestionId = optionalQuestion.id
 
   val allQuestionnaires = testGroups.flatMap(_.links)

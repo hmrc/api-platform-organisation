@@ -24,6 +24,7 @@ import org.mongodb.scala.model.Sorts.descending
 
 import uk.gov.hmrc.mongo.play.json.Codecs
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationId
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
 
@@ -52,10 +53,18 @@ class SubmissionsDAO @Inject() (submissionsRepository: SubmissionsRepository)(im
     }
   }
 
-  def fetchLatest(id: OrganisationId): Future[Option[Submission]] = {
+  def fetchLatestByOrganisationId(id: OrganisationId): Future[Option[Submission]] = {
     collection
       .withReadPreference(com.mongodb.ReadPreference.primary())
       .find(equal("organisationId", Codecs.toBson(id)))
+      .sort(descending("startedOn"))
+      .headOption()
+  }
+
+  def fetchLatestByUserId(id: UserId): Future[Option[Submission]] = {
+    collection
+      .withReadPreference(com.mongodb.ReadPreference.primary())
+      .find(equal("startedBy", Codecs.toBson(id)))
       .sort(descending("startedOn"))
       .headOption()
   }

@@ -82,13 +82,15 @@ class SubmissionsDAOISpec
   "fetchLatest" should {
     "find the only one" in {
       await(submissionsDao.save(aSubmission))
-      await(submissionsDao.fetchLatest(organisationId)).value mustBe aSubmission
+      await(submissionsDao.fetchLatestByOrganisationId(organisationId)).value mustBe aSubmission
+      await(submissionsDao.fetchLatestByUserId(userId)).value mustBe aSubmission
     }
 
     "find the latest one" in {
       await(submissionsDao.save(aSubmission))
       await(submissionsDao.save(altSubmission))
-      await(submissionsDao.fetchLatest(organisationId)).value mustBe altSubmission
+      await(submissionsDao.fetchLatestByOrganisationId(organisationId)).value mustBe altSubmission
+      await(submissionsDao.fetchLatestByUserId(userId)).value mustBe altSubmission
     }
   }
 
@@ -101,13 +103,13 @@ class SubmissionsDAOISpec
       val updatedSubmission = Submission.updateLatestAnswersTo(newAnswers)(aSubmission)
 
       await(submissionsDao.update(updatedSubmission)) mustBe updatedSubmission
-      await(submissionsDao.fetchLatest(organisationId)).value mustBe updatedSubmission
+      await(submissionsDao.fetchLatestByOrganisationId(organisationId)).value mustBe updatedSubmission
     }
 
     "upsert submission if it doesn't exist " in {
       await(submissionsDao.update(aSubmission))
 
-      await(submissionsDao.fetchLatest(organisationId)).value mustBe aSubmission
+      await(submissionsDao.fetchLatestByOrganisationId(organisationId)).value mustBe aSubmission
     }
   }
 }
