@@ -65,8 +65,8 @@ object QuestionnaireDAO {
           (PossibleAnswer("Registered society")                                             -> Mark.Pass),
           (PossibleAnswer("Charitable Incorporated Organisation (CIO)")                     -> Mark.Pass),
           (PossibleAnswer("Trust")                                                          -> Mark.Pass),
-          (PossibleAnswer("Non-UK company with a branch or place of business in the UK")    -> Mark.Warn),
-          (PossibleAnswer("Non-UK company without a branch or place of business in the UK") -> Mark.Fail)
+          (PossibleAnswer("Non-UK company with a branch or place of business in the UK")    -> Mark.Pass),
+          (PossibleAnswer("Non-UK company without a branch or place of business in the UK") -> Mark.Pass)
         ),
         errorInfo = ErrorInfo("Select your organisation type").some
       )
@@ -82,7 +82,6 @@ object QuestionnaireDAO {
           )
         ).some,
         hintText = StatementText("It is 8 characters. For example, 01234567 or AC012345.").some,
-        absence = Tuple2("My organisation doesn't have a company registration", Mark.Fail).some,
         errorInfo = ErrorInfo("Your company registration number cannot be blank", "Enter your company registration number, like 01234567").some
       )
 
@@ -115,6 +114,16 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo("Your Corporation Tax Unique Taxpayer Reference cannot be blank", "Enter your Corporation Tax Unique Taxpayer Reference, like 1234567890").some
       )
 
+      val question2e = Question.TextQuestion(
+        Question.Id("b2dbf6a1-e39b-4c38-a524-19f0854ca1cc"),
+        Wording("What is your organisation’s website address?"),
+        statement = None,
+        hintText = StatementText("For example https://example.com").some,
+        absence = ("My organisation doesn't have a website", Mark.Fail).some,
+        validation = TextValidation.Url.some,
+        errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some
+      )
+
       val questionnaire = Questionnaire(
         id = Questionnaire.Id("ba16b123-524a-4d10-89a5-4bfa12ed42c9"),
         label = Questionnaire.Label("Enter organisation details"),
@@ -123,7 +132,8 @@ object QuestionnaireDAO {
           QuestionItem(question2a, AskWhen.AskWhenAnswer(question1, "UK limited company")),
           QuestionItem(question2b),
           QuestionItem(question2c),
-          QuestionItem(question2d)
+          QuestionItem(question2d),
+          QuestionItem(question2e)
         )
       )
     }
@@ -191,16 +201,6 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo("Enter a telephone number", "Telephone number cannot be blank").some
       )
 
-      val question6 = Question.TextQuestion(
-        Question.Id("b2dbf6a1-e39b-4c38-a524-19f0854ca1cc"),
-        Wording("What is your organisation’s website address?"),
-        statement = None,
-        hintText = StatementText("For example https://example.com").some,
-        absence = ("My organisation doesn't have a website", Mark.Fail).some,
-        validation = TextValidation.Url.some,
-        errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some
-      )
-
       val questionnaire = Questionnaire(
         id = Questionnaire.Id("be15b318-524a-4d10-89a5-4bfa52ed49c2"),
         label = Questionnaire.Label("Enter responsible individual details"),
@@ -209,8 +209,7 @@ object QuestionnaireDAO {
           QuestionItem(question2, AskWhen.AskWhenAnswer(question1, "No")),
           QuestionItem(question3),
           QuestionItem(question4, AskWhen.AskWhenAnswer(question1, "No")),
-          QuestionItem(question5),
-          QuestionItem(question6)
+          QuestionItem(question5)
         )
       )
     }
