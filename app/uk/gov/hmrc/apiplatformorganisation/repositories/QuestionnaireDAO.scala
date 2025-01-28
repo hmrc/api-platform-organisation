@@ -116,7 +116,7 @@ object QuestionnaireDAO {
       )
 
       val questionnaire = Questionnaire(
-        id = Questionnaire.Id("ac69b129-524a-4d10-89a5-7bfa46ed95c7"),
+        id = Questionnaire.Id("ba16b123-524a-4d10-89a5-4bfa12ed42c9"),
         label = Questionnaire.Label("Enter organisation details"),
         questions = NonEmptyList.of(
           QuestionItem(question1),
@@ -202,7 +202,7 @@ object QuestionnaireDAO {
       )
 
       val questionnaire = Questionnaire(
-        id = Questionnaire.Id("ac69b129-524a-4d10-89a5-7bfa46ed95c7"),
+        id = Questionnaire.Id("be15b318-524a-4d10-89a5-4bfa52ed49c2"),
         label = Questionnaire.Label("Enter responsible individual details"),
         questions = NonEmptyList.of(
           QuestionItem(question1),
