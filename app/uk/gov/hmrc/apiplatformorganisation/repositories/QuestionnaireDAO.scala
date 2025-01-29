@@ -47,7 +47,7 @@ object QuestionnaireDAO {
   // *** Note - change this if the application name question changes. ***
   val questionIdsOfInterest = QuestionIdsOfInterest(
     organisationTypeId = OrganisationDetails.question1.id,
-    organisationNameId = OrganisationDetails.question2b.id
+    organisationNameId = OrganisationDetails.question3.id
   )
 
   object Questionnaires {
@@ -64,14 +64,27 @@ object QuestionnaireDAO {
           (PossibleAnswer("Partnership")                                                    -> Mark.Pass),
           (PossibleAnswer("Registered society")                                             -> Mark.Pass),
           (PossibleAnswer("Charitable Incorporated Organisation (CIO)")                     -> Mark.Pass),
-          (PossibleAnswer("Trust")                                                          -> Mark.Pass),
           (PossibleAnswer("Non-UK company with a branch or place of business in the UK")    -> Mark.Pass),
           (PossibleAnswer("Non-UK company without a branch or place of business in the UK") -> Mark.Pass)
         ),
         errorInfo = ErrorInfo("Select your organisation type").some
       )
 
-      val question2a = Question.TextQuestion(
+      val question2 = Question.ChooseOneOfQuestion(
+        Question.Id("adba162f-be58-2818-92ff-2ecd1799c513"),
+        Wording("What type of partnership are you registering?"),
+        statement = None,
+        marking = ListMap(
+          (PossibleAnswer("General partnership")           -> Mark.Pass),
+          (PossibleAnswer("Limited liability partnership") -> Mark.Pass),
+          (PossibleAnswer("Limited partnership")           -> Mark.Pass),
+          (PossibleAnswer("Scottish partnership")          -> Mark.Pass),
+          (PossibleAnswer("Scottish limited partnership")  -> Mark.Pass)
+        ),
+        errorInfo = ErrorInfo("Select your organisation type").some
+      )
+
+      val question3 = Question.TextQuestion(
         Question.Id("4e148791-1a07-4f28-8fe4-ba3e18cdc118"),
         Wording("What is the company registration number?"),
         statement = Statement(
@@ -85,7 +98,7 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo("Your company registration number cannot be blank", "Enter your company registration number, like 01234567").some
       )
 
-      val question2b = Question.TextQuestion(
+      val question4 = Question.TextQuestion(
         Question.Id("a2dbf1a7-e31b-4c89-a755-21f0652ca9cc"),
         Wording("What is your organisation’s name?"),
         statement = None,
@@ -93,14 +106,14 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo("Your organisation name cannot be blank", "Enter your organisation name").some
       )
 
-      val question2c = Question.TextQuestion(
+      val question5 = Question.TextQuestion(
         Question.Id("e1dbf1a3-e28b-1c83-a739-86f1319ca8cc"),
         Wording("What is your organisation’s address?"),
         statement = None,
         errorInfo = ErrorInfo("Your organisation address cannot be blank", "Enter your organisation address").some
       )
 
-      val question2d = Question.TextQuestion(
+      val question6 = Question.TextQuestion(
         Question.Id("6be23951-ac69-47bf-aa56-86d3d690ee0b"),
         Wording("What is your Corporation Tax Unique Taxpayer Reference (UTR)?"),
         statement = Statement(
@@ -114,7 +127,7 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo("Your Corporation Tax Unique Taxpayer Reference cannot be blank", "Enter your Corporation Tax Unique Taxpayer Reference, like 1234567890").some
       )
 
-      val question2e = Question.TextQuestion(
+      val question7 = Question.TextQuestion(
         Question.Id("b2dbf6a1-e39b-4c38-a524-19f0854ca1cc"),
         Wording("What is your organisation’s website address?"),
         statement = None,
@@ -129,11 +142,12 @@ object QuestionnaireDAO {
         label = Questionnaire.Label("Enter organisation details"),
         questions = NonEmptyList.of(
           QuestionItem(question1),
-          QuestionItem(question2a, AskWhen.AskWhenAnswer(question1, "UK limited company")),
-          QuestionItem(question2b),
-          QuestionItem(question2c),
-          QuestionItem(question2d),
-          QuestionItem(question2e)
+          QuestionItem(question2, AskWhen.AskWhenAnswer(question1, "Partnership")),
+          QuestionItem(question3, AskWhen.AskWhenAnswer(question1, "UK limited company")),
+          QuestionItem(question4),
+          QuestionItem(question5),
+          QuestionItem(question6),
+          QuestionItem(question7)
         )
       )
     }
