@@ -143,7 +143,7 @@ object QuestionnaireDAO {
         questions = NonEmptyList.of(
           QuestionItem(question1),
           QuestionItem(question2, AskWhen.AskWhenAnswer(question1, "Partnership")),
-          QuestionItem(question3, AskWhen.AskWhenAnswer(question1, "UK limited company")),
+          QuestionItem(question3, AskWhen.AskWhenAnswer(question1, "UK limited company", "Registered society")),
           QuestionItem(question4),
           QuestionItem(question5),
           QuestionItem(question6),
