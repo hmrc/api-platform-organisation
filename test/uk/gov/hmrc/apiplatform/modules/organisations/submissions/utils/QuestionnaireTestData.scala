@@ -93,7 +93,7 @@ trait QuestionnaireTestData {
       label = Questionnaire.Label("Enter organisation details"),
       questions = NonEmptyList.of(
         QuestionItem(question1),
-        QuestionItem(question2a, AskWhen.AskWhenAnswer(question1, "UK limited company", "Partnership")),
+        QuestionItem(question2a, AskWhen.AskWhenAnswer(question1, "UK limited company")),
         QuestionItem(question2b),
         QuestionItem(question2c),
         QuestionItem(question2d)

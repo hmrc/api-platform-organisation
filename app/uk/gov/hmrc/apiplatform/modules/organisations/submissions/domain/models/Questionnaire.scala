@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,16 +24,16 @@ import uk.gov.hmrc.apiplatform.modules.common.domain.services.NonEmptyListFormat
 
 sealed trait AskWhen
 
-object AskWhen extends NonEmptyListFormatters {
-  case class AskWhenContext(contextKey: String, expectedValue: String)                                             extends AskWhen
-  case class AskWhenAnswer(questionId: Question.Id, expectedValues: NonEmptyList[ActualAnswer.SingleChoiceAnswer]) extends AskWhen
-  case object AlwaysAsk                                                                                            extends AskWhen
+object AskWhen {
+  case class AskWhenContext(contextKey: String, expectedValue: String)                              extends AskWhen
+  case class AskWhenAnswer(questionId: Question.Id, expectedValue: ActualAnswer.SingleChoiceAnswer) extends AskWhen
+  case object AlwaysAsk                                                                             extends AskWhen
 
   object AskWhenAnswer {
 
-    def apply(question: Question.SingleChoiceQuestion, expectedValues: String*): AskWhen = {
-      require(!expectedValues.toList.map(expValue => question.choices.find(qc => qc.value == expValue).isDefined).contains(false))
-      AskWhenAnswer(question.id, NonEmptyList.fromListUnsafe(expectedValues.toList.map(value => ActualAnswer.SingleChoiceAnswer(value))))
+    def apply(question: Question.SingleChoiceQuestion, expectedValue: String): AskWhen = {
+      require(question.choices.find(qc => qc.value == expectedValue).isDefined)
+      AskWhenAnswer(question.id, ActualAnswer.SingleChoiceAnswer(expectedValue))
     }
   }
 
@@ -52,7 +52,7 @@ object AskWhen extends NonEmptyListFormatters {
     askWhen match {
       case AlwaysAsk                                 => true
       case AskWhenContext(contextKey, expectedValue) => context.get(contextKey).map(_.equalsIgnoreCase(expectedValue)).getOrElse(false)
-      case AskWhenAnswer(questionId, expectedValues) => answersToQuestions.get(questionId).map(expectedValues.toList.contains(_)).getOrElse(false)
+      case AskWhenAnswer(questionId, expectedAnswer) => answersToQuestions.get(questionId).map(_ == expectedAnswer).getOrElse(false)
     }
   }
 
