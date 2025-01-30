@@ -22,7 +22,6 @@ import org.scalatest.Inside
 import uk.gov.hmrc.apiplatform.modules.common.utils.HmrcSpec
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.{QuestionBuilder, SubmissionsTestData}
-import uk.gov.hmrc.apiplatformorganisation.repositories.QuestionnaireDAO
 
 trait AsIdsHelpers {
 
@@ -92,7 +91,7 @@ class AnswerQuestionSpec extends HmrcSpec with Inside with QuestionBuilder with 
       }
 
       "return left when answer is not valid" in new Setup {
-        val after = AnswerQuestion.recordAnswer(aSubmission, QuestionnaireDAO.Questionnaires.ResponsibleIndividualDetails.question1.id, List("Bob"))
+        val after = AnswerQuestion.recordAnswer(aSubmission, ResponsibleIndividualDetails.question1.id, List("Bob"))
 
         after.left.value
       }

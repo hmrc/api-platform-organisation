@@ -44,34 +44,49 @@ class QuestionnaireDAO @Inject() (implicit ec: ExecutionContext) {
 
 object QuestionnaireDAO {
 
-  // *** Note - change this if the application name question changes. ***
+  // Organisation types
+  final val ukLimitedCompany                   = "UK limited company"
+  final val soleTrader                         = "Sole trader"
+  final val partnership                        = "Partnership"
+  final val registeredSociety                  = "Registered society"
+  final val charitableIncorporatedOrganisation = "Charitable Incorporated Organisation (CIO)"
+  final val nonUkWithPlaceOfBusinessInUk       = "Non-UK company with a branch or place of business in the UK"
+  final val nonUkWithoutPlaceOfBusinessInUk    = "Non-UK company without a branch or place of business in the UK"
+
+  // Partnership types
+  final val generalPartnership          = "General partnership"
+  final val limitedLiabilityPartnership = "Limited liability partnership"
+  final val limitedPartnership          = "Limited partnership"
+  final val scottishPartnership         = "Scottish partnership"
+  final val scottishLimitedPartnership  = "Scottish limited partnership"
+
+  // *** Note - change this if the questions change. ***
   val questionIdsOfInterest = QuestionIdsOfInterest(
-    organisationTypeId = OrganisationDetails.question1.id,
-    organisationNameId = OrganisationDetails.question2b.id
+    organisationTypeId = OrganisationDetails.questionOrgType.id,
+    organisationNameId = OrganisationDetails.questionOrgName.id
   )
 
   object Questionnaires {
 
     object OrganisationDetails {
 
-      val question1 = Question.ChooseOneOfQuestion(
+      val questionOrgType = Question.ChooseOneOfQuestion(
         Question.Id("cbdf264f-be39-4638-92ff-6ecd2259c662"),
         Wording("What is your organisation type?"),
         statement = None,
         marking = ListMap(
-          (PossibleAnswer("UK limited company")                                             -> Mark.Pass),
-          (PossibleAnswer("Sole trader")                                                    -> Mark.Pass),
-          (PossibleAnswer("Partnership")                                                    -> Mark.Pass),
-          (PossibleAnswer("Registered society")                                             -> Mark.Pass),
-          (PossibleAnswer("Charitable Incorporated Organisation (CIO)")                     -> Mark.Pass),
-          (PossibleAnswer("Trust")                                                          -> Mark.Pass),
-          (PossibleAnswer("Non-UK company with a branch or place of business in the UK")    -> Mark.Warn),
-          (PossibleAnswer("Non-UK company without a branch or place of business in the UK") -> Mark.Fail)
+          (PossibleAnswer(ukLimitedCompany)                   -> Mark.Pass),
+          (PossibleAnswer(soleTrader)                         -> Mark.Pass),
+          (PossibleAnswer(partnership)                        -> Mark.Pass),
+          (PossibleAnswer(registeredSociety)                  -> Mark.Pass),
+          (PossibleAnswer(charitableIncorporatedOrganisation) -> Mark.Pass),
+          (PossibleAnswer(nonUkWithPlaceOfBusinessInUk)       -> Mark.Pass),
+          (PossibleAnswer(nonUkWithoutPlaceOfBusinessInUk)    -> Mark.Pass)
         ),
         errorInfo = ErrorInfo("Select your organisation type").some
       )
 
-      val question2a = Question.TextQuestion(
+      val questionCompanyNumber = Question.TextQuestion(
         Question.Id("4e148791-1a07-4f28-8fe4-ba3e18cdc118"),
         Wording("What is the company registration number?"),
         statement = Statement(
@@ -82,11 +97,10 @@ object QuestionnaireDAO {
           )
         ).some,
         hintText = StatementText("It is 8 characters. For example, 01234567 or AC012345.").some,
-        absence = Tuple2("My organisation doesn't have a company registration", Mark.Fail).some,
         errorInfo = ErrorInfo("Your company registration number cannot be blank", "Enter your company registration number, like 01234567").some
       )
 
-      val question2b = Question.TextQuestion(
+      val questionOrgName = Question.TextQuestion(
         Question.Id("a2dbf1a7-e31b-4c89-a755-21f0652ca9cc"),
         Wording("What is your organisation’s name?"),
         statement = None,
@@ -94,14 +108,14 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo("Your organisation name cannot be blank", "Enter your organisation name").some
       )
 
-      val question2c = Question.TextQuestion(
+      val questionOrgAddress = Question.TextQuestion(
         Question.Id("e1dbf1a3-e28b-1c83-a739-86f1319ca8cc"),
         Wording("What is your organisation’s address?"),
         statement = None,
         errorInfo = ErrorInfo("Your organisation address cannot be blank", "Enter your organisation address").some
       )
 
-      val question2d = Question.TextQuestion(
+      val questionCorporationUTR = Question.TextQuestion(
         Question.Id("6be23951-ac69-47bf-aa56-86d3d690ee0b"),
         Wording("What is your Corporation Tax Unique Taxpayer Reference (UTR)?"),
         statement = Statement(
@@ -115,15 +129,184 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo("Your Corporation Tax Unique Taxpayer Reference cannot be blank", "Enter your Corporation Tax Unique Taxpayer Reference, like 1234567890").some
       )
 
+      val questionOrgWebsite = Question.TextQuestion(
+        Question.Id("b2dbf6a1-e39b-4c38-a524-19f0854ca1cc"),
+        Wording("What is your organisation’s website address?"),
+        statement = None,
+        hintText = StatementText("For example https://example.com").some,
+        absence = ("My organisation doesn't have a website", Mark.Fail).some,
+        validation = TextValidation.Url.some,
+        errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some
+      )
+
+      val questionFullName = Question.TextQuestion(
+        Question.Id("2d99ab47-b8c1-4ece-82ee-91605a99c52b"),
+        Wording("What is your full name?"),
+        statement = None,
+        errorInfo = ErrorInfo("Your full name cannot be blank", "Enter your full name").some
+      )
+
+      val questionDoB = Question.TextQuestion(
+        Question.Id("6326f8fc-2543-4977-8a73-889be5901c84"),
+        Wording("What is your date of birth?"),
+        statement = None,
+        errorInfo = ErrorInfo("Your date of birth cannot be blank", "Enter your date of birth").some
+      )
+
+      val questionNI = Question.TextQuestion(
+        Question.Id("24ad2ed0-696b-446c-b9cf-d215ee8bdd4e"),
+        Wording("Enter your National Insurance number"),
+        statement = Statement(
+          StatementText("It’s on the National Insurance card, benefit letter, payslip or P60. For example, ‘QQ 12 34 56 C’.")
+        ).some,
+        errorInfo = ErrorInfo("Your National Insurance number cannot be blank", "Enter your National Insurance number").some
+      )
+
+      val questionDoYouHaveSaUTR = Question.YesNoQuestion(
+        Question.Id("ab58e941-ae7d-4a3e-aa7e-714017d86077"),
+        Wording("Do you have a Self Assessment Unique Taxpayer Reference?"),
+        statement = None,
+        yesMarking = Mark.Pass,
+        noMarking = Mark.Warn,
+        errorInfo = ErrorInfo("Select Yes if you have a Self Assessment Unique Taxpayer Reference").some
+      )
+
+      val questionSaUTR = Question.TextQuestion(
+        Question.Id("b7c654c9-f6b2-4a03-a189-d8e23dfc28a7"),
+        Wording("What is your self-assessment Unique Taxpayer Reference (UTR)?"),
+        statement = Statement(
+          StatementText("You can find it in your Personal Tax Account, the HMRC app or on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’."),
+          StatementLink("Get more help to find your UTR (opens in new tab)", "https://www.gov.uk/find-utr-number")
+        ).some,
+        hintText = StatementText("Your UTR can be 10 or 13 digits long.").some,
+        errorInfo = ErrorInfo("Your Unique Taxpayer Reference cannot be blank", "Enter your Unique Taxpayer Reference, like 1234567890").some
+      )
+
+      val questionHomeAddress = Question.TextQuestion(
+        Question.Id("99c578ff-d1c1-49e1-859a-9c04cc1c88a9"),
+        Wording("What is your home address?"),
+        statement = None,
+        errorInfo = ErrorInfo("Your address cannot be blank", "Enter your address").some
+      )
+
+      val questionPartnershipType = Question.ChooseOneOfQuestion(
+        Question.Id("adba162f-be58-2818-92ff-2ecd1799c513"),
+        Wording("What type of partnership are you registering?"),
+        statement = None,
+        marking = ListMap(
+          (PossibleAnswer(generalPartnership)          -> Mark.Pass),
+          (PossibleAnswer(limitedLiabilityPartnership) -> Mark.Pass),
+          (PossibleAnswer(limitedPartnership)          -> Mark.Pass),
+          (PossibleAnswer(scottishPartnership)         -> Mark.Pass),
+          (PossibleAnswer(scottishLimitedPartnership)  -> Mark.Pass)
+        ),
+        errorInfo = ErrorInfo("Select your partnership type").some
+      )
+
+      val questionDoYouHaveHmrcRef = Question.YesNoQuestion(
+        Question.Id("5acbf148-c9af-4967-a8a1-9417b9f4c8c1"),
+        Wording("Do you have an HMRC reference number?"),
+        statement = Statement(
+          StatementText("If the charity has registered for Gift Aid then their HMRC reference number will be the same as their Gift aid number."),
+          StatementText("This is not the same as the charity number available on the charity register.")
+        ).some,
+        yesMarking = Mark.Pass,
+        noMarking = Mark.Warn,
+        errorInfo = ErrorInfo("Select Yes if you have an HMRC reference number").some
+      )
+
+      val questionHmrcRef = Question.TextQuestion(
+        Question.Id("f05c530c-8058-4c6e-971b-698f0f50e9ec"),
+        Wording("What is your charity's HMRC reference number?"),
+        statement = Statement(
+          StatementText("HMRC reference number")
+        ).some,
+        hintText = StatementText("This could be up to 7 characters and must begin with either one or two letters, followed by 5 numbers. For example A999 or AB99999").some,
+        errorInfo = ErrorInfo("Your HMRC reference number cannot be blank", "Enter your HMRC reference number, like AB12345").some
+      )
+
+      val questionNonUkTaxDocument = Question.AcknowledgementOnly(
+        Question.Id("7933fb7d-09a0-49ef-b22c-a1d7f1e462c0"),
+        Wording("Provide evidence of your organisation’s registration"),
+        statement = Statement(
+          StatementText("You will need to provide evidence that your organisation is officially registered in a country outside of the UK."),
+          StatementText("You will be asked for a digital copy of the official registration document.")
+        ).some
+      )
+
       val questionnaire = Questionnaire(
         id = Questionnaire.Id("ba16b123-524a-4d10-89a5-4bfa12ed42c9"),
         label = Questionnaire.Label("Enter organisation details"),
         questions = NonEmptyList.of(
-          QuestionItem(question1),
-          QuestionItem(question2a, AskWhen.AskWhenAnswer(question1, "UK limited company")),
-          QuestionItem(question2b),
-          QuestionItem(question2c),
-          QuestionItem(question2d)
+          QuestionItem(questionOrgType),
+          // UK limited company
+          QuestionItem(questionCompanyNumber, AskWhen.AskWhenAnswer(questionOrgType, ukLimitedCompany)),
+          QuestionItem(questionOrgName, AskWhen.AskWhenAnswer(questionOrgType, ukLimitedCompany)),
+          QuestionItem(questionCorporationUTR, AskWhen.AskWhenAnswer(questionOrgType, ukLimitedCompany)),
+          QuestionItem(questionOrgAddress, AskWhen.AskWhenAnswer(questionOrgType, ukLimitedCompany)),
+          QuestionItem(questionOrgWebsite, AskWhen.AskWhenAnswer(questionOrgType, ukLimitedCompany)),
+          // Sole trader
+          QuestionItem(questionFullName, AskWhen.AskWhenAnswer(questionOrgType, soleTrader)),
+          QuestionItem(questionDoB, AskWhen.AskWhenAnswer(questionOrgType, soleTrader)),
+          QuestionItem(questionNI, AskWhen.AskWhenAnswer(questionOrgType, soleTrader)),
+          QuestionItem(questionDoYouHaveSaUTR, AskWhen.AskWhenAnswer(questionOrgType, soleTrader)),
+          QuestionItem(questionSaUTR, AskWhen.AskWhenAnswer(questionDoYouHaveSaUTR, "Yes")),
+          QuestionItem(questionHomeAddress, AskWhen.AskWhenAnswer(questionOrgType, soleTrader)),
+          // Partnerships
+          QuestionItem(questionPartnershipType, AskWhen.AskWhenAnswer(questionOrgType, partnership)),
+          // Limited liability partnership
+          QuestionItem(questionCompanyNumber, AskWhen.AskWhenAnswer(questionPartnershipType, limitedLiabilityPartnership)),
+          QuestionItem(questionOrgName, AskWhen.AskWhenAnswer(questionPartnershipType, limitedLiabilityPartnership)),
+          QuestionItem(questionCorporationUTR, AskWhen.AskWhenAnswer(questionPartnershipType, limitedLiabilityPartnership)),
+          QuestionItem(questionOrgAddress, AskWhen.AskWhenAnswer(questionPartnershipType, limitedLiabilityPartnership)),
+          QuestionItem(questionOrgWebsite, AskWhen.AskWhenAnswer(questionPartnershipType, limitedLiabilityPartnership)),
+          // Limited partnership
+          QuestionItem(questionCompanyNumber, AskWhen.AskWhenAnswer(questionPartnershipType, limitedPartnership)),
+          QuestionItem(questionOrgName, AskWhen.AskWhenAnswer(questionPartnershipType, limitedPartnership)),
+          QuestionItem(questionCorporationUTR, AskWhen.AskWhenAnswer(questionPartnershipType, limitedPartnership)),
+          QuestionItem(questionOrgAddress, AskWhen.AskWhenAnswer(questionPartnershipType, limitedPartnership)),
+          QuestionItem(questionOrgWebsite, AskWhen.AskWhenAnswer(questionPartnershipType, limitedPartnership)),
+          // General partnership
+          QuestionItem(questionOrgName, AskWhen.AskWhenAnswer(questionPartnershipType, generalPartnership)),
+          QuestionItem(questionCorporationUTR, AskWhen.AskWhenAnswer(questionPartnershipType, generalPartnership)),
+          QuestionItem(questionOrgAddress, AskWhen.AskWhenAnswer(questionPartnershipType, generalPartnership)),
+          QuestionItem(questionOrgWebsite, AskWhen.AskWhenAnswer(questionPartnershipType, generalPartnership)),
+          // Scottish partnership
+          QuestionItem(questionOrgName, AskWhen.AskWhenAnswer(questionPartnershipType, scottishPartnership)),
+          QuestionItem(questionCorporationUTR, AskWhen.AskWhenAnswer(questionPartnershipType, scottishPartnership)),
+          QuestionItem(questionOrgAddress, AskWhen.AskWhenAnswer(questionPartnershipType, scottishPartnership)),
+          QuestionItem(questionOrgWebsite, AskWhen.AskWhenAnswer(questionPartnershipType, scottishPartnership)),
+          // Scottish limited partnership
+          QuestionItem(questionCompanyNumber, AskWhen.AskWhenAnswer(questionPartnershipType, scottishLimitedPartnership)),
+          QuestionItem(questionOrgName, AskWhen.AskWhenAnswer(questionPartnershipType, scottishLimitedPartnership)),
+          QuestionItem(questionCorporationUTR, AskWhen.AskWhenAnswer(questionPartnershipType, scottishLimitedPartnership)),
+          QuestionItem(questionOrgAddress, AskWhen.AskWhenAnswer(questionPartnershipType, scottishLimitedPartnership)),
+          QuestionItem(questionOrgWebsite, AskWhen.AskWhenAnswer(questionPartnershipType, scottishLimitedPartnership)),
+          // Registered society
+          QuestionItem(questionCompanyNumber, AskWhen.AskWhenAnswer(questionOrgType, registeredSociety)),
+          QuestionItem(questionOrgName, AskWhen.AskWhenAnswer(questionOrgType, registeredSociety)),
+          QuestionItem(questionCorporationUTR, AskWhen.AskWhenAnswer(questionOrgType, registeredSociety)),
+          QuestionItem(questionOrgAddress, AskWhen.AskWhenAnswer(questionOrgType, registeredSociety)),
+          QuestionItem(questionOrgWebsite, AskWhen.AskWhenAnswer(questionOrgType, registeredSociety)),
+          // Charitable Incorporated Organisation (CIO)
+          QuestionItem(questionCompanyNumber, AskWhen.AskWhenAnswer(questionOrgType, charitableIncorporatedOrganisation)),
+          QuestionItem(questionOrgName, AskWhen.AskWhenAnswer(questionOrgType, charitableIncorporatedOrganisation)),
+          QuestionItem(questionDoYouHaveHmrcRef, AskWhen.AskWhenAnswer(questionOrgType, charitableIncorporatedOrganisation)),
+          QuestionItem(questionHmrcRef, AskWhen.AskWhenAnswer(questionDoYouHaveHmrcRef, "Yes")),
+          QuestionItem(questionOrgAddress, AskWhen.AskWhenAnswer(questionOrgType, charitableIncorporatedOrganisation)),
+          QuestionItem(questionOrgWebsite, AskWhen.AskWhenAnswer(questionOrgType, charitableIncorporatedOrganisation)),
+          // Non-UK company with a branch or place of business in the UK
+          QuestionItem(questionCompanyNumber, AskWhen.AskWhenAnswer(questionOrgType, nonUkWithPlaceOfBusinessInUk)),
+          QuestionItem(questionOrgName, AskWhen.AskWhenAnswer(questionOrgType, nonUkWithPlaceOfBusinessInUk)),
+          QuestionItem(questionCorporationUTR, AskWhen.AskWhenAnswer(questionOrgType, nonUkWithPlaceOfBusinessInUk)),
+          QuestionItem(questionOrgAddress, AskWhen.AskWhenAnswer(questionOrgType, nonUkWithPlaceOfBusinessInUk)),
+          QuestionItem(questionNonUkTaxDocument, AskWhen.AskWhenAnswer(questionOrgType, nonUkWithPlaceOfBusinessInUk)),
+          QuestionItem(questionOrgWebsite, AskWhen.AskWhenAnswer(questionOrgType, nonUkWithPlaceOfBusinessInUk)),
+          // Non-UK company without a branch or place of business in the UK
+          QuestionItem(questionOrgName, AskWhen.AskWhenAnswer(questionOrgType, nonUkWithoutPlaceOfBusinessInUk)),
+          QuestionItem(questionOrgAddress, AskWhen.AskWhenAnswer(questionOrgType, nonUkWithoutPlaceOfBusinessInUk)),
+          QuestionItem(questionNonUkTaxDocument, AskWhen.AskWhenAnswer(questionOrgType, nonUkWithoutPlaceOfBusinessInUk)),
+          QuestionItem(questionOrgWebsite, AskWhen.AskWhenAnswer(questionOrgType, nonUkWithoutPlaceOfBusinessInUk))
         )
       )
     }
@@ -191,16 +374,6 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo("Enter a telephone number", "Telephone number cannot be blank").some
       )
 
-      val question6 = Question.TextQuestion(
-        Question.Id("b2dbf6a1-e39b-4c38-a524-19f0854ca1cc"),
-        Wording("What is your organisation’s website address?"),
-        statement = None,
-        hintText = StatementText("For example https://example.com").some,
-        absence = ("My organisation doesn't have a website", Mark.Fail).some,
-        validation = TextValidation.Url.some,
-        errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some
-      )
-
       val questionnaire = Questionnaire(
         id = Questionnaire.Id("be15b318-524a-4d10-89a5-4bfa52ed49c2"),
         label = Questionnaire.Label("Enter responsible individual details"),
@@ -209,8 +382,7 @@ object QuestionnaireDAO {
           QuestionItem(question2, AskWhen.AskWhenAnswer(question1, "No")),
           QuestionItem(question3),
           QuestionItem(question4, AskWhen.AskWhenAnswer(question1, "No")),
-          QuestionItem(question5),
-          QuestionItem(question6)
+          QuestionItem(question5)
         )
       )
     }
