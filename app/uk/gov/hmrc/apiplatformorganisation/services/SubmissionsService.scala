@@ -70,6 +70,17 @@ class SubmissionsService @Inject() (
       .value
   }
 
+  def submit(submissionId: SubmissionId, requestedBy: String): Future[Either[String, Submission]] = {
+    (
+      for {
+        submission         <- fromOptionF(submissionsDAO.fetch(submissionId), "No such submission")
+        submittedSubmission = Submission.submit(instant(), requestedBy)(submission)
+        savedSubmission    <- liftF(submissionsDAO.update(submittedSubmission))
+      } yield savedSubmission
+    )
+      .value
+  }
+
   def fetchLatestByOrganisationId(organisationId: OrganisationId): Future[Option[Submission]] = {
     submissionsDAO.fetchLatestByOrganisationId(organisationId)
   }
