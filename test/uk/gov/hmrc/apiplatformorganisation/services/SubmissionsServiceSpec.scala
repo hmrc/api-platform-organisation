@@ -86,6 +86,27 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
       }
     }
 
+    "submit submission" should {
+      "submit a submission" in new Setup {
+        SubmissionsDAOMock.Fetch.thenReturn(completelyAnswerExtendedSubmission.submission)
+        SubmissionsDAOMock.Update.thenReturn()
+
+        val result = await(underTest.submit(submissionId, "bob@example.com"))
+
+        result.value.status shouldBe Submission.Status.Submitted(instant, "bob@example.com")
+      }
+
+      "fail to submit a submission that hasn't been answered completely" in new Setup {
+        SubmissionsDAOMock.Fetch.thenReturn(aSubmission)
+        SubmissionsDAOMock.Update.thenReturn()
+
+        val result = await(underTest.submit(submissionId, "bob@example.com"))
+
+        result.isLeft shouldBe true
+        result.left.value shouldBe "Submission not completely answered"
+      }
+    }
+
     "fetchLatestByOrganisationId" should {
       "fetch latest submission for an organisation id" in new Setup {
         SubmissionsDAOMock.FetchLatestByOrganisationId.thenReturn(aSubmission)

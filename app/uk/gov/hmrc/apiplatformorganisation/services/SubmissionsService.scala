@@ -74,6 +74,7 @@ class SubmissionsService @Inject() (
     (
       for {
         submission         <- fromOptionF(submissionsDAO.fetch(submissionId), "No such submission")
+        _                  <- cond(submission.status.isAnsweredCompletely, (), "Submission not completely answered")
         submittedSubmission = Submission.submit(instant(), requestedBy)(submission)
         savedSubmission    <- liftF(submissionsDAO.update(submittedSubmission))
       } yield savedSubmission

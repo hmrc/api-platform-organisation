@@ -30,19 +30,19 @@ import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.Submissio
 import uk.gov.hmrc.apiplatformorganisation.mocks.SubmissionsServiceMockModule
 import uk.gov.hmrc.apiplatformorganisation.util._
 
-class SubmissionsControllerSpec extends AsyncHmrcSpec {
+class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
   import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission._
   implicit val mat: Materializer = NoMaterializer
 
   implicit val readsExtendedSubmission: Reads[Submission] = Json.reads[Submission]
 
-  trait Setup extends SubmissionsServiceMockModule with SubmissionsTestData {
+  trait Setup extends SubmissionsServiceMockModule {
     val underTest = new SubmissionsController(SubmissionsServiceMock.aMock, Helpers.stubControllerComponents())
   }
 
   "create new submission" should {
     implicit val writer: OWrites[SubmissionsController.CreateSubmissionRequest] = Json.writes[SubmissionsController.CreateSubmissionRequest]
-    val fakeRequest                                                             = FakeRequest(POST, "/").withBody(Json.toJson(SubmissionsController.CreateSubmissionRequest("bob@example.com")))
+    val fakeRequest                                                             = FakeRequest(POST, "/create").withBody(Json.toJson(SubmissionsController.CreateSubmissionRequest("bob@example.com")))
 
     "return an ok response" in new Setup {
       SubmissionsServiceMock.Create.thenReturn(aSubmission)
@@ -62,6 +62,33 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec {
       SubmissionsServiceMock.Create.thenFails("Test Error")
 
       val result = underTest.createSubmissionFor(userId)(fakeRequest)
+
+      status(result) shouldBe BAD_REQUEST
+    }
+  }
+
+  "submit a submission" should {
+    implicit val writer: OWrites[SubmissionsController.SubmitSubmissionRequest] = Json.writes[SubmissionsController.SubmitSubmissionRequest]
+    val fakeRequest                                                             = FakeRequest(POST, s"/submission/$submissionId").withBody(Json.toJson(SubmissionsController.SubmitSubmissionRequest("bob@example.com")))
+
+    "return an ok response" in new Setup {
+      SubmissionsServiceMock.Submit.thenReturn(aSubmission)
+
+      val result = underTest.submitSubmission(submissionId)(fakeRequest)
+
+      status(result) shouldBe OK
+
+      contentAsJson(result).validate[Submission] match {
+        case JsSuccess(submission, _) =>
+          submission shouldBe aSubmission
+        case JsError(f)               => fail(s"Not parsed as a response $f")
+      }
+    }
+
+    "return a bad request response" in new Setup {
+      SubmissionsServiceMock.Submit.thenFails("Test Error")
+
+      val result = underTest.submitSubmission(submissionId)(fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }
