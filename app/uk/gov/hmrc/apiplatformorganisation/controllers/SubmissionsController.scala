@@ -38,6 +38,10 @@ object SubmissionsController {
 
   case class CreateSubmissionRequest(requestedBy: String)
   implicit val readsCreateSubmissionRequest: Reads[CreateSubmissionRequest] = Json.reads[CreateSubmissionRequest]
+
+  case class SubmitSubmissionRequest(requestedBy: String)
+  implicit val readsSubmitSubmissionRequest: Reads[SubmitSubmissionRequest] = Json.reads[SubmitSubmissionRequest]
+
 }
 
 @Singleton
@@ -59,12 +63,22 @@ class SubmissionsController @Inject() (
     }
   }
 
-  def fetchSubmission(id: SubmissionId) = Action.async { _ =>
+  def submitSubmission(submissionId: SubmissionId) = Action.async(parse.json) { implicit request =>
+    val failed = (msg: String) => BadRequest(Json.toJson(ErrorMessage(msg)))
+
+    val success = (s: Submission) => Ok(Json.toJson(s))
+
+    withJsonBody[SubmitSubmissionRequest] { submissionRequest =>
+      service.submit(submissionId, submissionRequest.requestedBy).map(_.fold(failed, success))
+    }
+  }
+
+  def fetchSubmission(submissionId: SubmissionId) = Action.async { _ =>
     lazy val failed = NotFound(Results.EmptyContent())
 
     val success = (s: ExtendedSubmission) => Ok(Json.toJson(s))
 
-    service.fetch(id).map(_.fold(failed)(success))
+    service.fetch(submissionId).map(_.fold(failed)(success))
   }
 
   def fetchLatestByOrganisationId(organisationId: OrganisationId) = Action.async { _ =>

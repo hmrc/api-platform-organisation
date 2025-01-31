@@ -24,8 +24,8 @@ class OrganisationIdSpec extends BaseJsonFormattersSpec {
 
   "OrganisationId" should {
     "toString" in {
-      val org = OrganisationId.random
-      org.toString shouldBe org.value.toString()
+      val orgId = OrganisationId.random
+      orgId.toString shouldBe orgId.value.toString()
     }
 
     "convert to json" in {
