@@ -74,10 +74,10 @@ class SubmissionSpec extends BaseJsonFormattersSpec with SubmissionsTestData {
 
   "submission setLatestAnswers" in {
     val newAnswersToQuestions = Map(
-      (OrganisationDetails.question1.id -> ActualAnswer.TextAnswer("new web site"))
+      (OrganisationDetails.questionOrgType.id -> ActualAnswer.TextAnswer("new web site"))
     )
 
-    Submission.updateLatestAnswersTo(newAnswersToQuestions)(aSubmission).latestInstance.answersToQuestions(OrganisationDetails.question1.id) shouldBe ActualAnswer.TextAnswer(
+    Submission.updateLatestAnswersTo(newAnswersToQuestions)(aSubmission).latestInstance.answersToQuestions(OrganisationDetails.questionOrgType.id) shouldBe ActualAnswer.TextAnswer(
       "new web site"
     )
   }
