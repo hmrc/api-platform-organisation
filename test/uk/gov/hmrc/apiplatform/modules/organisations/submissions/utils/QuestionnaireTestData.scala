@@ -201,7 +201,18 @@ trait QuestionnaireTestData {
 
   val testQuestionIdsOfInterest = QuestionIdsOfInterest(
     organisationTypeId = OrganisationDetails.question1.id,
-    partnershipTypeId = OrganisationDetails.question2b.id
+    partnershipTypeId = OrganisationDetails.question2b.id,
+    organisationNameLtdId = OrganisationDetails.question2b.id,
+    organisationNameSoleId = OrganisationDetails.question2b.id,
+    organisationNameRsId = OrganisationDetails.question2b.id,
+    organisationNameCioId = OrganisationDetails.question2b.id,
+    organisationNameNonUkWithId = OrganisationDetails.question2b.id,
+    organisationNameNonUkWithoutId = OrganisationDetails.question2b.id,
+    organisationNameGpId = OrganisationDetails.question2b.id,
+    organisationNameLlpId = OrganisationDetails.question2b.id,
+    organisationNameLpId = OrganisationDetails.question2b.id,
+    organisationNameSpId = OrganisationDetails.question2b.id,
+    organisationNameSlpId = OrganisationDetails.question2b.id
   )
 
   val questionnaire      = ResponsibleIndividualDetails.questionnaire

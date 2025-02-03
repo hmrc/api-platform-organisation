@@ -185,6 +185,17 @@ trait SubmissionsTestData extends QuestionBuilder with QuestionnaireTestData wit
       questionnaireGroups,
       QuestionIdsOfInterest(
         question1.id,
+        questionName.id,
+        questionName.id,
+        questionName.id,
+        questionName.id,
+        questionName.id,
+        questionName.id,
+        questionName.id,
+        questionName.id,
+        questionName.id,
+        questionName.id,
+        questionName.id,
         questionName.id
       ),
       standardContext

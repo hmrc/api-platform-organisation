@@ -301,7 +301,18 @@
     } ],
     "questionIdsOfInterest" : {
       "organisationTypeId" : "cbdf264f-be39-4638-92ff-6ecd2259c662",
-      "partnershipTypeId" : "a2dbf1a7-e31b-4c89-a755-21f0652ca9cc"
+      "partnershipTypeId" : "a2dbf1a7-e31b-4c89-a755-21f0652ca9cc",
+      "organisationNameLtdId" : "a2dbf1a7-e31b-4c89-a755-21f0652ca9cc",
+      "organisationNameSoleId" : "a2dbf1a7-e31b-4c89-a755-21f0652ca9cc",
+      "organisationNameRsId" : "a2dbf1a7-e31b-4c89-a755-21f0652ca9cc",
+      "organisationNameCioId" : "a2dbf1a7-e31b-4c89-a755-21f0652ca9cc",
+      "organisationNameNonUkWithId" : "a2dbf1a7-e31b-4c89-a755-21f0652ca9cc",
+      "organisationNameNonUkWithoutId" : "a2dbf1a7-e31b-4c89-a755-21f0652ca9cc",
+      "organisationNameGpId" : "a2dbf1a7-e31b-4c89-a755-21f0652ca9cc",
+      "organisationNameLlpId" : "a2dbf1a7-e31b-4c89-a755-21f0652ca9cc",
+      "organisationNameLpId" : "a2dbf1a7-e31b-4c89-a755-21f0652ca9cc",
+      "organisationNameSpId" : "a2dbf1a7-e31b-4c89-a755-21f0652ca9cc",
+      "organisationNameSlpId" : "a2dbf1a7-e31b-4c89-a755-21f0652ca9cc"      
     },
     "instances" : [ {
       "index" : 0,

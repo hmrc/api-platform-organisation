@@ -17,7 +17,6 @@
 package uk.gov.hmrc.apiplatformorganisation.services
 
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
-import uk.gov.hmrc.apiplatformorganisation.repositories.QuestionnaireDAO
 
 object SubmissionDataExtracter {
 
@@ -41,20 +40,21 @@ object SubmissionDataExtracter {
     val orgType         = getSingleChoiceQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationTypeId)
     val partnershipType = getSingleChoiceQuestionOfInterest(submission, submission.questionIdsOfInterest.partnershipTypeId)
 
-    val orgDetails = QuestionnaireDAO.Questionnaires.OrganisationDetails
     (orgType, partnershipType) match {
-      case (Some(QuestionnaireDAO.ukLimitedCompany), _)                                             => getTextQuestionOfInterest(submission, orgDetails.questionLtdOrgName.id)
-      case (Some(QuestionnaireDAO.soleTrader), _)                                                   => getTextQuestionOfInterest(submission, orgDetails.questionSoleFullName.id)
-      case (Some(QuestionnaireDAO.registeredSociety), _)                                            => getTextQuestionOfInterest(submission, orgDetails.questionRsOrgName.id)
-      case (Some(QuestionnaireDAO.charitableIncorporatedOrganisation), _)                           => getTextQuestionOfInterest(submission, orgDetails.questionCioOrgName.id)
-      case (Some(QuestionnaireDAO.nonUkWithPlaceOfBusinessInUk), _)                                 => getTextQuestionOfInterest(submission, orgDetails.questionNonUkWithOrgName.id)
-      case (Some(QuestionnaireDAO.nonUkWithoutPlaceOfBusinessInUk), _)                              => getTextQuestionOfInterest(submission, orgDetails.questionNonUkWithoutOrgName.id)
-      case (Some(QuestionnaireDAO.partnership), Some(QuestionnaireDAO.generalPartnership))          => getTextQuestionOfInterest(submission, orgDetails.questionGpOrgName.id)
-      case (Some(QuestionnaireDAO.partnership), Some(QuestionnaireDAO.limitedLiabilityPartnership)) => getTextQuestionOfInterest(submission, orgDetails.questionLlpOrgName.id)
-      case (Some(QuestionnaireDAO.partnership), Some(QuestionnaireDAO.limitedPartnership))          => getTextQuestionOfInterest(submission, orgDetails.questionLpOrgName.id)
-      case (Some(QuestionnaireDAO.partnership), Some(QuestionnaireDAO.scottishPartnership))         => getTextQuestionOfInterest(submission, orgDetails.questionSpOrgName.id)
-      case (Some(QuestionnaireDAO.partnership), Some(QuestionnaireDAO.scottishLimitedPartnership))  => getTextQuestionOfInterest(submission, orgDetails.questionSlpOrgName.id)
-      case (_, _)                                                                                   => None
+      case (Some("UK limited company"), _)                                             => getTextQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationNameLtdId)
+      case (Some("Sole trader"), _)                                                    => getTextQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationNameSoleId)
+      case (Some("Registered society"), _)                                             => getTextQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationNameRsId)
+      case (Some("Charitable Incorporated Organisation (CIO)"), _)                     => getTextQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationNameCioId)
+      case (Some("Non-UK company with a branch or place of business in the UK"), _)    =>
+        getTextQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationNameNonUkWithId)
+      case (Some("Non-UK company without a branch or place of business in the UK"), _) =>
+        getTextQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationNameNonUkWithoutId)
+      case (Some("Partnership"), Some("General partnership"))                          => getTextQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationNameGpId)
+      case (Some("Partnership"), Some("Limited liability partnership"))                => getTextQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationNameLlpId)
+      case (Some("Partnership"), Some("Limited partnership"))                          => getTextQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationNameLpId)
+      case (Some("Partnership"), Some("Scottish partnership"))                         => getTextQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationNameSpId)
+      case (Some("Partnership"), Some("Scottish limited partnership"))                 => getTextQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationNameSlpId)
+      case (_, _)                                                                      => None
     }
   }
 }
