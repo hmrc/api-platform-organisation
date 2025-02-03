@@ -301,7 +301,7 @@
     } ],
     "questionIdsOfInterest" : {
       "organisationTypeId" : "cbdf264f-be39-4638-92ff-6ecd2259c662",
-      "organisationNameId" : "a2dbf1a7-e31b-4c89-a755-21f0652ca9cc"
+      "partnershipTypeId" : "a2dbf1a7-e31b-4c89-a755-21f0652ca9cc"
     },
     "instances" : [ {
       "index" : 0,
@@ -309,10 +309,6 @@
         "cbdf264f-be39-4638-92ff-6ecd2259c662" : {
           "value" : "UK limited company",
           "answerType" : "singleChoice"
-        },
-        "a2dbf1a7-e31b-4c89-a755-21f0652ca9cc" : {
-          "value" : "Bobs Burgers",
-          "answerType" : "text"
         }
       },
       "statusHistory" : [ {

@@ -39,8 +39,8 @@ class SubmissionSpec extends BaseJsonFormattersSpec with SubmissionsTestData {
 
   "submission questionIdsOfInterest org name" in {
     Submission.updateLatestAnswersTo(samplePassAnswersToQuestions)(aSubmission).latestInstance.answersToQuestions(
-      aSubmission.questionIdsOfInterest.organisationNameId
-    ) shouldBe ActualAnswer.TextAnswer("Bobs Burgers")
+      aSubmission.questionIdsOfInterest.organisationTypeId
+    ) shouldBe ActualAnswer.SingleChoiceAnswer("UK limited company")
   }
 
   "submission instance state history" in {
@@ -69,7 +69,7 @@ class SubmissionSpec extends BaseJsonFormattersSpec with SubmissionsTestData {
   }
 
   "submission findQuestionnaireContaining" in {
-    aSubmission.findQuestionnaireContaining(aSubmission.questionIdsOfInterest.organisationNameId) shouldBe Some(OrganisationDetails.questionnaire)
+    aSubmission.findQuestionnaireContaining(aSubmission.questionIdsOfInterest.organisationTypeId) shouldBe Some(OrganisationDetails.questionnaire)
   }
 
   "submission setLatestAnswers" in {
