@@ -94,6 +94,14 @@ class SubmissionsDAOISpec
     }
   }
 
+  "fetchAll" should {
+    "return all of them" in {
+      await(submissionsDao.save(aSubmission))
+      await(submissionsDao.save(altSubmission))
+      await(submissionsDao.fetchAll()) mustBe List(aSubmission, altSubmission)
+    }
+  }
+
   "update" should {
     "replace the existing record" in {
       await(submissionsDao.save(aSubmission))

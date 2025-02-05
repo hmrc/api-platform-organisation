@@ -14,4 +14,6 @@ GET         /submission/marked/organisation/:oid    uk.gov.hmrc.apiplatformorgan
 GET         /submission/:sid                        uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchSubmission(sid: SubmissionId)
 POST        /submission/:sid/question/:qid          uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.recordAnswers(sid: SubmissionId, qid: Question.Id)
 
+GET         /submissions                            uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchAll()
+
 POST        /submission/:sid                        uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.submitSubmission(sid: SubmissionId)

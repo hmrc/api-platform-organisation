@@ -159,6 +159,28 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
       status(result) shouldBe NOT_FOUND
     }
   }
+  "fetchAll" should {
+    "return ok response with submissions when found" in new Setup {
+      SubmissionsServiceMock.FetchAll.thenReturn(aSubmission)
+
+      val result = underTest.fetchAll()(FakeRequest(GET, "/"))
+
+      status(result) shouldBe OK
+      contentAsJson(result).validate[List[Submission]] match {
+        case JsSuccess(sub, _) => succeed
+        case JsError(e)        => fail(s"Not parsed as a response $e")
+      }
+    }
+
+    "return ok response with empty submissions" in new Setup {
+      SubmissionsServiceMock.FetchAll.thenReturnEmptyList()
+
+      val result = underTest.fetchAll()(FakeRequest(GET, "/"))
+
+      status(result) shouldBe OK
+      contentAsString(result) shouldBe "[]"
+    }
+  }
 
   "fetchLatestExtendedByUserId" should {
     "return ok response with submission when found" in new Setup {
