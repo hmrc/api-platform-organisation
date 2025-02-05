@@ -73,4 +73,9 @@ class SubmissionsDAO @Inject() (submissionsRepository: SubmissionsRepository)(im
     collection.find(equal("id", Codecs.toBson(id)))
       .headOption()
   }
+
+  def fetchAll(): Future[List[Submission]] = {
+    collection.find().toFuture()
+      .map(_.toList)
+  }
 }

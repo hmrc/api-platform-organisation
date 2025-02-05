@@ -137,4 +137,8 @@ class SubmissionsService @Inject() (
 
   def store(submission: Submission): Future[Submission] =
     submissionsDAO.update(submission)
+
+  def fetchAll(): Future[List[Submission]] = {
+    submissionsDAO.fetchAll()
+  }
 }

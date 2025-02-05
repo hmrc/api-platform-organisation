@@ -22,7 +22,7 @@ import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationId
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, _}
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
 import uk.gov.hmrc.apiplatformorganisation.repositories.SubmissionsDAO
 
 trait SubmissionsDAOMockModule extends MockitoSugar with ArgumentMatchersSugar {
@@ -46,6 +46,12 @@ trait SubmissionsDAOMockModule extends MockitoSugar with ArgumentMatchersSugar {
 
       def thenReturnNothing() =
         when(aMock.fetch(*[SubmissionId])).thenReturn(successful(None))
+    }
+
+    object FetchAll {
+      def thenReturn(submission: Submission) = when(aMock.fetchAll()).thenReturn(successful(List(submission)))
+      def thenReturnNothing()                = when(aMock.fetchAll()).thenReturn(successful(List.empty))
+
     }
 
     object FetchLatestByOrganisationId {

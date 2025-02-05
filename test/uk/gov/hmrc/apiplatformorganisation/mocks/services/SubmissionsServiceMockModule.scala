@@ -90,6 +90,15 @@ trait SubmissionsServiceMockModule extends MockitoSugar with ArgumentMatchersSug
         when(aMock.fetchLatestExtendedByOrganisationId(*[OrganisationId])).thenReturn(successful(None))
     }
 
+    object FetchAll {
+
+      def thenReturn(submission: Submission) =
+        when(aMock.fetchAll()).thenReturn(successful(List(submission)))
+
+      def thenReturnEmptyList() =
+        when(aMock.fetchAll()).thenReturn(successful(List.empty))
+    }
+
     object FetchLatestExtendedByUserId {
 
       def thenReturn(extSubmission: ExtendedSubmission) =
