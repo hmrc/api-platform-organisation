@@ -109,8 +109,13 @@ object QuestionnaireDAO {
             StatementText(".")
           )
         ).some,
-        hintText = StatementText("It is 8 characters. For example, 01234567 or AC012345.").some,
-        errorInfo = ErrorInfo("Your company registration number cannot be blank", "Enter your company registration number, like 01234567").some
+        hintText =
+          StatementText("It is 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total. For example, 01234567 or AC012345.").some,
+        validation = TextValidation.OrganisationNumber.some,
+        errorInfo = ErrorInfo(
+          "Your company number must have 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total",
+          "Enter your company registration number, like 01234567"
+        ).some
       )
 
       val questionLtdOrgName = Question.TextQuestion(
@@ -232,8 +237,13 @@ object QuestionnaireDAO {
             StatementText(".")
           )
         ).some,
-        hintText = StatementText("It is 8 characters. For example, 01234567 or AC012345.").some,
-        errorInfo = ErrorInfo("Your company registration number cannot be blank", "Enter your company registration number, like 01234567").some
+        hintText =
+          StatementText("It is 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total. For example, 01234567 or AC012345.").some,
+        validation = TextValidation.OrganisationNumber.some,
+        errorInfo = ErrorInfo(
+          "Your company number must have 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total",
+          "Enter your company registration number, like 01234567"
+        ).some
       )
 
       val questionLlpOrgName = Question.TextQuestion(
@@ -287,8 +297,13 @@ object QuestionnaireDAO {
             StatementText(".")
           )
         ).some,
-        hintText = StatementText("It is 8 characters. For example, 01234567 or AC012345.").some,
-        errorInfo = ErrorInfo("Your company registration number cannot be blank", "Enter your company registration number, like 01234567").some
+        hintText =
+          StatementText("It is 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total. For example, 01234567 or AC012345.").some,
+        validation = TextValidation.OrganisationNumber.some,
+        errorInfo = ErrorInfo(
+          "Your company number must have 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total",
+          "Enter your company registration number, like 01234567"
+        ).some
       )
 
       val questionLpOrgName = Question.TextQuestion(
@@ -424,8 +439,13 @@ object QuestionnaireDAO {
             StatementText(".")
           )
         ).some,
-        hintText = StatementText("It is 8 characters. For example, 01234567 or AC012345.").some,
-        errorInfo = ErrorInfo("Your company registration number cannot be blank", "Enter your company registration number, like 01234567").some
+        hintText =
+          StatementText("It is 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total. For example, 01234567 or AC012345.").some,
+        validation = TextValidation.OrganisationNumber.some,
+        errorInfo = ErrorInfo(
+          "Your company number must have 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total",
+          "Enter your company registration number, like 01234567"
+        ).some
       )
 
       val questionSlpOrgName = Question.TextQuestion(
@@ -479,8 +499,13 @@ object QuestionnaireDAO {
             StatementText(".")
           )
         ).some,
-        hintText = StatementText("It is 8 characters. For example, 01234567 or AC012345.").some,
-        errorInfo = ErrorInfo("Your company registration number cannot be blank", "Enter your company registration number, like 01234567").some
+        hintText =
+          StatementText("It is 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total. For example, 01234567 or AC012345.").some,
+        validation = TextValidation.OrganisationNumber.some,
+        errorInfo = ErrorInfo(
+          "Your company number must have 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total",
+          "Enter your company registration number, like 01234567"
+        ).some
       )
 
       val questionRsOrgName = Question.TextQuestion(
@@ -534,8 +559,13 @@ object QuestionnaireDAO {
             StatementText(".")
           )
         ).some,
-        hintText = StatementText("It is 8 characters. For example, 01234567 or AC012345.").some,
-        errorInfo = ErrorInfo("Your company registration number cannot be blank", "Enter your company registration number, like 01234567").some
+        hintText =
+          StatementText("It is 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total. For example, 01234567 or AC012345.").some,
+        validation = TextValidation.OrganisationNumber.some,
+        errorInfo = ErrorInfo(
+          "Your company number must have 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total",
+          "Enter your company registration number, like 01234567"
+        ).some
       )
 
       val questionCioOrgName = Question.TextQuestion(
@@ -597,8 +627,13 @@ object QuestionnaireDAO {
             StatementText(".")
           )
         ).some,
-        hintText = StatementText("It is 8 characters. For example, 01234567 or AC012345.").some,
-        errorInfo = ErrorInfo("Your company registration number cannot be blank", "Enter your company registration number, like 01234567").some
+        hintText =
+          StatementText("It is 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total. For example, 01234567 or AC012345.").some,
+        validation = TextValidation.OrganisationNumber.some,
+        errorInfo = ErrorInfo(
+          "Your company number must have 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total",
+          "Enter your company registration number, like 01234567"
+        ).some
       )
 
       val questionNonUkWithOrgName = Question.TextQuestion(
