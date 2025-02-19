@@ -33,7 +33,7 @@ object SubmissionsController {
   case class ErrorMessage(message: String)
   implicit val writesErrorMessage: OWrites[ErrorMessage] = Json.writes[ErrorMessage]
 
-  case class RecordAnswersRequest(answers: List[String])
+  case class RecordAnswersRequest(responses: Map[String, Seq[String]])
   implicit val readsRecordAnswersRequest: Reads[RecordAnswersRequest] = Json.reads[RecordAnswersRequest]
 
   case class CreateSubmissionRequest(requestedBy: String)
@@ -139,7 +139,7 @@ class SubmissionsController @Inject() (
     val success = (s: ExtendedSubmission) => Ok(Json.toJson(s))
 
     withJsonBody[RecordAnswersRequest] { answersRequest =>
-      service.recordAnswers(submissionId, questionId, answersRequest.answers).map(_.fold(failed, success))
+      service.recordAnswers(submissionId, questionId, answersRequest.responses).map(_.fold(failed, success))
     }
   }
 }

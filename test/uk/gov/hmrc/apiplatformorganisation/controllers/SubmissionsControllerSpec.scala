@@ -25,7 +25,7 @@ import play.api.libs.json.{JsError, JsSuccess, Json, OWrites, Reads}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, MarkedSubmission, Submission}
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, MarkedSubmission, Question, Submission}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.SubmissionsTestData
 import uk.gov.hmrc.apiplatformorganisation.mocks.SubmissionsServiceMockModule
 import uk.gov.hmrc.apiplatformorganisation.util._
@@ -278,7 +278,7 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
 
       SubmissionsServiceMock.RecordAnswers.thenReturn(ExtendedSubmission(answeringSubmission, answeringSubmission.withIncompleteProgress().questionnaireProgress))
 
-      val answerJsonBody = Json.toJson(SubmissionsController.RecordAnswersRequest(List("Yes")))
+      val answerJsonBody = Json.toJson(SubmissionsController.RecordAnswersRequest(Map(Question.answerKey -> Seq("Yes"))))
 
       val result = underTest.recordAnswers(submissionId, questionId)(FakeRequest(PUT, "/").withBody(answerJsonBody))
 
@@ -290,7 +290,7 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
 
       SubmissionsServiceMock.RecordAnswers.thenFails("bang")
 
-      val answerJsonBody = Json.toJson(SubmissionsController.RecordAnswersRequest(List("Yes")))
+      val answerJsonBody = Json.toJson(SubmissionsController.RecordAnswersRequest(Map(Question.answerKey -> Seq("Yes"))))
       val result         = underTest.recordAnswers(submissionId, questionId)(FakeRequest(PUT, "/").withBody(answerJsonBody))
 
       status(result) shouldBe BAD_REQUEST
