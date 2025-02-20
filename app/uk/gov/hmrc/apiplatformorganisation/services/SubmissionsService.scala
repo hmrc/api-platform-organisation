@@ -124,7 +124,7 @@ class SubmissionsService @Inject() (
       .value
   }
 
-  def recordAnswers(submissionId: SubmissionId, questionId: Question.Id, rawAnswers: List[String]): Future[Either[String, ExtendedSubmission]] = {
+  def recordAnswers(submissionId: SubmissionId, questionId: Question.Id, rawAnswers: Map[String, Seq[String]]): Future[Either[String, ExtendedSubmission]] = {
     (
       for {
         initialSubmission <- fromOptionF(submissionsDAO.fetch(submissionId), "No such submission")

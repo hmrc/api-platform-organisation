@@ -236,7 +236,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         SubmissionsDAOMock.Fetch.thenReturn(aSubmission)
         SubmissionsDAOMock.Update.thenReturn()
 
-        val result = await(underTest.recordAnswers(submissionId, questionId, List("Yes")))
+        val result = await(underTest.recordAnswers(submissionId, questionId, Map(Question.answerKey -> Seq("Yes"))))
 
         val out = result.value
         out.submission.latestInstance.answersToQuestions.get(questionId).value shouldBe ActualAnswer.SingleChoiceAnswer("Yes")
@@ -247,7 +247,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         SubmissionsDAOMock.Fetch.thenReturn(aSubmission)
         SubmissionsDAOMock.Update.thenReturn()
 
-        val result = await(underTest.recordAnswers(submissionId, optionalQuestionId, List.empty))
+        val result = await(underTest.recordAnswers(submissionId, optionalQuestionId, Map.empty))
 
         val out = result.value
         out.submission.latestInstance.answersToQuestions.get(optionalQuestionId).value shouldBe ActualAnswer.NoAnswer
@@ -258,7 +258,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         SubmissionsDAOMock.Fetch.thenReturn(aSubmission)
         SubmissionsDAOMock.Update.thenReturn()
 
-        val result = await(underTest.recordAnswers(submissionId, Question.Id.random, List("Yes")))
+        val result = await(underTest.recordAnswers(submissionId, Question.Id.random, Map(Question.answerKey -> Seq("Yes"))))
 
         result.left.value shouldBe "Not valid for this submission"
       }
@@ -267,9 +267,9 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         SubmissionsDAOMock.Fetch.thenReturn(aSubmission)
         SubmissionsDAOMock.Update.thenReturn()
 
-        val result = await(underTest.recordAnswers(submissionId, questionId, List.empty))
+        val result = await(underTest.recordAnswers(submissionId, questionId, Map.empty))
 
-        result.left.value shouldBe "Question requires an answer"
+        result.left.value shouldBe "Question requires a single answer"
       }
     }
   }

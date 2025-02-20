@@ -166,11 +166,11 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo("Your full name cannot be blank", "Enter your full name").some
       )
 
-      val questionSoleDoB = Question.TextQuestion(
+      val questionSoleDoB = Question.DateQuestion(
         Question.Id("6326f8fc-2543-4977-8a73-889be5901c84"),
         Wording("What is your date of birth?"),
         statement = None,
-        errorInfo = ErrorInfo("Your date of birth cannot be blank", "Enter your date of birth").some
+        errorInfo = ErrorInfo("Your date of birth was invalid", "Enter your date of birth").some
       )
 
       val questionSoleNI = Question.TextQuestion(
