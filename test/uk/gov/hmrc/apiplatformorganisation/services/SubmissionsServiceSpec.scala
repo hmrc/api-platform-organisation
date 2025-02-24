@@ -23,8 +23,7 @@ import org.scalatest.Inside
 
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services._
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.SubmissionsTestData
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils._
 import uk.gov.hmrc.apiplatformorganisation.mocks.SubmissionsDAOMockModule
 import uk.gov.hmrc.apiplatformorganisation.repositories.QuestionnaireDAO
 import uk.gov.hmrc.apiplatformorganisation.util.AsyncHmrcSpec
