@@ -17,3 +17,5 @@ POST        /submission/:sid/question/:qid          uk.gov.hmrc.apiplatformorgan
 GET         /submissions                            uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchAll()
 
 POST        /submission/:sid                        uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.submitSubmission(sid: SubmissionId)
+
+GET         /company/:cnumber                       uk.gov.hmrc.apiplatformorganisation.controllers.CompanyController.fetchByCompanyNumber(cnumber: String)

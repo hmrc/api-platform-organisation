@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apiplatformorganisation.config
-
-import javax.inject.{Inject, Singleton}
+package uk.gov.hmrc.utils
 
 import play.api.Configuration
 
-@Singleton
-class AppConfig @Inject() (config: Configuration) {
+trait ConfigBuilder {
 
-  val appName: String           = config.get[String]("appName")
-  val companiesHouseKey: String = config.get[String]("companies-house.api-key")
-  val companiesHouseUri: String = config.get[String]("companies-house.uri")
+  protected def stubConfig(stubPort: Int) = Configuration(
+    "companies-house.uri" -> s"http://localhost:$stubPort",
+    "api-key"             -> "5bb51bca-8f97-4f2b-aee4-81a4a70a42d3"
+  )
 }
