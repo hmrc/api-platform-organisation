@@ -140,7 +140,7 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
 
   "fetchLatestExtendedByOrganisationId" should {
     "return ok response with submission when found" in new Setup {
-      SubmissionsServiceMock.FetchLatestExtendedByOrganisationId.thenReturn(aSubmission.withNotStartedProgresss())
+      SubmissionsServiceMock.FetchLatestExtendedByOrganisationId.thenReturn(aSubmission.withNotStartedProgress())
 
       val result = underTest.fetchLatestExtendedByOrganisationId(organisationId)(FakeRequest(GET, "/"))
 
@@ -184,7 +184,7 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
 
   "fetchLatestExtendedByUserId" should {
     "return ok response with submission when found" in new Setup {
-      SubmissionsServiceMock.FetchLatestExtendedByUserId.thenReturn(aSubmission.withNotStartedProgresss())
+      SubmissionsServiceMock.FetchLatestExtendedByUserId.thenReturn(aSubmission.withNotStartedProgress())
 
       val result = underTest.fetchLatestExtendedByUserId(userId)(FakeRequest(GET, "/"))
 
@@ -206,7 +206,7 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
 
   "fetchSubmission" should {
     "return ok response with submission when found" in new Setup {
-      SubmissionsServiceMock.Fetch.thenReturn(aSubmission.withNotStartedProgresss())
+      SubmissionsServiceMock.Fetch.thenReturn(aSubmission.withNotStartedProgress())
 
       val result = underTest.fetchSubmission(submissionId)(FakeRequest(GET, "/"))
 
