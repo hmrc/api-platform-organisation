@@ -33,8 +33,6 @@ abstract class BaseISpec extends PlaySpec with WireMockSupport with Matchers {
   def app: Application
   protected def appBuilder: GuiceApplicationBuilder
 
-  override def commonStubs(): Unit = {}
-
   protected implicit def materializer: Materializer = app.materializer
 
   private lazy val messagesApi            = app.injector.instanceOf[MessagesApi]
