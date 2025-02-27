@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,9 @@ package uk.gov.hmrc.apiplatformorganisation.models
 import play.api.libs.json.{Json, OFormat}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
 
-case class CreateOrganisationRequest(organisationName: OrganisationName, createdBy: UserId, createdByEmail: LaxEmailAddress)
+case class Member(userId: UserId, emailAddress: LaxEmailAddress)
 
-object CreateOrganisationRequest {
-  implicit val createOrgFormat: OFormat[CreateOrganisationRequest] = Json.format[CreateOrganisationRequest]
+object Member {
+  implicit val format: OFormat[Member] = Json.format[Member]
 }

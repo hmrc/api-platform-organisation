@@ -21,6 +21,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 import uk.gov.hmrc.apiplatform.modules.common.services.ClockNow
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationId
 import uk.gov.hmrc.apiplatformorganisation.models._
 import uk.gov.hmrc.apiplatformorganisation.repositories.OrganisationRepository
 
@@ -29,5 +30,13 @@ class OrganisationService @Inject() (organisationRepository: OrganisationReposit
 
   def create(createOrganisationRequest: CreateOrganisationRequest)(implicit ec: ExecutionContext): Future[Organisation] = {
     organisationRepository.save(StoredOrganisation.create(createOrganisationRequest, instant())).map(StoredOrganisation.asOrganisation)
+  }
+
+  def addMember(organisationId: OrganisationId, member: Member)(implicit ec: ExecutionContext): Future[Organisation] = {
+    organisationRepository.addMember(organisationId, member).map(StoredOrganisation.asOrganisation)
+  }
+
+  def removeMember(organisationId: OrganisationId, member: Member)(implicit ec: ExecutionContext): Future[Organisation] = {
+    organisationRepository.removeMember(organisationId, member).map(StoredOrganisation.asOrganisation)
   }
 }

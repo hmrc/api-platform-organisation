@@ -20,18 +20,20 @@ import java.time.Instant
 
 import play.api.libs.json._
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{OrganisationId, OrganisationName}
 
-case class StoredOrganisation(id: OrganisationId, name: OrganisationName, createdDatetime: Instant)
+case class StoredOrganisation(id: OrganisationId, name: OrganisationName, createdDatetime: Instant, createdBy: UserId, members: Set[Member])
 
 object StoredOrganisation {
   implicit val storedOrganisationFormat: OFormat[StoredOrganisation] = Json.format[StoredOrganisation]
 
   def create(createOrganisationRequest: CreateOrganisationRequest, createdTime: Instant): StoredOrganisation = {
-    StoredOrganisation(OrganisationId.random, createOrganisationRequest.organisationName, createdTime)
+    val member = Member(createOrganisationRequest.createdBy, createOrganisationRequest.createdByEmail)
+    StoredOrganisation(OrganisationId.random, createOrganisationRequest.organisationName, createdTime, createOrganisationRequest.createdBy, Set(member))
   }
 
   def asOrganisation(data: StoredOrganisation): Organisation = {
-    Organisation(data.id, data.name)
+    Organisation(data.id, data.name, data.members)
   }
 }

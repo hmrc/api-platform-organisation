@@ -26,9 +26,10 @@ import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
 import uk.gov.hmrc.apiplatformorganisation.OrganisationFixtures
-import uk.gov.hmrc.apiplatformorganisation.models.StoredOrganisation
+import uk.gov.hmrc.apiplatformorganisation.models.{Member, StoredOrganisation}
 import uk.gov.hmrc.apiplatformorganisation.repositories.OrganisationRepository
 
 class OrganisationRepositoryISpec extends AnyWordSpec
@@ -52,6 +53,7 @@ class OrganisationRepositoryISpec extends AnyWordSpec
       await(underTest.save(standardStoredOrg))
       await(repository.collection.find().toFuture()).head shouldBe standardStoredOrg
     }
+
     "update single org" in {
       await(repository.collection.insertOne(standardStoredOrg).toFuture())
       await(repository.collection.find().toFuture()).head shouldBe standardStoredOrg
@@ -59,6 +61,26 @@ class OrganisationRepositoryISpec extends AnyWordSpec
       val updatedOrg = standardStoredOrg.copy(name = OrganisationName("Dave"))
       await(underTest.save(updatedOrg))
       await(repository.collection.find().toFuture()).head shouldBe updatedOrg
+    }
+
+    "add member" in {
+      await(repository.collection.insertOne(standardStoredOrg).toFuture())
+      await(repository.collection.find().toFuture()).head shouldBe standardStoredOrg
+
+      val newMember  = Member(UserId.random, LaxEmailAddress("new-person@example.com"))
+      await(underTest.addMember(standardStoredOrg.id, newMember))
+      val updatedOrg = standardStoredOrg.copy(members = standardStoredOrg.members + newMember)
+      await(repository.collection.find().toFuture()).head shouldBe updatedOrg
+    }
+
+    "remove member" in {
+      val member        = Member(UserId.random, LaxEmailAddress("new-person@example.com"))
+      val twoMembersOrg = standardStoredOrg.copy(members = standardStoredOrg.members + member)
+      await(repository.collection.insertOne(twoMembersOrg).toFuture())
+      await(repository.collection.find().toFuture()).head shouldBe twoMembersOrg
+
+      await(underTest.removeMember(standardStoredOrg.id, member))
+      await(repository.collection.find().toFuture()).head shouldBe standardStoredOrg
     }
   }
 }

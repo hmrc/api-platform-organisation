@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.apiplatformorganisation
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{OrganisationId, OrganisationName}
 import uk.gov.hmrc.apiplatformorganisation.models._
@@ -28,16 +29,24 @@ object OrganisationNameData {
   val one: OrganisationName = OrganisationName("Example")
 }
 
+object UserIdData {
+  val one: UserId = UserId.random
+}
+
+object MemberData {
+  val one: Member = Member(UserIdData.one, LaxEmailAddress("bob@example.com"))
+}
+
 object CreateOrganisationRequestData {
-  val one: CreateOrganisationRequest = CreateOrganisationRequest(OrganisationNameData.one)
+  val one: CreateOrganisationRequest = CreateOrganisationRequest(OrganisationNameData.one, UserIdData.one, LaxEmailAddress("bob@example.com"))
 }
 
 object OrganisationData {
-  val one: Organisation = Organisation(OrganisationIdData.one, OrganisationNameData.one)
+  val one: Organisation = Organisation(OrganisationIdData.one, OrganisationNameData.one, Set(MemberData.one))
 }
 
 object StoredOrganisationData extends FixedClock {
-  val one: StoredOrganisation = StoredOrganisation(OrganisationIdData.one, OrganisationNameData.one, instant)
+  val one: StoredOrganisation = StoredOrganisation(OrganisationIdData.one, OrganisationNameData.one, instant, UserIdData.one, Set(MemberData.one))
 }
 
 trait OrganisationFixtures {

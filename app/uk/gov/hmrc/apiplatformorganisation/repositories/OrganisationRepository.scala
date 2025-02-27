@@ -19,14 +19,16 @@ package uk.gov.hmrc.apiplatformorganisation.repositories
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+import org.bson.conversions.Bson
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
-import org.mongodb.scala.model.{IndexModel, IndexOptions}
+import org.mongodb.scala.model.{FindOneAndUpdateOptions, IndexModel, IndexOptions, ReturnDocument, Updates}
 
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 
-import uk.gov.hmrc.apiplatformorganisation.models.StoredOrganisation
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationId
+import uk.gov.hmrc.apiplatformorganisation.models.{Member, StoredOrganisation}
 
 @Singleton
 class OrganisationRepository @Inject() (mongo: MongoComponent)(implicit val ec: ExecutionContext)
@@ -56,5 +58,33 @@ class OrganisationRepository @Inject() (mongo: MongoComponent)(implicit val ec: 
 
       case None => collection.insertOne(organisation).toFuture().map(_ => organisation)
     }
+  }
+
+  def addMember(organisationId: OrganisationId, member: Member): Future[StoredOrganisation] =
+    updateOrganisation(
+      organisationId,
+      Updates.push(
+        "members",
+        Codecs.toBson(member)
+      )
+    )
+
+  def removeMember(organisationId: OrganisationId, member: Member): Future[StoredOrganisation] =
+    updateOrganisation(
+      organisationId,
+      Updates.pull(
+        "members",
+        Codecs.toBson(member)
+      )
+    )
+
+  private def updateOrganisation(organisationId: OrganisationId, updateStatement: Bson): Future[StoredOrganisation] = {
+    val query = equal("id", Codecs.toBson(organisationId))
+
+    collection.findOneAndUpdate(
+      filter = query,
+      update = updateStatement,
+      options = new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER)
+    ).toFuture()
   }
 }
