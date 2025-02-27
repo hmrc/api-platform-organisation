@@ -27,6 +27,7 @@ import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
+import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
 import uk.gov.hmrc.apiplatformorganisation.OrganisationFixtures
 import uk.gov.hmrc.apiplatformorganisation.models.{Member, StoredOrganisation}
@@ -52,6 +53,20 @@ class OrganisationRepositoryISpec extends AnyWordSpec
       await(repository.collection.find().toFuture()).length shouldBe 0
       await(underTest.save(standardStoredOrg))
       await(repository.collection.find().toFuture()).head shouldBe standardStoredOrg
+    }
+
+    "fetch" in {
+      await(repository.collection.find().toFuture()).length shouldBe 0
+      await(underTest.save(standardStoredOrg))
+      await(underTest.fetch(standardStoredOrg.id)) shouldBe Some(standardStoredOrg)
+    }
+
+    "fetchLatestByUserId" in {
+      await(repository.collection.find().toFuture()).length shouldBe 0
+      await(underTest.save(standardStoredOrg.copy(createdDateTime = FixedClock.Instants.anHourAgo)))
+      await(underTest.save(standardStoredOrg.copy(createdDateTime = FixedClock.Instants.fiveMinsAgo)))
+      await(underTest.save(standardStoredOrg))
+      await(underTest.fetchLatestByUserId(standardStoredOrg.createdBy)) shouldBe Some(standardStoredOrg)
     }
 
     "update single org" in {

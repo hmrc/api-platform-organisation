@@ -28,6 +28,7 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatformorganisation.OrganisationFixtures
 import uk.gov.hmrc.apiplatformorganisation.mocks.services.OrganisationServiceMockModule
 
@@ -51,6 +52,42 @@ class OrganisationControllerSpec extends AnyWordSpec with Matchers with Organisa
       val result      = controller.create()(fakeRequest.withBody(standardCreateRequest))
       status(result) shouldBe Status.OK
       contentAsJson(result) shouldBe Json.toJson(standardOrg)
+    }
+  }
+
+  "fetch" should {
+    "return 200" in {
+      OrganisationServiceMock.Fetch.thenReturn(standardOrg)
+      val fakeRequest = FakeRequest("GET", s"/organisation/${standardOrg.id}").withHeaders("content-type" -> "application/json")
+      val result      = controller.fetch(standardOrg.id)(fakeRequest)
+      status(result) shouldBe Status.OK
+      contentAsJson(result) shouldBe Json.toJson(standardOrg)
+    }
+
+    "return not found when not found" in {
+      OrganisationServiceMock.Fetch.thenReturnNone()
+      val fakeRequest = FakeRequest("GET", s"/organisation/${standardOrg.id}").withHeaders("content-type" -> "application/json")
+      val result      = controller.fetch(standardOrg.id)(fakeRequest)
+      status(result) shouldBe Status.NOT_FOUND
+    }
+  }
+
+  "fetchLatestByUserId" should {
+    "return 200" in {
+      OrganisationServiceMock.FetchLatestByUserId.thenReturn(standardOrg)
+      val userId      = UserId.random
+      val fakeRequest = FakeRequest("GET", s"/organisation/user/${userId}").withHeaders("content-type" -> "application/json")
+      val result      = controller.fetchLatestByUserId(userId)(fakeRequest)
+      status(result) shouldBe Status.OK
+      contentAsJson(result) shouldBe Json.toJson(standardOrg)
+    }
+
+    "return not found when not found" in {
+      OrganisationServiceMock.FetchLatestByUserId.thenReturnNone()
+      val userId      = UserId.random
+      val fakeRequest = FakeRequest("GET", s"/organisation/${userId}").withHeaders("content-type" -> "application/json")
+      val result      = controller.fetchLatestByUserId(userId)(fakeRequest)
+      status(result) shouldBe Status.NOT_FOUND
     }
   }
 

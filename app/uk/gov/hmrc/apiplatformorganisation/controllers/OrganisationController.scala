@@ -20,9 +20,10 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 import play.api.libs.json.{Json, OWrites}
-import play.api.mvc.{Action, ControllerComponents}
+import play.api.mvc.{Action, ControllerComponents, Results}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationId
 import uk.gov.hmrc.apiplatformorganisation.models.{CreateOrganisationRequest, Member, Organisation, UpdateMembersRequest}
 import uk.gov.hmrc.apiplatformorganisation.services.OrganisationService
@@ -39,6 +40,22 @@ class OrganisationController @Inject() (cc: ControllerComponents, organisationSe
 
   def create(): Action[CreateOrganisationRequest] = Action.async(parse.json[CreateOrganisationRequest]) { implicit request =>
     organisationService.create(request.body).map(org => Ok(Json.toJson(org)))
+  }
+
+  def fetch(organisationId: OrganisationId) = Action.async { _ =>
+    lazy val failed = NotFound(Results.EmptyContent())
+
+    val success = (o: Organisation) => Ok(Json.toJson(o))
+
+    organisationService.fetch(organisationId).map(_.fold(failed)(success))
+  }
+
+  def fetchLatestByUserId(userId: UserId) = Action.async { _ =>
+    lazy val failed = NotFound(Results.EmptyContent())
+
+    val success = (o: Organisation) => Ok(Json.toJson(o))
+
+    organisationService.fetchLatestByUserId(userId).map(_.fold(failed)(success))
   }
 
   def addMember(organisationId: OrganisationId): Action[UpdateMembersRequest] = Action.async(parse.json[UpdateMembersRequest]) { implicit request =>

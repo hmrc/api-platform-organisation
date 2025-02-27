@@ -22,11 +22,13 @@ import scala.concurrent.{ExecutionContext, Future}
 import org.bson.conversions.Bson
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
+import org.mongodb.scala.model.Sorts.descending
 import org.mongodb.scala.model.{FindOneAndUpdateOptions, IndexModel, IndexOptions, ReturnDocument, Updates}
 
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationId
 import uk.gov.hmrc.apiplatformorganisation.models.{Member, StoredOrganisation}
 
@@ -36,19 +38,35 @@ class OrganisationRepository @Inject() (mongo: MongoComponent)(implicit val ec: 
       collectionName = "organisation",
       mongoComponent = mongo,
       domainFormat = StoredOrganisation.storedOrganisationFormat,
-      indexes = Seq(IndexModel(
-        ascending("id"),
-        IndexOptions()
-          .name("organisationIdIndex")
-          .unique(true)
-          .background(true)
-      )),
+      indexes = Seq(
+        IndexModel(
+          ascending("id"),
+          IndexOptions()
+            .name("organisationIdIndex")
+            .unique(true)
+            .background(true)
+        ),
+        IndexModel(
+          ascending("createdBy"),
+          IndexOptions()
+            .name("createdByIndex")
+            .background(true)
+        )
+      ),
       replaceIndexes = true
     ) {
   override lazy val requiresTtlIndex: Boolean = false
 
   def fetch(id: OrganisationId): Future[Option[StoredOrganisation]] = {
     collection.find(equal("id", Codecs.toBson(id))).headOption()
+  }
+
+  def fetchLatestByUserId(id: UserId): Future[Option[StoredOrganisation]] = {
+    collection
+      .withReadPreference(com.mongodb.ReadPreference.primary())
+      .find(equal("createdBy", Codecs.toBson(id)))
+      .sort(descending("createdDateTime"))
+      .headOption()
   }
 
   def save(organisation: StoredOrganisation): Future[StoredOrganisation] = {

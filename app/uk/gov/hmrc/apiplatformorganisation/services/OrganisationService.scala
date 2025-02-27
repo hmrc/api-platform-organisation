@@ -20,6 +20,7 @@ import java.time.Clock
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.common.services.{ClockNow, EitherTHelper}
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationId
 import uk.gov.hmrc.apiplatformorganisation.models._
@@ -34,6 +35,18 @@ class OrganisationService @Inject() (
 
   def create(createOrganisationRequest: CreateOrganisationRequest)(implicit ec: ExecutionContext): Future[Organisation] = {
     organisationRepository.save(StoredOrganisation.create(createOrganisationRequest, instant())).map(StoredOrganisation.asOrganisation)
+  }
+
+  def fetch(organisationId: OrganisationId)(implicit ec: ExecutionContext): Future[Option[Organisation]] = {
+    organisationRepository.fetch(organisationId) map {
+      _.map(org => StoredOrganisation.asOrganisation(org))
+    }
+  }
+
+  def fetchLatestByUserId(userId: UserId)(implicit ec: ExecutionContext): Future[Option[Organisation]] = {
+    organisationRepository.fetchLatestByUserId(userId) map {
+      _.map(org => StoredOrganisation.asOrganisation(org))
+    }
   }
 
   def addMember(organisationId: OrganisationId, member: Member)(implicit ec: ExecutionContext): Future[Either[String, Organisation]] = {
