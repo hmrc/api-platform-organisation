@@ -47,6 +47,10 @@ class OrganisationRepository @Inject() (mongo: MongoComponent)(implicit val ec: 
     ) {
   override lazy val requiresTtlIndex: Boolean = false
 
+  def fetch(id: OrganisationId): Future[Option[StoredOrganisation]] = {
+    collection.find(equal("id", Codecs.toBson(id))).headOption()
+  }
+
   def save(organisation: StoredOrganisation): Future[StoredOrganisation] = {
     val query = equal("id", Codecs.toBson(organisation.id))
     collection.find(query).headOption().flatMap {

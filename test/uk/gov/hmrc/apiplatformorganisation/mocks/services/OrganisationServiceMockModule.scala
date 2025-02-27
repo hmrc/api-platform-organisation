@@ -20,6 +20,7 @@ import scala.concurrent.Future
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationId
 import uk.gov.hmrc.apiplatformorganisation.models._
 import uk.gov.hmrc.apiplatformorganisation.services.OrganisationService
 
@@ -29,7 +30,19 @@ trait OrganisationServiceMockModule extends MockitoSugar with ArgumentMatchersSu
     val aMock = mock[OrganisationService]
 
     object CreateOrganisation {
-      def willReturn(org: Organisation) = when(aMock.create(*)(*)).thenReturn(Future.successful(org))
+      def thenReturn(org: Organisation) = when(aMock.create(*)(*)).thenReturn(Future.successful(org))
+    }
+
+    object AddMember {
+      def thenReturn(org: Organisation) = when(aMock.addMember(*[OrganisationId], *)(*)).thenReturn(Future.successful(Right(org)))
+
+      def thenFails(error: String) = when(aMock.addMember(*[OrganisationId], *)(*)).thenReturn(Future.successful(Left(error)))
+    }
+
+    object RemoveMember {
+      def thenReturn(org: Organisation) = when(aMock.removeMember(*[OrganisationId], *)(*)).thenReturn(Future.successful(Right(org)))
+
+      def thenFails(error: String) = when(aMock.removeMember(*[OrganisationId], *)(*)).thenReturn(Future.successful(Left(error)))
     }
   }
 }

@@ -36,20 +36,55 @@ class OrganisationControllerSpec extends AnyWordSpec with Matchers with Organisa
 
   implicit lazy val materializer: Materializer = NoMaterializer
 
-  private val fakeRequest = FakeRequest("POST", "/create").withHeaders("content-type" -> "application/json")
-  private val controller  = new OrganisationController(Helpers.stubControllerComponents(), OrganisationServiceMock.aMock)
+  private val controller = new OrganisationController(Helpers.stubControllerComponents(), OrganisationServiceMock.aMock)
 
-  "POST /create" should {
+  "create" should {
     "return 400" in {
-      val result = controller.create()(fakeRequest.withBody(Json.parse("{}")))
+      val fakeRequest = FakeRequest("POST", "/organisation/create").withHeaders("content-type" -> "application/json")
+      val result      = controller.create()(fakeRequest.withBody(Json.parse("{}")))
       status(result) shouldBe Status.BAD_REQUEST
     }
 
     "return 200" in {
-      OrganisationServiceMock.CreateOrganisation.willReturn(standardOrg)
-      val result = controller.create()(fakeRequest.withBody(standardCreateRequest))
+      OrganisationServiceMock.CreateOrganisation.thenReturn(standardOrg)
+      val fakeRequest = FakeRequest("POST", "/organisation/create").withHeaders("content-type" -> "application/json")
+      val result      = controller.create()(fakeRequest.withBody(standardCreateRequest))
       status(result) shouldBe Status.OK
       contentAsJson(result) shouldBe Json.toJson(standardOrg)
+    }
+  }
+
+  "addMember" should {
+    "return 200" in {
+      OrganisationServiceMock.AddMember.thenReturn(standardOrg)
+      val fakeRequest = FakeRequest("POST", s"/organisation/${standardOrg.id}/add-member").withHeaders("content-type" -> "application/json")
+      val result      = controller.addMember(standardOrg.id)(fakeRequest.withBody(standardUpdateMembersRequest))
+      status(result) shouldBe Status.OK
+      contentAsJson(result) shouldBe Json.toJson(standardOrg)
+    }
+
+    "return 400" in {
+      OrganisationServiceMock.AddMember.thenFails("Organisation not found")
+      val fakeRequest = FakeRequest("POST", s"/organisation/${standardOrg.id}/add-member").withHeaders("content-type" -> "application/json")
+      val result      = controller.addMember(standardOrg.id)(fakeRequest.withBody(standardUpdateMembersRequest))
+      status(result) shouldBe Status.BAD_REQUEST
+    }
+  }
+
+  "removeMember" should {
+    "return 200" in {
+      OrganisationServiceMock.RemoveMember.thenReturn(standardOrg)
+      val fakeRequest = FakeRequest("POST", s"/organisation/${standardOrg.id}/remove-member").withHeaders("content-type" -> "application/json")
+      val result      = controller.removeMember(standardOrg.id)(fakeRequest.withBody(standardUpdateMembersRequest))
+      status(result) shouldBe Status.OK
+      contentAsJson(result) shouldBe Json.toJson(standardOrg)
+    }
+
+    "return 400" in {
+      OrganisationServiceMock.RemoveMember.thenFails("Organisation not found")
+      val fakeRequest = FakeRequest("POST", s"/organisation/${standardOrg.id}/remove-member").withHeaders("content-type" -> "application/json")
+      val result      = controller.removeMember(standardOrg.id)(fakeRequest.withBody(standardUpdateMembersRequest))
+      status(result) shouldBe Status.BAD_REQUEST
     }
   }
 }

@@ -41,6 +41,10 @@ object CreateOrganisationRequestData {
   val one: CreateOrganisationRequest = CreateOrganisationRequest(OrganisationNameData.one, UserIdData.one, LaxEmailAddress("bob@example.com"))
 }
 
+object UpdateMembersRequestData {
+  val one: UpdateMembersRequest = UpdateMembersRequest(UserIdData.one, LaxEmailAddress("bob@example.com"))
+}
+
 object OrganisationData {
   val one: Organisation = Organisation(OrganisationIdData.one, OrganisationNameData.one, Set(MemberData.one))
 }
@@ -50,7 +54,8 @@ object StoredOrganisationData extends FixedClock {
 }
 
 trait OrganisationFixtures {
-  val standardOrg: Organisation                        = OrganisationData.one
-  val standardCreateRequest: CreateOrganisationRequest = CreateOrganisationRequestData.one
-  val standardStoredOrg: StoredOrganisation            = StoredOrganisationData.one
+  val standardOrg: Organisation                          = OrganisationData.one
+  val standardCreateRequest: CreateOrganisationRequest   = CreateOrganisationRequestData.one
+  val standardUpdateMembersRequest: UpdateMembersRequest = UpdateMembersRequestData.one
+  val standardStoredOrg: StoredOrganisation              = StoredOrganisationData.one
 }
