@@ -24,8 +24,8 @@ import play.api.mvc.{Action, ControllerComponents, Results}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationId
-import uk.gov.hmrc.apiplatformorganisation.models.{CreateOrganisationRequest, Member, Organisation, UpdateMembersRequest}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, Organisation, OrganisationId}
+import uk.gov.hmrc.apiplatformorganisation.models.{CreateOrganisationRequest, UpdateMembersRequest}
 import uk.gov.hmrc.apiplatformorganisation.services.OrganisationService
 
 object OrganisationController {

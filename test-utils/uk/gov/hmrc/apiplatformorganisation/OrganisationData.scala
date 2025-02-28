@@ -18,7 +18,7 @@ package uk.gov.hmrc.apiplatformorganisation
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{OrganisationId, OrganisationName}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, Organisation, OrganisationId, OrganisationName}
 import uk.gov.hmrc.apiplatformorganisation.models._
 
 object OrganisationIdData {

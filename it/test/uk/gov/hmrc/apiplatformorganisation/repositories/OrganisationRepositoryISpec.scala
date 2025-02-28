@@ -28,9 +28,9 @@ import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, OrganisationName}
 import uk.gov.hmrc.apiplatformorganisation.OrganisationFixtures
-import uk.gov.hmrc.apiplatformorganisation.models.{Member, StoredOrganisation}
+import uk.gov.hmrc.apiplatformorganisation.models.StoredOrganisation
 import uk.gov.hmrc.apiplatformorganisation.repositories.OrganisationRepository
 
 class OrganisationRepositoryISpec extends AnyWordSpec

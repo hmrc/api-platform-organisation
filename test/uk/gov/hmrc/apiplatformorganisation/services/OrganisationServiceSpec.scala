@@ -25,9 +25,9 @@ import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Member
 import uk.gov.hmrc.apiplatformorganisation.OrganisationFixtures
 import uk.gov.hmrc.apiplatformorganisation.mocks.repositories.OrganisationRepositoryMockModule
-import uk.gov.hmrc.apiplatformorganisation.models.Member
 import uk.gov.hmrc.apiplatformorganisation.util.AsyncHmrcSpec
 
 class OrganisationServiceSpec extends AsyncHmrcSpec

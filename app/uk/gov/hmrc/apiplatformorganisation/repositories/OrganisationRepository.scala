@@ -29,8 +29,8 @@ import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationId
-import uk.gov.hmrc.apiplatformorganisation.models.{Member, StoredOrganisation}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, OrganisationId}
+import uk.gov.hmrc.apiplatformorganisation.models.StoredOrganisation
 
 @Singleton
 class OrganisationRepository @Inject() (mongo: MongoComponent)(implicit val ec: ExecutionContext)

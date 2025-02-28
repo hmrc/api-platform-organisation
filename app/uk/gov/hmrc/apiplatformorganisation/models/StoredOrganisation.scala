@@ -22,7 +22,7 @@ import play.api.libs.json._
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{OrganisationId, OrganisationName}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, Organisation, OrganisationId, OrganisationName}
 
 case class StoredOrganisation(id: OrganisationId, name: OrganisationName, createdDateTime: Instant, requestedBy: UserId, members: Set[Member])
 

@@ -22,7 +22,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.common.services.{ClockNow, EitherTHelper}
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationId
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, Organisation, OrganisationId}
 import uk.gov.hmrc.apiplatformorganisation.models._
 import uk.gov.hmrc.apiplatformorganisation.repositories.OrganisationRepository
 
