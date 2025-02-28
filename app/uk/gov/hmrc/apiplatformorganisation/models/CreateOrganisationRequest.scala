@@ -21,7 +21,7 @@ import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
 
-case class CreateOrganisationRequest(organisationName: OrganisationName, createdBy: UserId, createdByEmail: LaxEmailAddress)
+case class CreateOrganisationRequest(organisationName: OrganisationName, requestedBy: UserId, requestedByEmail: LaxEmailAddress)
 
 object CreateOrganisationRequest {
   implicit val createOrgFormat: OFormat[CreateOrganisationRequest] = Json.format[CreateOrganisationRequest]

@@ -66,7 +66,7 @@ class OrganisationRepositoryISpec extends AnyWordSpec
       await(underTest.save(standardStoredOrg.copy(createdDateTime = FixedClock.Instants.anHourAgo)))
       await(underTest.save(standardStoredOrg.copy(createdDateTime = FixedClock.Instants.fiveMinsAgo)))
       await(underTest.save(standardStoredOrg))
-      await(underTest.fetchLatestByUserId(standardStoredOrg.createdBy)) shouldBe Some(standardStoredOrg)
+      await(underTest.fetchLatestByUserId(standardStoredOrg.requestedBy)) shouldBe Some(standardStoredOrg)
     }
 
     "update single org" in {

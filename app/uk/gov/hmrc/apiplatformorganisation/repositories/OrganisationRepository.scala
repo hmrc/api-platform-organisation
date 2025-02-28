@@ -47,9 +47,9 @@ class OrganisationRepository @Inject() (mongo: MongoComponent)(implicit val ec: 
             .background(true)
         ),
         IndexModel(
-          ascending("createdBy"),
+          ascending("requestedBy"),
           IndexOptions()
-            .name("createdByIndex")
+            .name("requestedByIndex")
             .background(true)
         )
       ),
@@ -64,7 +64,7 @@ class OrganisationRepository @Inject() (mongo: MongoComponent)(implicit val ec: 
   def fetchLatestByUserId(id: UserId): Future[Option[StoredOrganisation]] = {
     collection
       .withReadPreference(com.mongodb.ReadPreference.primary())
-      .find(equal("createdBy", Codecs.toBson(id)))
+      .find(equal("requestedBy", Codecs.toBson(id)))
       .sort(descending("createdDateTime"))
       .headOption()
   }
