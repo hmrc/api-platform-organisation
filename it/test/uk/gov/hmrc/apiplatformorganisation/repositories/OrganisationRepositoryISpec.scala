@@ -26,7 +26,7 @@ import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, OrganisationName}
 import uk.gov.hmrc.apiplatformorganisation.OrganisationFixtures
@@ -82,14 +82,14 @@ class OrganisationRepositoryISpec extends AnyWordSpec
       await(repository.collection.insertOne(standardStoredOrg).toFuture())
       await(repository.collection.find().toFuture()).head shouldBe standardStoredOrg
 
-      val newMember  = Member(UserId.random, LaxEmailAddress("new-person@example.com"))
+      val newMember  = Member(UserId.random)
       await(underTest.addMember(standardStoredOrg.id, newMember))
       val updatedOrg = standardStoredOrg.copy(members = standardStoredOrg.members + newMember)
       await(repository.collection.find().toFuture()).head shouldBe updatedOrg
     }
 
     "remove member" in {
-      val member        = Member(UserId.random, LaxEmailAddress("new-person@example.com"))
+      val member        = Member(UserId.random)
       val twoMembersOrg = standardStoredOrg.copy(members = standardStoredOrg.members + member)
       await(repository.collection.insertOne(twoMembersOrg).toFuture())
       await(repository.collection.find().toFuture()).head shouldBe twoMembersOrg

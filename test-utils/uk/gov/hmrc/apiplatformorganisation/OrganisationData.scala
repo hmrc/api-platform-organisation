@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.apiplatformorganisation
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, Organisation, OrganisationId, OrganisationName}
 import uk.gov.hmrc.apiplatformorganisation.models._
@@ -34,15 +34,15 @@ object UserIdData {
 }
 
 object MemberData {
-  val one: Member = Member(UserIdData.one, LaxEmailAddress("bob@example.com"))
+  val one: Member = Member(UserIdData.one)
 }
 
 object CreateOrganisationRequestData {
-  val one: CreateOrganisationRequest = CreateOrganisationRequest(OrganisationNameData.one, UserIdData.one, LaxEmailAddress("bob@example.com"))
+  val one: CreateOrganisationRequest = CreateOrganisationRequest(OrganisationNameData.one, UserIdData.one)
 }
 
 object UpdateMembersRequestData {
-  val one: UpdateMembersRequest = UpdateMembersRequest(UserIdData.one, LaxEmailAddress("bob@example.com"))
+  val one: UpdateMembersRequest = UpdateMembersRequest(UserIdData.one)
 }
 
 object OrganisationData {

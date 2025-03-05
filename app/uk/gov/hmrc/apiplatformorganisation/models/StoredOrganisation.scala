@@ -31,7 +31,7 @@ object StoredOrganisation {
   implicit val storedOrganisationFormat: OFormat[StoredOrganisation] = Json.format[StoredOrganisation]
 
   def create(createOrganisationRequest: CreateOrganisationRequest, createdTime: Instant): StoredOrganisation = {
-    val member = Member(createOrganisationRequest.requestedBy, createOrganisationRequest.requestedByEmail)
+    val member = Member(createOrganisationRequest.requestedBy)
     StoredOrganisation(OrganisationId.random, createOrganisationRequest.organisationName, createdTime, createOrganisationRequest.requestedBy, Set(member))
   }
 

@@ -23,7 +23,7 @@ import org.scalatest.matchers.should.Matchers
 
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Member
 import uk.gov.hmrc.apiplatformorganisation.OrganisationFixtures
@@ -85,7 +85,7 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
 
     "addMember" should {
       "add member if not present" in new Setup {
-        val member = Member(UserId.random, LaxEmailAddress("new-person@example.com"))
+        val member = Member(UserId.random)
         OrganisationRepositoryMock.Fetch.willReturn(standardStoredOrg)
         OrganisationRepositoryMock.AddMember.willReturn(standardStoredOrg)
         val result = await(underTest.addMember(standardStoredOrg.id, member))
@@ -101,7 +101,7 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
       }
 
       "add member fails if organisation not found" in new Setup {
-        val member = Member(UserId.random, LaxEmailAddress("new-person@example.com"))
+        val member = Member(UserId.random)
         OrganisationRepositoryMock.Fetch.willReturnNone()
         val result = await(underTest.addMember(standardStoredOrg.id, member))
         result.isLeft shouldBe true
@@ -119,7 +119,7 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
       }
 
       "remove member fails if not present" in new Setup {
-        val member = Member(UserId.random, LaxEmailAddress("new-person@example.com"))
+        val member = Member(UserId.random)
         OrganisationRepositoryMock.Fetch.willReturn(standardStoredOrg)
         val result = await(underTest.removeMember(standardStoredOrg.id, member))
         result.isLeft shouldBe true

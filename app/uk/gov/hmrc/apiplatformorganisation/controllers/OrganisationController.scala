@@ -61,14 +61,14 @@ class OrganisationController @Inject() (cc: ControllerComponents, organisationSe
   def addMember(organisationId: OrganisationId): Action[UpdateMembersRequest] = Action.async(parse.json[UpdateMembersRequest]) { implicit request =>
     val failed  = (msg: String) => BadRequest(Json.toJson(ErrorMessage(msg)))
     val success = (o: Organisation) => Ok(Json.toJson(o))
-    val member  = Member(request.body.userId, request.body.emailAddress)
+    val member  = Member(request.body.userId)
     organisationService.addMember(organisationId, member).map(_.fold(failed, success))
   }
 
   def removeMember(organisationId: OrganisationId): Action[UpdateMembersRequest] = Action.async(parse.json[UpdateMembersRequest]) { implicit request =>
     val failed  = (msg: String) => BadRequest(Json.toJson(ErrorMessage(msg)))
     val success = (o: Organisation) => Ok(Json.toJson(o))
-    val member  = Member(request.body.userId, request.body.emailAddress)
+    val member  = Member(request.body.userId)
     organisationService.removeMember(organisationId, member).map(_.fold(failed, success))
   }
 }
