@@ -126,11 +126,11 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo("Your organisation name cannot be blank", "Enter your organisation name").some
       )
 
-      val questionLtdOrgAddress = Question.TextQuestion(
+      val questionLtdOrgAddress = Question.AddressQuestion(
         Question.Id("e1dbf1a3-e28b-1c83-a739-86f1319ca8cc"),
         Wording("What is your organisation’s address?"),
         statement = None,
-        errorInfo = ErrorInfo("Your organisation address cannot be blank", "Enter your organisation address").some
+        errorInfo = ErrorInfo("Your organisation address line one and postcode cannot be blank", "Enter your organisation address").some
       )
 
       val questionLtdCorporationUTR = Question.TextQuestion(
