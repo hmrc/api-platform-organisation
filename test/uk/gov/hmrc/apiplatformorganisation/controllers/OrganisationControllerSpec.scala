@@ -94,7 +94,7 @@ class OrganisationControllerSpec extends AnyWordSpec with Matchers with Organisa
   "addMember" should {
     "return 200" in {
       OrganisationServiceMock.AddMember.thenReturn(standardOrg)
-      val fakeRequest = FakeRequest("POST", s"/organisation/${standardOrg.id}/add-member").withHeaders("content-type" -> "application/json")
+      val fakeRequest = FakeRequest("PUT", s"/organisation/${standardOrg.id}/member").withHeaders("content-type" -> "application/json")
       val result      = controller.addMember(standardOrg.id)(fakeRequest.withBody(standardUpdateMembersRequest))
       status(result) shouldBe Status.OK
       contentAsJson(result) shouldBe Json.toJson(standardOrg)
@@ -102,7 +102,7 @@ class OrganisationControllerSpec extends AnyWordSpec with Matchers with Organisa
 
     "return 400" in {
       OrganisationServiceMock.AddMember.thenFails("Organisation not found")
-      val fakeRequest = FakeRequest("POST", s"/organisation/${standardOrg.id}/add-member").withHeaders("content-type" -> "application/json")
+      val fakeRequest = FakeRequest("PUT", s"/organisation/${standardOrg.id}/member").withHeaders("content-type" -> "application/json")
       val result      = controller.addMember(standardOrg.id)(fakeRequest.withBody(standardUpdateMembersRequest))
       status(result) shouldBe Status.BAD_REQUEST
     }
