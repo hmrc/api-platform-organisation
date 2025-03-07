@@ -4,7 +4,7 @@ POST        /organisation/create                    uk.gov.hmrc.apiplatformorgan
 GET         /organisation/:oid                      uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationController.fetch(oid: OrganisationId)
 GET         /organisation/user/:uid                 uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationController.fetchLatestByUserId(uid: UserId)
 POST        /organisation/:oid/add-member           uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationController.addMember(oid: OrganisationId)
-POST        /organisation/:oid/remove-member        uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationController.removeMember(oid: OrganisationId)
+DELETE      /organisation/:oid/remove-member/:uid   uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationController.removeMember(oid: OrganisationId, uid: UserId)
 
 POST        /submission/user/:uid                   uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.createSubmissionFor(uid: UserId)
 GET         /submission/user/:uid                   uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchLatestByUserId(uid: UserId)

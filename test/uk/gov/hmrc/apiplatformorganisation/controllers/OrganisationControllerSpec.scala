@@ -28,7 +28,7 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{UserId, UserIdData}
 import uk.gov.hmrc.apiplatformorganisation.OrganisationFixtures
 import uk.gov.hmrc.apiplatformorganisation.mocks.services.OrganisationServiceMockModule
 
@@ -111,16 +111,16 @@ class OrganisationControllerSpec extends AnyWordSpec with Matchers with Organisa
   "removeMember" should {
     "return 200" in {
       OrganisationServiceMock.RemoveMember.thenReturn(standardOrg)
-      val fakeRequest = FakeRequest("POST", s"/organisation/${standardOrg.id}/remove-member").withHeaders("content-type" -> "application/json")
-      val result      = controller.removeMember(standardOrg.id)(fakeRequest.withBody(standardUpdateMembersRequest))
+      val fakeRequest = FakeRequest("DELETE", s"/organisation/${standardOrg.id}/remove-member/${UserIdData.one}").withHeaders("content-type" -> "application/json")
+      val result      = controller.removeMember(standardOrg.id, UserIdData.one)(fakeRequest)
       status(result) shouldBe Status.OK
       contentAsJson(result) shouldBe Json.toJson(standardOrg)
     }
 
     "return 400" in {
       OrganisationServiceMock.RemoveMember.thenFails("Organisation not found")
-      val fakeRequest = FakeRequest("POST", s"/organisation/${standardOrg.id}/remove-member").withHeaders("content-type" -> "application/json")
-      val result      = controller.removeMember(standardOrg.id)(fakeRequest.withBody(standardUpdateMembersRequest))
+      val fakeRequest = FakeRequest("DELETE", s"/organisation/${standardOrg.id}/remove-member/${UserIdData.one}").withHeaders("content-type" -> "application/json")
+      val result      = controller.removeMember(standardOrg.id, UserIdData.one)(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST
     }
   }
