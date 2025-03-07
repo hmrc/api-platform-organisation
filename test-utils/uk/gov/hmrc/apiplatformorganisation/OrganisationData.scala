@@ -16,8 +16,9 @@
 
 package uk.gov.hmrc.apiplatformorganisation
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{OrganisationId, OrganisationName}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, Organisation, OrganisationId, OrganisationName}
 import uk.gov.hmrc.apiplatformorganisation.models._
 
 object OrganisationIdData {
@@ -28,20 +29,33 @@ object OrganisationNameData {
   val one: OrganisationName = OrganisationName("Example")
 }
 
+object UserIdData {
+  val one: UserId = UserId.random
+}
+
+object MemberData {
+  val one: Member = Member(UserIdData.one)
+}
+
 object CreateOrganisationRequestData {
-  val one: CreateOrganisationRequest = CreateOrganisationRequest(OrganisationNameData.one)
+  val one: CreateOrganisationRequest = CreateOrganisationRequest(OrganisationNameData.one, UserIdData.one)
+}
+
+object UpdateMembersRequestData {
+  val one: UpdateMembersRequest = UpdateMembersRequest(UserIdData.one)
 }
 
 object OrganisationData {
-  val one: Organisation = Organisation(OrganisationIdData.one, OrganisationNameData.one)
+  val one: Organisation = Organisation(OrganisationIdData.one, OrganisationNameData.one, Set(MemberData.one))
 }
 
 object StoredOrganisationData extends FixedClock {
-  val one: StoredOrganisation = StoredOrganisation(OrganisationIdData.one, OrganisationNameData.one, instant)
+  val one: StoredOrganisation = StoredOrganisation(OrganisationIdData.one, OrganisationNameData.one, instant, UserIdData.one, Set(MemberData.one))
 }
 
 trait OrganisationFixtures {
-  val standardOrg: Organisation                        = OrganisationData.one
-  val standardCreateRequest: CreateOrganisationRequest = CreateOrganisationRequestData.one
-  val standardStoredOrg: StoredOrganisation            = StoredOrganisationData.one
+  val standardOrg: Organisation                          = OrganisationData.one
+  val standardCreateRequest: CreateOrganisationRequest   = CreateOrganisationRequestData.one
+  val standardUpdateMembersRequest: UpdateMembersRequest = UpdateMembersRequestData.one
+  val standardStoredOrg: StoredOrganisation              = StoredOrganisationData.one
 }
