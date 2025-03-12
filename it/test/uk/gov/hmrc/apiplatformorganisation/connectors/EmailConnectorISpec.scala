@@ -79,7 +79,7 @@ class EmailConnectorISpec
         val request = SendEmailRequest(recipients, "apiRemovedMemberFromOrganisationConfirmation", Map("organisationName" -> orgName.value))
         SendEmail.stubSuccess(request)
 
-        val result = await(objInTest.sendRemovedMemberConfirmation(orgName, recipients))
+        val result = await(objInTest.sendMemberRemovedConfirmation(orgName, recipients))
         result shouldBe HasSucceeded
       }
     }

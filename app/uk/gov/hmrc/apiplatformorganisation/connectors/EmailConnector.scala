@@ -72,7 +72,7 @@ class EmailConnector @Inject() (httpClient: HttpClientV2, config: EmailConnector
       .map(_ => HasSucceeded)
   }
 
-  def sendRemovedMemberConfirmation(organisationName: OrganisationName, recipients: Set[LaxEmailAddress])(implicit hc: HeaderCarrier): Future[HasSucceeded] = {
+  def sendMemberRemovedConfirmation(organisationName: OrganisationName, recipients: Set[LaxEmailAddress])(implicit hc: HeaderCarrier): Future[HasSucceeded] = {
     post(SendEmailRequest(recipients, removedMemberFromOrganisationConfirmation, Map("organisationName" -> organisationName.value)))
       .map(_ => HasSucceeded)
   }
