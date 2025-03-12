@@ -20,7 +20,8 @@ import scala.concurrent.Future
 
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
-import uk.gov.hmrc.apiplatformorganisation.models._
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationId}
 import uk.gov.hmrc.apiplatformorganisation.services.OrganisationService
 
 trait OrganisationServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
@@ -29,7 +30,31 @@ trait OrganisationServiceMockModule extends MockitoSugar with ArgumentMatchersSu
     val aMock = mock[OrganisationService]
 
     object CreateOrganisation {
-      def willReturn(org: Organisation) = when(aMock.create(*)(*)).thenReturn(Future.successful(org))
+      def thenReturn(org: Organisation) = when(aMock.create(*)(*)).thenReturn(Future.successful(org))
+    }
+
+    object Fetch {
+      def thenReturn(org: Organisation) = when(aMock.fetch(*[OrganisationId])(*)).thenReturn(Future.successful(Some(org)))
+
+      def thenReturnNone() = when(aMock.fetch(*[OrganisationId])(*)).thenReturn(Future.successful(None))
+    }
+
+    object FetchLatestByUserId {
+      def thenReturn(org: Organisation) = when(aMock.fetchLatestByUserId(*[UserId])(*)).thenReturn(Future.successful(Some(org)))
+
+      def thenReturnNone() = when(aMock.fetchLatestByUserId(*[UserId])(*)).thenReturn(Future.successful(None))
+    }
+
+    object AddMember {
+      def thenReturn(org: Organisation) = when(aMock.addMember(*[OrganisationId], *)(*)).thenReturn(Future.successful(Right(org)))
+
+      def thenFails(error: String) = when(aMock.addMember(*[OrganisationId], *)(*)).thenReturn(Future.successful(Left(error)))
+    }
+
+    object RemoveMember {
+      def thenReturn(org: Organisation) = when(aMock.removeMember(*[OrganisationId], *)(*)).thenReturn(Future.successful(Right(org)))
+
+      def thenFails(error: String) = when(aMock.removeMember(*[OrganisationId], *)(*)).thenReturn(Future.successful(Left(error)))
     }
   }
 }
