@@ -99,9 +99,10 @@ object QuestionnaireDAO {
 
       // UK limited company
 
-      val questionLtdCompanyNumber = Question.TextQuestion(
+      val questionLtdCompanyNumber = Question.CompaniesHouseQuestion(
         Question.Id("4e148791-1a07-4f28-8fe4-ba3e18cdc118"),
         Wording("What is the company registration number?"),
+        ReplaceWordingPlaceholder("companyName"),
         statement = Statement(
           CompoundFragment(
             StatementText("You can "),
@@ -128,8 +129,14 @@ object QuestionnaireDAO {
 
       val questionLtdOrgAddress = Question.TextQuestion(
         Question.Id("e1dbf1a3-e28b-1c83-a739-86f1319ca8cc"),
-        Wording("What is your organisation’s address?"),
-        statement = None,
+        Wording("What is companyName’s address?"),
+        statement = Statement(
+          CompoundFragment(
+            StatementText("Enter "),
+            ReplacementText(questionLtdOrgName.id, "your company"),
+            StatementText("'s address")
+          )
+        ).some,
         errorInfo = ErrorInfo("Your organisation address cannot be blank", "Enter your organisation address").some
       )
 
@@ -149,8 +156,14 @@ object QuestionnaireDAO {
 
       val questionLtdOrgWebsite = Question.TextQuestion(
         Question.Id("b2dbf6a1-e39b-4c38-a524-19f0854ca1cc"),
-        Wording("What is your organisation’s website address?"),
-        statement = None,
+        Wording("What is companyName’s website address?"),
+        statement = Statement(
+          CompoundFragment(
+            StatementText("Enter "),
+            ReplacementText(questionLtdOrgName.id, "your company"),
+            StatementText("'s website address")
+          )
+        ).some,
         hintText = StatementText("For example https://example.com").some,
         absence = ("My organisation doesn't have a website", Mark.Fail).some,
         validation = TextValidation.Url.some,

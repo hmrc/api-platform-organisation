@@ -19,20 +19,20 @@ package uk.gov.hmrc.apiplatformorganisation.services
 import java.time.Clock
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-
 import cats.data.NonEmptyList
-
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.common.services.{ClockNow, EitherTHelper}
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationId
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, _}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services._
 import uk.gov.hmrc.apiplatformorganisation.repositories._
+import uk.gov.hmrc.http.HeaderCarrier
 
 @Singleton
 class SubmissionsService @Inject() (
     questionnaireDAO: QuestionnaireDAO,
     submissionsDAO: SubmissionsDAO,
+    replaceWordingService: ReplaceWordingService,
     val clock: Clock
   )(implicit val ec: ExecutionContext
   ) extends EitherTHelper[String] with ClockNow {
@@ -124,13 +124,15 @@ class SubmissionsService @Inject() (
       .value
   }
 
-  def recordAnswers(submissionId: SubmissionId, questionId: Question.Id, rawAnswers: Map[String, Seq[String]]): Future[Either[String, ExtendedSubmission]] = {
+  def recordAnswers(submissionId: SubmissionId, questionId: Question.Id, rawAnswers: Map[String, Seq[String]])
+                   (implicit hc: HeaderCarrier): Future[Either[String, ExtendedSubmission]] = {
     (
       for {
         initialSubmission <- fromOptionF(submissionsDAO.fetch(submissionId), "No such submission")
         extSubmission     <- fromEither(AnswerQuestion.recordAnswer(initialSubmission, questionId, rawAnswers))
-        savedSubmission   <- liftF(submissionsDAO.update(extSubmission.submission))
-      } yield extSubmission.copy(submission = savedSubmission)
+        replacedExtSubmission     <- fromEitherF(replaceWordingService.replaceCompanyInfoInQuestionsAnswers(initialSubmission, extSubmission, questionId, rawAnswers))
+        savedSubmission   <- liftF(submissionsDAO.update(replacedExtSubmission.submission))
+      } yield replacedExtSubmission.copy(submission = savedSubmission)
     )
       .value
   }

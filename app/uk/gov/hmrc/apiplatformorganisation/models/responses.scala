@@ -29,7 +29,23 @@ case class RegisteredOfficeAddress(
     postalCode: Option[String] = None,
     premises: Option[String] = None,
     region: Option[String] = None
-  )
+  ){
+  lazy val asText = {
+
+    def getAddressComponentAsText(component: Option[String], comma: Boolean) = {
+      component match {
+        case Some(a: String) => s"${if(comma){", "} else {""}}$a"
+        case _ => ""
+      }
+    }
+
+    s"${getAddressComponentAsText(addressLineOne, false)}" +
+    s"${getAddressComponentAsText(addressLineTwo, true)}" +
+    s"${getAddressComponentAsText(postalCode, true)}" +
+    s"${getAddressComponentAsText(country, true)}"
+
+  }
+}
 
 object RegisteredOfficeAddress {
 
@@ -52,7 +68,7 @@ object RegisteredOfficeAddress {
   implicit val format = OFormat[RegisteredOfficeAddress](reads, writes)
 }
 
-case class CompaniesHouseCompanyProfile(companyName: String, registeredOfficeAddress: Option[RegisteredOfficeAddress])
+case class CompaniesHouseCompanyProfile(companyName: String, registeredOfficeAddress: Option[RegisteredOfficeAddress] = None)
 
 object CompaniesHouseCompanyProfile {
 
