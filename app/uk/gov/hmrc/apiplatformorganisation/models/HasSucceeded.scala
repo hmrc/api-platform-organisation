@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,7 @@
 
 package uk.gov.hmrc.apiplatformorganisation.models
 
-import play.api.libs.json.{Json, OFormat}
-
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
-
-case class UpdateMembersRequest(userId: UserId, email: LaxEmailAddress)
-
-object UpdateMembersRequest {
-  implicit val format: OFormat[UpdateMembersRequest] = Json.format[UpdateMembersRequest]
-}
+/** Used instead of Unit where a method has nothing to return because Unit prevents Scala's type checking from working on mappings of Future[Unit].
+  */
+trait HasSucceeded
+object HasSucceeded extends HasSucceeded

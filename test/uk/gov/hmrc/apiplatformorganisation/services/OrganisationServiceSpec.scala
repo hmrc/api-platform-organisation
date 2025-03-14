@@ -22,11 +22,12 @@ import org.scalatest.Inside
 import org.scalatest.matchers.should.Matchers
 
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
+import uk.gov.hmrc.http.HeaderCarrier
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Member
 import uk.gov.hmrc.apiplatformorganisation.OrganisationFixtures
+import uk.gov.hmrc.apiplatformorganisation.mocks.connectors.EmailConnectorMockModule
 import uk.gov.hmrc.apiplatformorganisation.mocks.repositories.OrganisationRepositoryMockModule
 import uk.gov.hmrc.apiplatformorganisation.util.AsyncHmrcSpec
 
@@ -36,12 +37,14 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
     with DefaultAwaitTimeout
     with FutureAwaits
     with OrganisationRepositoryMockModule
+    with EmailConnectorMockModule
     with OrganisationFixtures
     with FixedClock {
   implicit val ec: ExecutionContext = ExecutionContext.global
+  implicit val hc: HeaderCarrier    = HeaderCarrier()
 
   trait Setup {
-    val underTest = new OrganisationService(OrganisationRepositoryMock.aMock, clock)
+    val underTest = new OrganisationService(OrganisationRepositoryMock.aMock, EmailConnectorMock.aMock, clock)
   }
 
   "OrganisationService" when {
@@ -85,25 +88,30 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
 
     "addMember" should {
       "add member if not present" in new Setup {
-        val member = Member(UserId.random)
+        val userId = UserId.random
+        val email  = LaxEmailAddress("bob@example.com")
         OrganisationRepositoryMock.Fetch.willReturn(standardStoredOrg)
         OrganisationRepositoryMock.AddMember.willReturn(standardStoredOrg)
-        val result = await(underTest.addMember(standardStoredOrg.id, member))
+        EmailConnectorMock.SendMemberAddedConfirmation.succeeds()
+        val result = await(underTest.addMember(standardStoredOrg.id, userId, email))
         result.value shouldBe standardOrg
+        EmailConnectorMock.SendMemberAddedConfirmation.verifyCalledWith(standardStoredOrg.name, Set(email))
       }
 
       "add member fails if already present" in new Setup {
-        val member = standardStoredOrg.members.head
+        val userId = standardStoredOrg.members.head.userId
+        val email  = LaxEmailAddress("bob@example.com")
         OrganisationRepositoryMock.Fetch.willReturn(standardStoredOrg)
-        val result = await(underTest.addMember(standardStoredOrg.id, member))
+        val result = await(underTest.addMember(standardStoredOrg.id, userId, email))
         result.isLeft shouldBe true
         result.left.value shouldBe "Organisation already contains member"
       }
 
       "add member fails if organisation not found" in new Setup {
-        val member = Member(UserId.random)
+        val userId = UserId.random
+        val email  = LaxEmailAddress("bob@example.com")
         OrganisationRepositoryMock.Fetch.willReturnNone()
-        val result = await(underTest.addMember(standardStoredOrg.id, member))
+        val result = await(underTest.addMember(standardStoredOrg.id, userId, email))
         result.isLeft shouldBe true
         result.left.value shouldBe "Organisation not found"
       }
@@ -111,25 +119,30 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
 
     "removeMember" should {
       "remove member if present" in new Setup {
-        val member = standardStoredOrg.members.head
+        val userId = standardStoredOrg.members.head.userId
+        val email  = LaxEmailAddress("bob@example.com")
         OrganisationRepositoryMock.Fetch.willReturn(standardStoredOrg)
         OrganisationRepositoryMock.RemoveMember.willReturn(standardStoredOrg)
-        val result = await(underTest.removeMember(standardStoredOrg.id, member))
+        EmailConnectorMock.SendMemberRemovedConfirmation.succeeds()
+        val result = await(underTest.removeMember(standardStoredOrg.id, userId, email))
         result.value shouldBe standardOrg
+        EmailConnectorMock.SendMemberRemovedConfirmation.verifyCalledWith(standardStoredOrg.name, Set(email))
       }
 
       "remove member fails if not present" in new Setup {
-        val member = Member(UserId.random)
+        val userId = UserId.random
+        val email  = LaxEmailAddress("bob@example.com")
         OrganisationRepositoryMock.Fetch.willReturn(standardStoredOrg)
-        val result = await(underTest.removeMember(standardStoredOrg.id, member))
+        val result = await(underTest.removeMember(standardStoredOrg.id, userId, email))
         result.isLeft shouldBe true
         result.left.value shouldBe "Organisation does not contain member"
       }
 
       "add member fails if organisation not found" in new Setup {
-        val member = standardStoredOrg.members.head
+        val userId = standardStoredOrg.members.head.userId
+        val email  = LaxEmailAddress("bob@example.com")
         OrganisationRepositoryMock.Fetch.willReturnNone()
-        val result = await(underTest.removeMember(standardStoredOrg.id, member))
+        val result = await(underTest.removeMember(standardStoredOrg.id, userId, email))
         result.isLeft shouldBe true
         result.left.value shouldBe "Organisation not found"
       }

@@ -20,15 +20,19 @@ import java.time.Clock
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
+import uk.gov.hmrc.http.HeaderCarrier
+
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.services.{ClockNow, EitherTHelper}
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, Organisation, OrganisationId}
+import uk.gov.hmrc.apiplatformorganisation.connectors.EmailConnector
 import uk.gov.hmrc.apiplatformorganisation.models._
 import uk.gov.hmrc.apiplatformorganisation.repositories.OrganisationRepository
 
 @Singleton
 class OrganisationService @Inject() (
     organisationRepository: OrganisationRepository,
+    emailConnector: EmailConnector,
     val clock: Clock
   )(implicit val ec: ExecutionContext
   ) extends EitherTHelper[String] with ClockNow {
@@ -49,22 +53,26 @@ class OrganisationService @Inject() (
     }
   }
 
-  def addMember(organisationId: OrganisationId, member: Member)(implicit ec: ExecutionContext): Future[Either[String, Organisation]] = {
+  def addMember(organisationId: OrganisationId, userId: UserId, email: LaxEmailAddress)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Either[String, Organisation]] = {
+    val member = Member(userId)
     (
       for {
         organisation        <- fromOptionF(organisationRepository.fetch(organisationId), "Organisation not found")
         _                   <- cond(!organisation.members.contains(member), (), "Organisation already contains member")
         updatedOrganisation <- liftF(organisationRepository.addMember(organisationId, member).map(StoredOrganisation.asOrganisation))
+        _                    = emailConnector.sendMemberAddedConfirmation(organisation.name, Set(email))
       } yield updatedOrganisation
     ).value
   }
 
-  def removeMember(organisationId: OrganisationId, member: Member)(implicit ec: ExecutionContext): Future[Either[String, Organisation]] = {
+  def removeMember(organisationId: OrganisationId, userId: UserId, email: LaxEmailAddress)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Either[String, Organisation]] = {
+    val member = Member(userId)
     (
       for {
         organisation        <- fromOptionF(organisationRepository.fetch(organisationId), "Organisation not found")
         _                   <- cond(organisation.members.contains(member), (), "Organisation does not contain member")
         updatedOrganisation <- liftF(organisationRepository.removeMember(organisationId, member).map(StoredOrganisation.asOrganisation))
+        _                    = emailConnector.sendMemberRemovedConfirmation(organisation.name, Set(email))
       } yield updatedOrganisation
     ).value
   }

@@ -17,8 +17,14 @@
 package uk.gov.hmrc.apiplatformorganisation.config
 
 import java.time.Clock
+import javax.inject.{Inject, Provider, Singleton}
 
 import com.google.inject.AbstractModule
+
+import play.api.Configuration
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+
+import uk.gov.hmrc.apiplatformorganisation.connectors.EmailConnector
 
 class Module extends AbstractModule {
 
@@ -26,5 +32,17 @@ class Module extends AbstractModule {
 
     bind(classOf[AppConfig]).asEagerSingleton()
     bind(classOf[Clock]).toInstance(Clock.systemUTC())
+    bind(classOf[EmailConnector.Config]).toProvider(classOf[EmailConfigProvider])
+  }
+}
+
+@Singleton
+class EmailConfigProvider @Inject() (val configuration: Configuration)
+    extends ServicesConfig(configuration)
+    with Provider[EmailConnector.Config] {
+
+  override def get() = {
+    val url = baseUrl("email")
+    EmailConnector.Config(url)
   }
 }

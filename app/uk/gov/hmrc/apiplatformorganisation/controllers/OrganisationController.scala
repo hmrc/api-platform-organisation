@@ -24,7 +24,7 @@ import play.api.mvc.{Action, ControllerComponents, Results}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, Organisation, OrganisationId}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationId}
 import uk.gov.hmrc.apiplatformorganisation.models.{CreateOrganisationRequest, UpdateMembersRequest}
 import uk.gov.hmrc.apiplatformorganisation.services.OrganisationService
 
@@ -61,14 +61,12 @@ class OrganisationController @Inject() (cc: ControllerComponents, organisationSe
   def addMember(organisationId: OrganisationId): Action[UpdateMembersRequest] = Action.async(parse.json[UpdateMembersRequest]) { implicit request =>
     val failed  = (msg: String) => BadRequest(Json.toJson(ErrorMessage(msg)))
     val success = (o: Organisation) => Ok(Json.toJson(o))
-    val member  = Member(request.body.userId)
-    organisationService.addMember(organisationId, member).map(_.fold(failed, success))
+    organisationService.addMember(organisationId, request.body.userId, request.body.email).map(_.fold(failed, success))
   }
 
-  def removeMember(organisationId: OrganisationId, userId: UserId) = Action.async { _ =>
+  def removeMember(organisationId: OrganisationId, userId: UserId) = Action.async(parse.json[UpdateMembersRequest]) { implicit request =>
     val failed  = (msg: String) => BadRequest(Json.toJson(ErrorMessage(msg)))
     val success = (o: Organisation) => Ok(Json.toJson(o))
-    val member  = Member(userId)
-    organisationService.removeMember(organisationId, member).map(_.fold(failed, success))
+    organisationService.removeMember(organisationId, userId, request.body.email).map(_.fold(failed, success))
   }
 }
