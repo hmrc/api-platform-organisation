@@ -45,17 +45,39 @@ class SubmissionReviewRepositoryISpec extends AnyWordSpec
   val underTest: SubmissionReviewRepository                                = app.injector.instanceOf[SubmissionReviewRepository]
 
   "SubmissionReviewRepository" should {
-    "insert single submission review" in {
+    "create submission review" in {
       await(repository.collection.find().toFuture()).length shouldBe 0
       await(underTest.create(submittedSubmissionReview))
       await(repository.collection.find().toFuture()).head shouldBe submittedSubmissionReview
     }
 
+    "update submission review" in {
+      await(repository.collection.find().toFuture()).length shouldBe 0
+      await(underTest.create(submittedSubmissionReview))
+      val updatedSubmissionReview = submittedSubmissionReview.copy(state = SubmissionReview.State.InProgress)
+      await(underTest.update(updatedSubmissionReview))
+      await(repository.collection.find().toFuture()).head shouldBe updatedSubmissionReview
+    }
+
     "fetch" in {
       await(repository.collection.find().toFuture()).length shouldBe 0
       await(underTest.create(submittedSubmissionReview))
+      await(underTest.create(approvedSubmissionReview))
       await(underTest.fetch(submittedSubmissionReview.submissionId, submittedSubmissionReview.instanceIndex)) shouldBe Some(submittedSubmissionReview)
     }
 
+    "fetchAll" in {
+      await(repository.collection.find().toFuture()).length shouldBe 0
+      await(underTest.create(submittedSubmissionReview))
+      await(underTest.create(approvedSubmissionReview))
+      await(underTest.fetchAll()) shouldBe List(submittedSubmissionReview, approvedSubmissionReview)
+    }
+
+    "fetchByState" in {
+      await(repository.collection.find().toFuture()).length shouldBe 0
+      await(underTest.create(submittedSubmissionReview))
+      await(underTest.create(approvedSubmissionReview))
+      await(underTest.fetchByState(SubmissionReview.State.Approved)) shouldBe List(approvedSubmissionReview)
+    }
   }
 }

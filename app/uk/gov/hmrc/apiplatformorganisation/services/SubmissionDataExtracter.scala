@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.apiplatformorganisation.services
 
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
 
 object SubmissionDataExtracter {
@@ -36,11 +37,11 @@ object SubmissionDataExtracter {
     }
   }
 
-  def getOrganisationName(submission: Submission): Option[String] = {
+  def getOrganisationName(submission: Submission): Option[OrganisationName] = {
     val orgType         = getSingleChoiceQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationTypeId)
     val partnershipType = getSingleChoiceQuestionOfInterest(submission, submission.questionIdsOfInterest.partnershipTypeId)
 
-    (orgType, partnershipType) match {
+    val maybeOrgName: Option[String] = (orgType, partnershipType) match {
       case (Some("UK limited company"), _)                                             => getTextQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationNameLtdId)
       case (Some("Sole trader"), _)                                                    => getTextQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationNameSoleId)
       case (Some("Registered society"), _)                                             => getTextQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationNameRsId)
@@ -55,6 +56,10 @@ object SubmissionDataExtracter {
       case (Some("Partnership"), Some("Scottish partnership"))                         => getTextQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationNameSpId)
       case (Some("Partnership"), Some("Scottish limited partnership"))                 => getTextQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationNameSlpId)
       case (_, _)                                                                      => None
+    }
+    maybeOrgName match {
+      case Some(orgName) => Some(OrganisationName(orgName))
+      case _             => None
     }
   }
 }
