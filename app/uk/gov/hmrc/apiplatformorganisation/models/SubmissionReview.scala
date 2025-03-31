@@ -19,9 +19,8 @@ package uk.gov.hmrc.apiplatformorganisation.models
 import java.time.Instant
 import scala.collection.immutable.ListSet
 
-import play.api.libs.json.{Json, OFormat, Reads}
+import play.api.libs.json.{Json, OFormat}
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.services.InstantJsonFormatter
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionId
 
@@ -62,7 +61,6 @@ object SubmissionReview {
     implicit val eventFormat: OFormat[Event] = Json.format[Event]
   }
 
-  implicit val utcReads: Reads[Instant]                          = InstantJsonFormatter.lenientInstantReads
   implicit val submissionReviewFormat: OFormat[SubmissionReview] = Json.format[SubmissionReview]
 }
 

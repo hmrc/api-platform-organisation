@@ -36,7 +36,8 @@ object SubmissionsReviewRepository {
   object MongoFormats {
     implicit val dateFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 
-    implicit val submissionReviewFormat: OFormat[SubmissionReview] = Json.format[SubmissionReview]
+    implicit val submissionReviewEventFormat: OFormat[SubmissionReview.Event] = Json.format[SubmissionReview.Event]
+    implicit val submissionReviewFormat: OFormat[SubmissionReview]            = Json.format[SubmissionReview]
   }
 }
 
