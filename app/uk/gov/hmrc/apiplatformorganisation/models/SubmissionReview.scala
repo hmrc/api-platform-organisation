@@ -17,64 +17,52 @@
 package uk.gov.hmrc.apiplatformorganisation.models
 
 import java.time.Instant
-
-import cats.data.NonEmptyList
+import scala.collection.immutable.ListSet
 
 import play.api.libs.json.{Json, OFormat, Reads}
-import uk.gov.hmrc.play.json.Union
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.services.{InstantJsonFormatter, NonEmptyListFormatters}
+import uk.gov.hmrc.apiplatform.modules.common.domain.services.InstantJsonFormatter
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionId
 
-object SubmissionReview extends NonEmptyListFormatters {
+object SubmissionReview {
 
-  sealed trait Status {
-    def timestamp: Instant
+  sealed trait State {
+    val isSubmitted: Boolean  = this == State.Submitted
+    val isInProgress: Boolean = this == State.InProgress
+    val isApproved: Boolean   = this == State.Approved
+    val isFailed: Boolean     = this == State.Failed
   }
 
-  object Status {
+  object State {
+    case object Submitted  extends State
+    case object InProgress extends State
+    case object Approved   extends State
+    case object Failed     extends State
 
-    case class Submitted(
-        timestamp: Instant,
-        requestedBy: String
-      ) extends Status
+    val values = ListSet(Submitted, InProgress, Approved, Failed)
 
-    case class InProgress(
-        timestamp: Instant,
-        name: String,
-        comments: String
-      ) extends Status
+    def apply(text: String): Option[State] = State.values.find(_.toString.toUpperCase == text.toUpperCase())
 
-    case class Approved(
-        timestamp: Instant,
-        name: String,
-        comments: String
-      ) extends Status
+    def unsafeApply(text: String): State = apply(text).getOrElse(throw new RuntimeException(s"$text is not a valid State"))
 
-    case class Failed(
-        timestamp: Instant,
-        name: String,
-        comments: String
-      ) extends Status
+    import play.api.libs.json.Format
+    import uk.gov.hmrc.apiplatform.modules.common.domain.services.SealedTraitJsonFormatting
+    implicit val format: Format[State] = SealedTraitJsonFormatting.createFormatFor[State]("State", apply)
   }
 
-  import SubmissionReview.Status._
+  case class Event(
+      description: String,
+      name: String,
+      timestamp: Instant,
+      comment: Option[String]
+    )
 
-  implicit val utcReads: Reads[Instant] = InstantJsonFormatter.lenientInstantReads
+  object Event {
+    implicit val eventFormat: OFormat[Event] = Json.format[Event]
+  }
 
-  implicit val submittedStatusFormat: OFormat[Submitted]   = Json.format[Submitted]
-  implicit val inProgressStatusFormat: OFormat[InProgress] = Json.format[InProgress]
-  implicit val approvedStatusFormat: OFormat[Approved]     = Json.format[Approved]
-  implicit val failedStatusFormat: OFormat[Failed]         = Json.format[Failed]
-
-  implicit val submissionReviewStatus: OFormat[SubmissionReview.Status] = Union.from[SubmissionReview.Status]("SubmissionReview.StatusType")
-    .and[Submitted]("submitted")
-    .and[InProgress]("inProgress")
-    .and[Approved]("approved")
-    .and[Failed]("failed")
-    .format
-
+  implicit val utcReads: Reads[Instant]                          = InstantJsonFormatter.lenientInstantReads
   implicit val submissionReviewFormat: OFormat[SubmissionReview] = Json.format[SubmissionReview]
 }
 
@@ -83,5 +71,8 @@ case class SubmissionReview(
     instanceIndex: Int,
     organisationName: OrganisationName,
     lastUpdate: Instant,
-    statusHistory: NonEmptyList[SubmissionReview.Status]
+    requestedBy: String,
+    requestedOn: Instant,
+    state: SubmissionReview.State,
+    events: List[SubmissionReview.Event]
   )
