@@ -169,24 +169,6 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
       }
     }
 
-    "fetchAll" should {
-      "fetch all submissions" in new Setup {
-        SubmissionsDAOMock.FetchAll.thenReturn(aSubmission)
-
-        val result = await(underTest.fetchAll())
-
-        result shouldBe List(aSubmission)
-      }
-
-      "return empty list" in new Setup {
-        SubmissionsDAOMock.FetchAll.thenReturnNothing()
-
-        val result = await(underTest.fetchAll())
-
-        result shouldBe List.empty
-      }
-    }
-
     "fetchLatestMarkedSubmissionByOrganisationId" should {
       "fetch latest marked submission for id" in new Setup {
         SubmissionsDAOMock.FetchLatestByOrganisationId.thenReturn(completeSubmission)
