@@ -28,8 +28,7 @@ import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionId
-import uk.gov.hmrc.apiplatformorganisation.models.SubmissionReview
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, SubmissionReview}
 
 object SubmissionsReviewRepository {
 

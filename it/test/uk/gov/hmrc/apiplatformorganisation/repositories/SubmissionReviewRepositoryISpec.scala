@@ -26,8 +26,8 @@ import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionReview
 import uk.gov.hmrc.apiplatformorganisation.SubmissionReviewFixtures
-import uk.gov.hmrc.apiplatformorganisation.models.SubmissionReview
 
 class SubmissionReviewRepositoryISpec extends AnyWordSpec
     with Matchers

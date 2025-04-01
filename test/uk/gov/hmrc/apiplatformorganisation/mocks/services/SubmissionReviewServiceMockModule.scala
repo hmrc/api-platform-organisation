@@ -21,8 +21,7 @@ import scala.concurrent.Future
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionId
-import uk.gov.hmrc.apiplatformorganisation.models.SubmissionReview
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apiplatformorganisation.services.SubmissionReviewService
 
 trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
