@@ -24,7 +24,9 @@ import org.scalatest.Inside
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils._
+import uk.gov.hmrc.apiplatformorganisation.SubmissionReviewFixtures
 import uk.gov.hmrc.apiplatformorganisation.mocks.SubmissionsDAOMockModule
+import uk.gov.hmrc.apiplatformorganisation.mocks.services.SubmissionReviewServiceMockModule
 import uk.gov.hmrc.apiplatformorganisation.repositories.QuestionnaireDAO
 import uk.gov.hmrc.apiplatformorganisation.util.AsyncHmrcSpec
 
@@ -34,7 +36,9 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
 
   trait Setup
       extends SubmissionsDAOMockModule
+      with SubmissionReviewServiceMockModule
       with SubmissionsTestData
+      with SubmissionReviewFixtures
       with AsIdsHelpers {
 
     val completedAnswers: Submission.AnswersToQuestions = Map(Question.Id("q1") -> ActualAnswer.TextAnswer("ok"))
@@ -67,7 +71,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
     )
       .hasCompletelyAnsweredWith(completedAnswers)
 
-    val underTest = new SubmissionsService(new QuestionnaireDAO(), SubmissionsDAOMock.aMock, clock)
+    val underTest = new SubmissionsService(new QuestionnaireDAO(), SubmissionsDAOMock.aMock, SubmissionReviewServiceMock.aMock, clock)
   }
 
   "SubmissionsService" when {
@@ -87,8 +91,13 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
 
     "submit submission" should {
       "submit a submission" in new Setup {
-        SubmissionsDAOMock.Fetch.thenReturn(completelyAnswerExtendedSubmission.submission)
+        val samplePassAnsweredSubmission = aSubmission.copy(id = completedSubmissionId)
+          .hasCompletelyAnsweredWith(samplePassAnswersToQuestions)
+          .withCompletedProgress()
+
+        SubmissionsDAOMock.Fetch.thenReturn(samplePassAnsweredSubmission.submission)
         SubmissionsDAOMock.Update.thenReturn()
+        SubmissionReviewServiceMock.CreateSubmissionReview.thenReturn(submittedSubmissionReview)
 
         val result = await(underTest.submit(submissionId, "bob@example.com"))
 
@@ -157,24 +166,6 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         val result = await(underTest.fetch(submissionId))
 
         result shouldBe None
-      }
-    }
-
-    "fetchAll" should {
-      "fetch all submissions" in new Setup {
-        SubmissionsDAOMock.FetchAll.thenReturn(aSubmission)
-
-        val result = await(underTest.fetchAll())
-
-        result shouldBe List(aSubmission)
-      }
-
-      "return empty list" in new Setup {
-        SubmissionsDAOMock.FetchAll.thenReturnNothing()
-
-        val result = await(underTest.fetchAll())
-
-        result shouldBe List.empty
       }
     }
 

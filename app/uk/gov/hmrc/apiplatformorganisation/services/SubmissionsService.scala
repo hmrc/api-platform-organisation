@@ -33,6 +33,7 @@ import uk.gov.hmrc.apiplatformorganisation.repositories._
 class SubmissionsService @Inject() (
     questionnaireDAO: QuestionnaireDAO,
     submissionsDAO: SubmissionsDAO,
+    submissionReviewService: SubmissionReviewService,
     val clock: Clock
   )(implicit val ec: ExecutionContext
   ) extends EitherTHelper[String] with ClockNow {
@@ -71,12 +72,15 @@ class SubmissionsService @Inject() (
   }
 
   def submit(submissionId: SubmissionId, requestedBy: String): Future[Either[String, Submission]] = {
+    import SubmissionDataExtracter._
     (
       for {
         submission         <- fromOptionF(submissionsDAO.fetch(submissionId), "No such submission")
         _                  <- cond(submission.status.isAnsweredCompletely, (), "Submission not completely answered")
+        organisationName   <- fromOption(getOrganisationName(submission), "No organisation name found")
         submittedSubmission = Submission.submit(instant(), requestedBy)(submission)
         savedSubmission    <- liftF(submissionsDAO.update(submittedSubmission))
+        _                  <- liftF(submissionReviewService.create(savedSubmission.id, savedSubmission.latestInstance.index, requestedBy, organisationName))
       } yield savedSubmission
     )
       .value
@@ -137,8 +141,4 @@ class SubmissionsService @Inject() (
 
   def store(submission: Submission): Future[Submission] =
     submissionsDAO.update(submission)
-
-  def fetchAll(): Future[List[Submission]] = {
-    submissionsDAO.fetchAll()
-  }
 }
