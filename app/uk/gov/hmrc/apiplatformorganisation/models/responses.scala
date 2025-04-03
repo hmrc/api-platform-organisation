@@ -17,6 +17,7 @@
 package uk.gov.hmrc.apiplatformorganisation.models
 
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
+import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
 
 case class RegisteredOfficeAddress(
@@ -66,4 +67,35 @@ object CompaniesHouseCompanyProfile {
   implicit val writes: OWrites[CompaniesHouseCompanyProfile] = Json.writes[CompaniesHouseCompanyProfile]
 
   implicit val format = OFormat[CompaniesHouseCompanyProfile](reads, writes)
+}
+
+object ErrorCode extends Enumeration {
+  type ErrorCode = Value
+
+  val INVALID_REQUEST_PAYLOAD      = Value("INVALID_REQUEST_PAYLOAD")
+  val UNAUTHORIZED                 = Value("UNAUTHORIZED")
+  val UNKNOWN_ERROR                = Value("UNKNOWN_ERROR")
+  val APPLICATION_NOT_FOUND        = Value("APPLICATION_NOT_FOUND")
+  val SCOPE_NOT_FOUND              = Value("SCOPE_NOT_FOUND")
+  val INVALID_CREDENTIALS          = Value("INVALID_CREDENTIALS")
+  val APPLICATION_ALREADY_EXISTS   = Value("APPLICATION_ALREADY_EXISTS")
+  val SUBSCRIPTION_ALREADY_EXISTS  = Value("SUBSCRIPTION_ALREADY_EXISTS")
+  val USER_ALREADY_EXISTS          = Value("USER_ALREADY_EXISTS")
+  val APPLICATION_NEEDS_ADMIN      = Value("APPLICATION_NEEDS_ADMIN")
+  val CLIENT_SECRET_LIMIT_EXCEEDED = Value("CLIENT_SECRET_LIMIT_EXCEEDED")
+  val INVALID_STATE_TRANSITION     = Value("INVALID_STATE_TRANSITION")
+  val SUBSCRIPTION_NOT_FOUND       = Value("SUBSCRIPTION_NOT_FOUND")
+  val FORBIDDEN                    = Value("FORBIDDEN")
+  val INVALID_IP_ALLOWLIST         = Value("INVALID_IP_ALLOWLIST")
+  val BAD_QUERY_PARAMETER          = Value("BAD_QUERY_PARAMETER")
+  val FAILED_TO_SUBSCRIBE          = Value("FAILED_TO_SUBSCRIBE")
+}
+
+object JsErrorResponse {
+
+  def apply(errorCode: ErrorCode.Value, message: JsValueWrapper): JsObject =
+    Json.obj(
+      "code"    -> errorCode.toString,
+      "message" -> message
+    )
 }

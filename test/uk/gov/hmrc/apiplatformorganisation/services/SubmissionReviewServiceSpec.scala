@@ -27,6 +27,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatformorganisation.SubmissionReviewFixtures
 import uk.gov.hmrc.apiplatformorganisation.mocks.repositories.SubmissionReviewRepositoryMockModule
+import uk.gov.hmrc.apiplatformorganisation.models.{Approved, SubmissionReviewSearch, Submitted}
 import uk.gov.hmrc.apiplatformorganisation.util.AsyncHmrcSpec
 
 class SubmissionReviewServiceSpec extends AsyncHmrcSpec
@@ -59,10 +60,19 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec
     }
 
     "fetchAll" should {
-      "tfecth all submission review records" in new Setup {
+      "fetch all submission review records" in new Setup {
         SubmissionReviewRepositoryMock.FetchAll.willReturn(List(submittedSubmissionReview, approvedSubmissionReview))
         val result = await(underTest.fetchAll())
         result shouldBe List(submittedSubmissionReview, approvedSubmissionReview)
+      }
+    }
+
+    "search" should {
+      "search for submission review records" in new Setup {
+        SubmissionReviewRepositoryMock.Search.willReturn(Seq(submittedSubmissionReview, approvedSubmissionReview))
+        val criteria = SubmissionReviewSearch(List(Submitted, Approved))
+        val result   = await(underTest.search(criteria))
+        result shouldBe Seq(submittedSubmissionReview, approvedSubmissionReview)
       }
     }
   }
