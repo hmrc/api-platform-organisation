@@ -59,14 +59,6 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec
       }
     }
 
-    "fetchAll" should {
-      "fetch all submission review records" in new Setup {
-        SubmissionReviewRepositoryMock.FetchAll.willReturn(List(submittedSubmissionReview, approvedSubmissionReview))
-        val result = await(underTest.fetchAll())
-        result shouldBe List(submittedSubmissionReview, approvedSubmissionReview)
-      }
-    }
-
     "search" should {
       "search for submission review records" in new Setup {
         SubmissionReviewRepositoryMock.Search.willReturn(Seq(submittedSubmissionReview, approvedSubmissionReview))

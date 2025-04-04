@@ -38,28 +38,10 @@ class SubmissionReviewControllerSpec extends AnyWordSpec with Matchers with Subm
 
   private val controller = new SubmissionReviewController(Helpers.stubControllerComponents(), SubmissionReviewServiceMock.aMock)
 
-  "fetchAll" should {
-    "return 200" in {
-      SubmissionReviewServiceMock.FetchAll.thenReturn(List(submittedSubmissionReview, approvedSubmissionReview))
-      val fakeRequest = FakeRequest("GET", "/submission-reviews").withHeaders("content-type" -> "application/json")
-      val result      = controller.fetchAll()(fakeRequest)
-      status(result) shouldBe Status.OK
-      contentAsJson(result) shouldBe Json.toJson(List(submittedSubmissionReview, approvedSubmissionReview))
-    }
-
-    "return empty list when none found" in {
-      SubmissionReviewServiceMock.FetchAll.thenReturn(List.empty)
-      val fakeRequest = FakeRequest("GET", "/submission-reviews").withHeaders("content-type" -> "application/json")
-      val result      = controller.fetchAll()(fakeRequest)
-      status(result) shouldBe Status.OK
-      contentAsString(result) shouldBe "[]"
-    }
-  }
-
   "search" should {
     "return 200" in {
       SubmissionReviewServiceMock.Search.thenReturn(Seq(submittedSubmissionReview, approvedSubmissionReview))
-      val fakeRequest = FakeRequest("GET", "/submission-reviews/search?status=SUBMITTED&status=APPROVED").withHeaders("content-type" -> "application/json")
+      val fakeRequest = FakeRequest("GET", "/submission-reviews?status=SUBMITTED&status=APPROVED").withHeaders("content-type" -> "application/json")
       val result      = controller.search()(fakeRequest)
       status(result) shouldBe Status.OK
       contentAsJson(result) shouldBe Json.toJson(List(submittedSubmissionReview, approvedSubmissionReview))
@@ -67,7 +49,7 @@ class SubmissionReviewControllerSpec extends AnyWordSpec with Matchers with Subm
 
     "return empty list when none found" in {
       SubmissionReviewServiceMock.Search.thenReturn(List.empty)
-      val fakeRequest = FakeRequest("GET", "/submission-reviews/search?status=FAILED").withHeaders("content-type" -> "application/json")
+      val fakeRequest = FakeRequest("GET", "/submission-reviews?status=FAILED").withHeaders("content-type" -> "application/json")
       val result      = controller.search()(fakeRequest)
       status(result) shouldBe Status.OK
       contentAsString(result) shouldBe "[]"
@@ -75,7 +57,7 @@ class SubmissionReviewControllerSpec extends AnyWordSpec with Matchers with Subm
 
     "return 500 when error" in {
       SubmissionReviewServiceMock.Search.thenError()
-      val fakeRequest = FakeRequest("GET", "/submission-reviews/search?status=FAILED").withHeaders("content-type" -> "application/json")
+      val fakeRequest = FakeRequest("GET", "/submission-reviews?status=FAILED").withHeaders("content-type" -> "application/json")
       val result      = controller.search()(fakeRequest)
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
       contentAsString(result) shouldBe """{"code":"UNKNOWN_ERROR","message":"An unexpected error occurred"}"""

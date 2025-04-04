@@ -34,10 +34,6 @@ import uk.gov.hmrc.apiplatformorganisation.utils.ApplicationLogger
 class SubmissionReviewController @Inject() (cc: ControllerComponents, submissionReviewService: SubmissionReviewService)(implicit val ec: ExecutionContext)
     extends BackendController(cc) with ApplicationLogger {
 
-  def fetchAll() = Action.async { _ =>
-    submissionReviewService.fetchAll().map(s => Ok(Json.toJson(s)))
-  }
-
   def search() = Action.async { request =>
     Try(SubmissionReviewSearch.fromQueryString(request.queryString)) match {
       case Success(search) => submissionReviewService.search(search).map(s => Ok(Json.toJson(s))) recover recovery

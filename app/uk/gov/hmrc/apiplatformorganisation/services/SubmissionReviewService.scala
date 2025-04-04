@@ -33,10 +33,6 @@ class SubmissionReviewService @Inject() (
   )(implicit val ec: ExecutionContext
   ) extends ClockNow {
 
-  def fetchAll(): Future[List[SubmissionReview]] = {
-    submissionReviewRepository.fetchAll()
-  }
-
   def search(searchCriteria: SubmissionReviewSearch): Future[Seq[SubmissionReview]] = {
     submissionReviewRepository.search(searchCriteria)
   }
