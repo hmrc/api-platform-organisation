@@ -20,13 +20,15 @@ import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, SubmissionReview}
 
 object SubmissionIdData {
-  val one: SubmissionId = SubmissionId.random
-  val two: SubmissionId = SubmissionId.random
+  val one: SubmissionId   = SubmissionId.random
+  val two: SubmissionId   = SubmissionId.random
+  val three: SubmissionId = SubmissionId.random
 }
 
 object SubmissionReviewEventData extends FixedClock {
-  val one: SubmissionReview.Event = SubmissionReview.Event("Submitted", "bob@example.com", instant, None)
-  val two: SubmissionReview.Event = SubmissionReview.Event("Approved", "sam@sdst.com", instant, Some("Approval comment"))
+  val one: SubmissionReview.Event   = SubmissionReview.Event("Submitted", "bob@example.com", instant, None)
+  val two: SubmissionReview.Event   = SubmissionReview.Event("Comment", "sam@sdst.com", instant, Some("Comment"))
+  val three: SubmissionReview.Event = SubmissionReview.Event("Approved", "sam@sdst.com", instant, Some("Approval comment"))
 }
 
 object SubmissionReviewData extends FixedClock {
@@ -49,12 +51,24 @@ object SubmissionReviewData extends FixedClock {
     instant,
     "bill@example.com",
     instant,
-    SubmissionReview.State.Approved,
+    SubmissionReview.State.InProgress,
     List(SubmissionReviewEventData.one, SubmissionReviewEventData.two)
+  )
+
+  val three: SubmissionReview = SubmissionReview(
+    SubmissionIdData.three,
+    0,
+    OrganisationNameData.one,
+    instant,
+    "bill@example.com",
+    instant,
+    SubmissionReview.State.Approved,
+    List(SubmissionReviewEventData.one, SubmissionReviewEventData.two, SubmissionReviewEventData.three)
   )
 }
 
 trait SubmissionReviewFixtures {
-  val submittedSubmissionReview: SubmissionReview = SubmissionReviewData.one
-  val approvedSubmissionReview: SubmissionReview  = SubmissionReviewData.two
+  val submittedSubmissionReview: SubmissionReview  = SubmissionReviewData.one
+  val inProgressSubmissionReview: SubmissionReview = SubmissionReviewData.two
+  val approvedSubmissionReview: SubmissionReview   = SubmissionReviewData.three
 }

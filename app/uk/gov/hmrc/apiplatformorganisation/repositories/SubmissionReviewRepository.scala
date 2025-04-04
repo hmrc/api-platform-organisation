@@ -20,15 +20,21 @@ import java.time.Instant
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-import org.mongodb.scala.model.Filters.equal
+import org.mongodb.scala.bson.Document
+import org.mongodb.scala.bson.conversions.Bson
+import org.mongodb.scala.model.Aggregates._
+import org.mongodb.scala.model.Filters.{equal, _}
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes}
 
 import play.api.libs.json.{Format, Json, OFormat}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
+import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, SubmissionReview}
+import uk.gov.hmrc.apiplatformorganisation.models._
+import uk.gov.hmrc.apiplatformorganisation.utils.{ApplicationLogger, MetricsTimer}
 
 object SubmissionsReviewRepository {
 
@@ -41,7 +47,7 @@ object SubmissionsReviewRepository {
 }
 
 @Singleton
-class SubmissionReviewRepository @Inject() (mongo: MongoComponent)(implicit ec: ExecutionContext) extends PlayMongoRepository[SubmissionReview](
+class SubmissionReviewRepository @Inject() (mongo: MongoComponent, val metrics: Metrics)(implicit ec: ExecutionContext) extends PlayMongoRepository[SubmissionReview](
       mongoComponent = mongo,
       collectionName = "submissionReview",
       domainFormat = SubmissionsReviewRepository.MongoFormats.submissionReviewFormat,
@@ -61,7 +67,7 @@ class SubmissionReviewRepository @Inject() (mongo: MongoComponent)(implicit ec: 
         )
       ),
       replaceIndexes = true
-    ) {
+    ) with ApplicationLogger with MetricsTimer {
   override lazy val requiresTtlIndex: Boolean = false
 
   private def filterBy(submissionId: SubmissionId, instanceIndex: Int) =
@@ -96,5 +102,45 @@ class SubmissionReviewRepository @Inject() (mongo: MongoComponent)(implicit ec: 
   def update(review: SubmissionReview): Future[SubmissionReview] = {
     val filter = filterBy(review.submissionId, review.instanceIndex)
     collection.findOneAndReplace(filter, review).toFuture().map(_ => review)
+  }
+
+  def search(searchCriteria: SubmissionReviewSearch): Future[Seq[SubmissionReview]] = {
+    val statusFilters = convertFilterToStatusQueryClause(searchCriteria.filters)
+    runAggregationQuery(statusFilters)
+  }
+
+  private def convertFilterToStatusQueryClause(filters: List[SubmissionReviewSearchFilter]): Bson = {
+
+    def statusMatch(states: SubmissionReview.State*): Bson = {
+      if (states.size == 0) {
+        Document()
+      } else {
+        val bsonStates = states.map(s => Codecs.toBson(s))
+        in("state", bsonStates: _*)
+      }
+    }
+
+    def getFilterState(filter: SubmissionReviewStatusFilter): SubmissionReview.State = {
+      filter match {
+        case Submitted  => SubmissionReview.State.Submitted
+        case InProgress => SubmissionReview.State.InProgress
+        case Approved   => SubmissionReview.State.Approved
+        case Failed     => SubmissionReview.State.Failed
+      }
+    }
+
+    val statusFilters = filters.collect { case sf: SubmissionReviewStatusFilter => sf }
+    statusMatch(statusFilters.map(sf => getFilterState(sf)): _*)
+  }
+
+  private def runAggregationQuery(statusFilters: Bson) = {
+    timeFuture("Run SubmissionReview Aggregation Query", "submissionReview.repository.runAggregationQuery") {
+
+      collection.aggregate(
+        Seq(
+          filter(statusFilters)
+        )
+      ).toFuture()
+    }
   }
 }

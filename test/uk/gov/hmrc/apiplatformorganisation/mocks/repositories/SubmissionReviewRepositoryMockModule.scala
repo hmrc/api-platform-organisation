@@ -42,5 +42,8 @@ trait SubmissionReviewRepositoryMockModule extends MockitoSugar with ArgumentMat
       def willReturn(reviews: List[SubmissionReview]) = when(aMock.fetchAll()).thenReturn(Future.successful(reviews))
     }
 
+    object Search {
+      def willReturn(reviews: Seq[SubmissionReview]) = when(aMock.search(*)).thenReturn(Future.successful(reviews))
+    }
   }
 }
