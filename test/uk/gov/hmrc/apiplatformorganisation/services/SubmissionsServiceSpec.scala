@@ -24,11 +24,11 @@ import org.scalatest.Inside
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils._
-import uk.gov.hmrc.apiplatformorganisation.SubmissionReviewFixtures
 import uk.gov.hmrc.apiplatformorganisation.mocks.SubmissionsDAOMockModule
-import uk.gov.hmrc.apiplatformorganisation.mocks.services.SubmissionReviewServiceMockModule
+import uk.gov.hmrc.apiplatformorganisation.mocks.services.{OrganisationServiceMockModule, SubmissionReviewServiceMockModule}
 import uk.gov.hmrc.apiplatformorganisation.repositories.QuestionnaireDAO
 import uk.gov.hmrc.apiplatformorganisation.util.AsyncHmrcSpec
+import uk.gov.hmrc.apiplatformorganisation.{OrganisationFixtures, SubmissionReviewFixtures}
 
 class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
 
@@ -37,8 +37,10 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
   trait Setup
       extends SubmissionsDAOMockModule
       with SubmissionReviewServiceMockModule
+      with OrganisationServiceMockModule
       with SubmissionsTestData
       with SubmissionReviewFixtures
+      with OrganisationFixtures
       with AsIdsHelpers {
 
     val completedAnswers: Submission.AnswersToQuestions = Map(Question.Id("q1") -> ActualAnswer.TextAnswer("ok"))
@@ -71,7 +73,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
     )
       .hasCompletelyAnsweredWith(completedAnswers)
 
-    val underTest = new SubmissionsService(new QuestionnaireDAO(), SubmissionsDAOMock.aMock, SubmissionReviewServiceMock.aMock, clock)
+    val underTest = new SubmissionsService(new QuestionnaireDAO(), SubmissionsDAOMock.aMock, SubmissionReviewServiceMock.aMock, OrganisationServiceMock.aMock, clock)
   }
 
   "SubmissionsService" when {
@@ -106,12 +108,33 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
 
       "fail to submit a submission that hasn't been answered completely" in new Setup {
         SubmissionsDAOMock.Fetch.thenReturn(aSubmission)
-        SubmissionsDAOMock.Update.thenReturn()
 
         val result = await(underTest.submit(submissionId, "bob@example.com"))
 
         result.isLeft shouldBe true
         result.left.value shouldBe "Submission not completely answered"
+      }
+    }
+
+    "approve submission" should {
+      "approve a submission" in new Setup {
+        SubmissionsDAOMock.Fetch.thenReturn(submittedSubmission)
+        OrganisationServiceMock.CreateOrganisation.thenReturn(standardOrg)
+        SubmissionsDAOMock.Update.thenReturn()
+        SubmissionReviewServiceMock.ApproveSubmissionReview.thenReturn(approvedSubmissionReview)
+
+        val result = await(underTest.approve(submissionId, "bob@example.com", Some("comment")))
+
+        result.value.status shouldBe Submission.Status.Granted(instant, "bob@example.com", Some("comment"), None)
+      }
+
+      "fail to submit a submission that hasn't been submitted" in new Setup {
+        SubmissionsDAOMock.Fetch.thenReturn(aSubmission)
+
+        val result = await(underTest.approve(submissionId, "bob@example.com", Some("comment")))
+
+        result.isLeft shouldBe true
+        result.left.value shouldBe "Submission not submitted"
       }
     }
 

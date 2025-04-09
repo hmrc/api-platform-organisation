@@ -51,7 +51,7 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
     "create" should {
       "transform returned storedOrg" in new Setup {
         OrganisationRepositoryMock.Save.willReturn(standardStoredOrg)
-        val result = await(underTest.create(standardCreateRequest))
+        val result = await(underTest.create(standardCreateRequest.organisationName, standardCreateRequest.requestedBy))
         result shouldBe standardOrg
       }
     }

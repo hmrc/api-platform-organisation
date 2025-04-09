@@ -30,9 +30,9 @@ object StoredOrganisation {
   implicit val dateFormat: Format[Instant]                           = MongoJavatimeFormats.instantFormat
   implicit val storedOrganisationFormat: OFormat[StoredOrganisation] = Json.format[StoredOrganisation]
 
-  def create(createOrganisationRequest: CreateOrganisationRequest, createdTime: Instant): StoredOrganisation = {
-    val member = Member(createOrganisationRequest.requestedBy)
-    StoredOrganisation(OrganisationId.random, createOrganisationRequest.organisationName, createdTime, createOrganisationRequest.requestedBy, Set(member))
+  def create(organisationName: OrganisationName, requestedBy: UserId, createdTime: Instant): StoredOrganisation = {
+    val member = Member(requestedBy)
+    StoredOrganisation(OrganisationId.random, organisationName, createdTime, requestedBy, Set(member))
   }
 
   def asOrganisation(data: StoredOrganisation): Organisation = {

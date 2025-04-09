@@ -21,7 +21,7 @@ import scala.concurrent.Future
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationId}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationId, OrganisationName}
 import uk.gov.hmrc.apiplatformorganisation.services.OrganisationService
 
 trait OrganisationServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
@@ -30,7 +30,7 @@ trait OrganisationServiceMockModule extends MockitoSugar with ArgumentMatchersSu
     val aMock = mock[OrganisationService]
 
     object CreateOrganisation {
-      def thenReturn(org: Organisation) = when(aMock.create(*)(*)).thenReturn(Future.successful(org))
+      def thenReturn(org: Organisation) = when(aMock.create(*[OrganisationName], *[UserId])(*)).thenReturn(Future.successful(org))
     }
 
     object Fetch {

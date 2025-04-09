@@ -24,7 +24,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.services.{ClockNow, EitherTHelper}
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, Organisation, OrganisationId}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, Organisation, OrganisationId, OrganisationName}
 import uk.gov.hmrc.apiplatformorganisation.connectors.EmailConnector
 import uk.gov.hmrc.apiplatformorganisation.models._
 import uk.gov.hmrc.apiplatformorganisation.repositories.OrganisationRepository
@@ -37,8 +37,8 @@ class OrganisationService @Inject() (
   )(implicit val ec: ExecutionContext
   ) extends EitherTHelper[String] with ClockNow {
 
-  def create(createOrganisationRequest: CreateOrganisationRequest)(implicit ec: ExecutionContext): Future[Organisation] = {
-    organisationRepository.save(StoredOrganisation.create(createOrganisationRequest, instant())).map(StoredOrganisation.asOrganisation)
+  def create(organisationName: OrganisationName, requestedBy: UserId)(implicit ec: ExecutionContext): Future[Organisation] = {
+    organisationRepository.save(StoredOrganisation.create(organisationName, requestedBy, instant())).map(StoredOrganisation.asOrganisation)
   }
 
   def fetch(organisationId: OrganisationId)(implicit ec: ExecutionContext): Future[Option[Organisation]] = {
