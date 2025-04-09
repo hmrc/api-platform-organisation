@@ -17,6 +17,7 @@
 package uk.gov.hmrc.apiplatformorganisation.models
 
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
+import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
 
 case class RegisteredOfficeAddress(
@@ -66,4 +67,23 @@ object CompaniesHouseCompanyProfile {
   implicit val writes: OWrites[CompaniesHouseCompanyProfile] = Json.writes[CompaniesHouseCompanyProfile]
 
   implicit val format = OFormat[CompaniesHouseCompanyProfile](reads, writes)
+}
+
+object ErrorCode extends Enumeration {
+  type ErrorCode = Value
+
+  val INVALID_REQUEST_PAYLOAD = Value("INVALID_REQUEST_PAYLOAD")
+  val UNAUTHORIZED            = Value("UNAUTHORIZED")
+  val UNKNOWN_ERROR           = Value("UNKNOWN_ERROR")
+  val FORBIDDEN               = Value("FORBIDDEN")
+  val BAD_QUERY_PARAMETER     = Value("BAD_QUERY_PARAMETER")
+}
+
+object JsErrorResponse {
+
+  def apply(errorCode: ErrorCode.Value, message: JsValueWrapper): JsObject =
+    Json.obj(
+      "code"    -> errorCode.toString,
+      "message" -> message
+    )
 }

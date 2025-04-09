@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.apiplatformorganisation.repositories
 
-import org.scalatest.matchers.should.Matchers
+import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
@@ -28,6 +28,7 @@ import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionReview
 import uk.gov.hmrc.apiplatformorganisation.SubmissionReviewFixtures
+import uk.gov.hmrc.apiplatformorganisation.models.{Approved, InProgress, SubmissionReviewSearch, Submitted}
 
 class SubmissionReviewRepositoryISpec extends AnyWordSpec
     with Matchers
@@ -46,38 +47,76 @@ class SubmissionReviewRepositoryISpec extends AnyWordSpec
 
   "SubmissionReviewRepository" should {
     "create submission review" in {
-      await(repository.collection.find().toFuture()).length shouldBe 0
+      await(repository.collection.find().toFuture()).length mustBe 0
       await(underTest.create(submittedSubmissionReview))
-      await(repository.collection.find().toFuture()).head shouldBe submittedSubmissionReview
+      await(repository.collection.find().toFuture()).head mustBe submittedSubmissionReview
     }
 
     "update submission review" in {
-      await(repository.collection.find().toFuture()).length shouldBe 0
+      await(repository.collection.find().toFuture()).length mustBe 0
       await(underTest.create(submittedSubmissionReview))
       val updatedSubmissionReview = submittedSubmissionReview.copy(state = SubmissionReview.State.InProgress)
       await(underTest.update(updatedSubmissionReview))
-      await(repository.collection.find().toFuture()).head shouldBe updatedSubmissionReview
+      await(repository.collection.find().toFuture()).head mustBe updatedSubmissionReview
     }
 
     "fetch" in {
-      await(repository.collection.find().toFuture()).length shouldBe 0
+      await(repository.collection.find().toFuture()).length mustBe 0
       await(underTest.create(submittedSubmissionReview))
       await(underTest.create(approvedSubmissionReview))
-      await(underTest.fetch(submittedSubmissionReview.submissionId, submittedSubmissionReview.instanceIndex)) shouldBe Some(submittedSubmissionReview)
+      await(underTest.fetch(submittedSubmissionReview.submissionId, submittedSubmissionReview.instanceIndex)) mustBe Some(submittedSubmissionReview)
     }
 
     "fetchAll" in {
-      await(repository.collection.find().toFuture()).length shouldBe 0
+      await(repository.collection.find().toFuture()).length mustBe 0
       await(underTest.create(submittedSubmissionReview))
       await(underTest.create(approvedSubmissionReview))
-      await(underTest.fetchAll()) shouldBe List(submittedSubmissionReview, approvedSubmissionReview)
+      await(underTest.fetchAll()) mustBe List(submittedSubmissionReview, approvedSubmissionReview)
     }
 
     "fetchByState" in {
-      await(repository.collection.find().toFuture()).length shouldBe 0
+      await(repository.collection.find().toFuture()).length mustBe 0
       await(underTest.create(submittedSubmissionReview))
+      await(underTest.create(inProgressSubmissionReview))
       await(underTest.create(approvedSubmissionReview))
-      await(underTest.fetchByState(SubmissionReview.State.Approved)) shouldBe List(approvedSubmissionReview)
+      await(underTest.fetchByState(SubmissionReview.State.Approved)) mustBe List(approvedSubmissionReview)
+    }
+
+    "search" in {
+      await(repository.collection.find().toFuture()).length mustBe 0
+      await(underTest.create(submittedSubmissionReview))
+      await(underTest.create(inProgressSubmissionReview))
+      await(underTest.create(approvedSubmissionReview))
+
+      val searchCriteria = SubmissionReviewSearch(List(Submitted, InProgress))
+      val result         = await(underTest.search(searchCriteria))
+
+      result.size mustBe 2
+      result must contain only (submittedSubmissionReview, inProgressSubmissionReview)
+    }
+
+    "search returns all" in {
+      await(repository.collection.find().toFuture()).length mustBe 0
+      await(underTest.create(submittedSubmissionReview))
+      await(underTest.create(inProgressSubmissionReview))
+      await(underTest.create(approvedSubmissionReview))
+
+      val searchCriteria = SubmissionReviewSearch(List(Submitted, InProgress, Approved))
+      val result         = await(underTest.search(searchCriteria))
+
+      result.size mustBe 3
+      result must contain only (submittedSubmissionReview, inProgressSubmissionReview, approvedSubmissionReview)
+    }
+
+    "search returns none" in {
+      await(repository.collection.find().toFuture()).length mustBe 0
+      await(underTest.create(submittedSubmissionReview))
+      await(underTest.create(inProgressSubmissionReview))
+
+      val searchCriteria = SubmissionReviewSearch(List(Approved))
+      val result         = await(underTest.search(searchCriteria))
+
+      result.size mustBe 0
     }
   }
 }

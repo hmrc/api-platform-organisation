@@ -33,8 +33,9 @@ trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatche
       def thenReturn(review: SubmissionReview) = when(aMock.create(*[SubmissionId], *, *, *[OrganisationName])).thenReturn(Future.successful(review))
     }
 
-    object FetchAll {
-      def thenReturn(reviews: List[SubmissionReview]) = when(aMock.fetchAll()).thenReturn(Future.successful(reviews))
+    object Search {
+      def thenReturn(reviews: Seq[SubmissionReview]) = when(aMock.search(*)).thenReturn(Future.successful(reviews))
+      def thenError()                                = when(aMock.search(*)).thenReturn(Future.failed(new RuntimeException("Error message")))
     }
   }
 }
