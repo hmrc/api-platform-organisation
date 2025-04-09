@@ -31,6 +31,12 @@ trait OrganisationServiceMockModule extends MockitoSugar with ArgumentMatchersSu
 
     object CreateOrganisation {
       def thenReturn(org: Organisation) = when(aMock.create(*[OrganisationName], *[UserId])(*)).thenReturn(Future.successful(org))
+
+      def verifyCalledWith(organisationName: OrganisationName, requestedBy: UserId) =
+        verify(aMock).create(eqTo(organisationName), eqTo(requestedBy))(*)
+
+      def verifyNotCalled() =
+        verify(aMock, never).create(*[OrganisationName], *[UserId])(*)
     }
 
     object Fetch {

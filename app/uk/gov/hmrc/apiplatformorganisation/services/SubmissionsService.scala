@@ -87,7 +87,7 @@ class SubmissionsService @Inject() (
       .value
   }
 
-  def approve(submissionId: SubmissionId, requestedBy: String, comment: Option[String]): Future[Either[String, Submission]] = {
+  def approve(submissionId: SubmissionId, approvedBy: String, comment: Option[String]): Future[Either[String, Submission]] = {
     import SubmissionDataExtracter._
     (
       for {
@@ -95,9 +95,9 @@ class SubmissionsService @Inject() (
         _                 <- cond(submission.status.isSubmitted, (), "Submission not submitted")
         organisationName  <- fromOption(getOrganisationName(submission), "No organisation name found")
         organisation      <- liftF(organisationService.create(organisationName, submission.startedBy))
-        approvedSubmission = Submission.grant(instant(), requestedBy, comment, None)(submission)
+        approvedSubmission = Submission.grant(instant(), approvedBy, comment, None)(submission)
         savedSubmission   <- liftF(submissionsDAO.update(approvedSubmission))
-        _                 <- liftF(submissionReviewService.approve(savedSubmission.id, savedSubmission.latestInstance.index, requestedBy, comment))
+        _                 <- liftF(submissionReviewService.approve(savedSubmission.id, savedSubmission.latestInstance.index, approvedBy, comment))
       } yield savedSubmission
     )
       .value

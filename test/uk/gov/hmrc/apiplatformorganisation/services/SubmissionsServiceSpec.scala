@@ -22,6 +22,7 @@ import cats.data.NonEmptyList
 import org.scalatest.Inside
 
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils._
 import uk.gov.hmrc.apiplatformorganisation.mocks.SubmissionsDAOMockModule
@@ -118,7 +119,11 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
 
     "approve submission" should {
       "approve a submission" in new Setup {
-        SubmissionsDAOMock.Fetch.thenReturn(submittedSubmission)
+        val samplePassSubmittedSubmission = aSubmission.copy(id = completedSubmissionId)
+          .hasCompletelyAnsweredWith(samplePassAnswersToQuestions)
+          .withSubmittedProgress()
+
+        SubmissionsDAOMock.Fetch.thenReturn(samplePassSubmittedSubmission.submission)
         OrganisationServiceMock.CreateOrganisation.thenReturn(standardOrg)
         SubmissionsDAOMock.Update.thenReturn()
         SubmissionReviewServiceMock.ApproveSubmissionReview.thenReturn(approvedSubmissionReview)
@@ -126,6 +131,8 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         val result = await(underTest.approve(submissionId, "bob@example.com", Some("comment")))
 
         result.value.status shouldBe Submission.Status.Granted(instant, "bob@example.com", Some("comment"), None)
+
+        OrganisationServiceMock.CreateOrganisation.verifyCalledWith(OrganisationName("Bobs Burgers"), samplePassSubmittedSubmission.submission.startedBy)
       }
 
       "fail to submit a submission that hasn't been submitted" in new Setup {
@@ -135,6 +142,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
 
         result.isLeft shouldBe true
         result.left.value shouldBe "Submission not submitted"
+        OrganisationServiceMock.CreateOrganisation.verifyNotCalled()
       }
     }
 

@@ -94,6 +94,34 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
     }
   }
 
+  "approve a submission" should {
+    implicit val writer: OWrites[SubmissionsController.ApproveSubmissionRequest] = Json.writes[SubmissionsController.ApproveSubmissionRequest]
+    val fakeRequest                                                              =
+      FakeRequest(POST, s"/submission/$submissionId/approve").withBody(Json.toJson(SubmissionsController.ApproveSubmissionRequest("bob@example.com", Some("comment"))))
+
+    "return an ok response" in new Setup {
+      SubmissionsServiceMock.Approve.thenReturn(aSubmission)
+
+      val result = underTest.approveSubmission(submissionId)(fakeRequest)
+
+      status(result) shouldBe OK
+
+      contentAsJson(result).validate[Submission] match {
+        case JsSuccess(submission, _) =>
+          submission shouldBe aSubmission
+        case JsError(f)               => fail(s"Not parsed as a response $f")
+      }
+    }
+
+    "return a bad request response" in new Setup {
+      SubmissionsServiceMock.Approve.thenFails("Test Error")
+
+      val result = underTest.approveSubmission(submissionId)(fakeRequest)
+
+      status(result) shouldBe BAD_REQUEST
+    }
+  }
+
   "fetchLatestByOrgansationId" should {
     "return ok response with submission when found" in new Setup {
       SubmissionsServiceMock.FetchLatestByOrganisationId.thenReturn(aSubmission)
