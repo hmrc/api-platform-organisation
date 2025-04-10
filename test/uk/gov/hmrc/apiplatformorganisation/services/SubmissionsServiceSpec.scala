@@ -22,7 +22,7 @@ import cats.data.NonEmptyList
 import org.scalatest.Inside
 
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationName}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils._
 import uk.gov.hmrc.apiplatformorganisation.mocks.SubmissionsDAOMockModule
@@ -132,16 +132,30 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
 
         result.value.status shouldBe Submission.Status.Granted(instant, "bob@example.com", Some("comment"), None)
 
-        OrganisationServiceMock.CreateOrganisation.verifyCalledWith(OrganisationName("Bobs Burgers"), samplePassSubmittedSubmission.submission.startedBy)
+        OrganisationServiceMock.CreateOrganisation.verifyCalledWith(
+          OrganisationName("Bobs Burgers"),
+          Organisation.OrganisationType.UkLimitedCompany,
+          samplePassSubmittedSubmission.submission.startedBy
+        )
       }
 
-      "fail to submit a submission that hasn't been submitted" in new Setup {
+      "fail to approve a submission that hasn't been submitted" in new Setup {
         SubmissionsDAOMock.Fetch.thenReturn(aSubmission)
 
         val result = await(underTest.approve(submissionId, "bob@example.com", Some("comment")))
 
         result.isLeft shouldBe true
         result.left.value shouldBe "Submission not submitted"
+        OrganisationServiceMock.CreateOrganisation.verifyNotCalled()
+      }
+
+      "fail to approve a submission that doesn't exist" in new Setup {
+        SubmissionsDAOMock.Fetch.thenReturnNothing()
+
+        val result = await(underTest.approve(submissionId, "bob@example.com", Some("comment")))
+
+        result.isLeft shouldBe true
+        result.left.value shouldBe "No such submission"
         OrganisationServiceMock.CreateOrganisation.verifyNotCalled()
       }
     }

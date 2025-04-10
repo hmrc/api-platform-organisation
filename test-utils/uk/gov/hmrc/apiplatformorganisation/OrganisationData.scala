@@ -29,6 +29,10 @@ object OrganisationNameData {
   val one: OrganisationName = OrganisationName("Example")
 }
 
+object OrganisationTypeData {
+  val one: Organisation.OrganisationType = Organisation.OrganisationType.UkLimitedCompany
+}
+
 object UserIdData {
   val one: UserId = UserId.random
 }
@@ -38,7 +42,7 @@ object MemberData {
 }
 
 object CreateOrganisationRequestData {
-  val one: CreateOrganisationRequest = CreateOrganisationRequest(OrganisationNameData.one, UserIdData.one)
+  val one: CreateOrganisationRequest = CreateOrganisationRequest(OrganisationNameData.one, OrganisationTypeData.one, UserIdData.one)
 }
 
 object UpdateMembersRequestData {
@@ -46,11 +50,11 @@ object UpdateMembersRequestData {
 }
 
 object OrganisationData {
-  val one: Organisation = Organisation(OrganisationIdData.one, OrganisationNameData.one, Set(MemberData.one))
+  val one: Organisation = Organisation(OrganisationIdData.one, OrganisationNameData.one, OrganisationTypeData.one, Set(MemberData.one))
 }
 
 object StoredOrganisationData extends FixedClock {
-  val one: StoredOrganisation = StoredOrganisation(OrganisationIdData.one, OrganisationNameData.one, instant, UserIdData.one, Set(MemberData.one))
+  val one: StoredOrganisation = StoredOrganisation(OrganisationIdData.one, OrganisationNameData.one, OrganisationTypeData.one, instant, UserIdData.one, Set(MemberData.one))
 }
 
 trait OrganisationFixtures {

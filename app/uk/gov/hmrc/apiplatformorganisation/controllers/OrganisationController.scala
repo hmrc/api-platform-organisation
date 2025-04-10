@@ -39,7 +39,7 @@ class OrganisationController @Inject() (cc: ControllerComponents, organisationSe
   import OrganisationController._
 
   def create(): Action[CreateOrganisationRequest] = Action.async(parse.json[CreateOrganisationRequest]) { implicit request =>
-    organisationService.create(request.body.organisationName, request.body.requestedBy).map(org => Ok(Json.toJson(org)))
+    organisationService.create(request.body.organisationName, request.body.organisationType, request.body.requestedBy).map(org => Ok(Json.toJson(org)))
   }
 
   def fetch(organisationId: OrganisationId) = Action.async { _ =>

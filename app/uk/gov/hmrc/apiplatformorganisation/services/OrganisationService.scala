@@ -37,8 +37,8 @@ class OrganisationService @Inject() (
   )(implicit val ec: ExecutionContext
   ) extends EitherTHelper[String] with ClockNow {
 
-  def create(organisationName: OrganisationName, requestedBy: UserId)(implicit ec: ExecutionContext): Future[Organisation] = {
-    organisationRepository.save(StoredOrganisation.create(organisationName, requestedBy, instant())).map(StoredOrganisation.asOrganisation)
+  def create(organisationName: OrganisationName, organisationType: Organisation.OrganisationType, requestedBy: UserId)(implicit ec: ExecutionContext): Future[Organisation] = {
+    organisationRepository.save(StoredOrganisation.create(organisationName, organisationType, requestedBy, instant())).map(StoredOrganisation.asOrganisation)
   }
 
   def fetch(organisationId: OrganisationId)(implicit ec: ExecutionContext): Future[Option[Organisation]] = {

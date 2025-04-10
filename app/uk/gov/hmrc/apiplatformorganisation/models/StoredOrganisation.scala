@@ -24,18 +24,25 @@ import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, Organisation, OrganisationId, OrganisationName}
 
-case class StoredOrganisation(id: OrganisationId, name: OrganisationName, createdDateTime: Instant, requestedBy: UserId, members: Set[Member])
+case class StoredOrganisation(
+    id: OrganisationId,
+    name: OrganisationName,
+    organisationType: Organisation.OrganisationType,
+    createdDateTime: Instant,
+    requestedBy: UserId,
+    members: Set[Member]
+  )
 
 object StoredOrganisation {
   implicit val dateFormat: Format[Instant]                           = MongoJavatimeFormats.instantFormat
   implicit val storedOrganisationFormat: OFormat[StoredOrganisation] = Json.format[StoredOrganisation]
 
-  def create(organisationName: OrganisationName, requestedBy: UserId, createdTime: Instant): StoredOrganisation = {
+  def create(organisationName: OrganisationName, organisationType: Organisation.OrganisationType, requestedBy: UserId, createdTime: Instant): StoredOrganisation = {
     val member = Member(requestedBy)
-    StoredOrganisation(OrganisationId.random, organisationName, createdTime, requestedBy, Set(member))
+    StoredOrganisation(OrganisationId.random, organisationName, organisationType, createdTime, requestedBy, Set(member))
   }
 
   def asOrganisation(data: StoredOrganisation): Organisation = {
-    Organisation(data.id, data.name, data.members)
+    Organisation(data.id, data.name, data.organisationType, data.members)
   }
 }
