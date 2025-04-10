@@ -24,6 +24,7 @@ import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationId
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, _}
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services.{ValidationError, ValidationErrors}
 import uk.gov.hmrc.apiplatformorganisation.services.SubmissionsService
 
 trait SubmissionsServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
@@ -141,7 +142,7 @@ trait SubmissionsServiceMockModule extends MockitoSugar with ArgumentMatchersSug
         when(aMock.recordAnswers(*[SubmissionId], *[Question.Id], *[Map[String, Seq[String]]])).thenReturn(successful(Right(extSubmission)))
 
       def thenFails(error: String) =
-        when(aMock.recordAnswers(*[SubmissionId], *[Question.Id], *[Map[String, Seq[String]]])).thenReturn(successful(Left(error)))
+        when(aMock.recordAnswers(*[SubmissionId], *[Question.Id], *[Map[String, Seq[String]]])).thenReturn(successful(Left(ValidationErrors(ValidationError(message = error)))))
     }
 
     object Store {
