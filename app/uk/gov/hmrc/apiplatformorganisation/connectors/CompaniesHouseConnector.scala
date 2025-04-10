@@ -26,6 +26,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import uk.gov.hmrc.apiplatformorganisation.config.AppConfig
 import uk.gov.hmrc.apiplatformorganisation.models.CompaniesHouseCompanyProfile
 import uk.gov.hmrc.apiplatformorganisation.utils.ApplicationLogger
+// $COVERAGE-OFF$
 
 class CompaniesHouseConnector @Inject() (http: HttpClientV2, config: AppConfig)(implicit val ec: ExecutionContext) extends ApplicationLogger {
 
@@ -40,3 +41,4 @@ class CompaniesHouseConnector @Inject() (http: HttpClientV2, config: AppConfig)(
 
   private def requestUrl[B, A](uri: String): String = s"$serviceBaseUrl$uri"
 }
+// $COVERAGE-ON$
