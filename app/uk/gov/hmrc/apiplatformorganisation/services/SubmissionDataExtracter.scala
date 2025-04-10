@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.apiplatformorganisation.services
 
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationName}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
 
 object SubmissionDataExtracter {
@@ -60,6 +60,26 @@ object SubmissionDataExtracter {
     maybeOrgName match {
       case Some(orgName) => Some(OrganisationName(orgName))
       case _             => None
+    }
+  }
+
+  def getOrganisationType(submission: Submission): Option[Organisation.OrganisationType] = {
+    val orgType         = getSingleChoiceQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationTypeId)
+    val partnershipType = getSingleChoiceQuestionOfInterest(submission, submission.questionIdsOfInterest.partnershipTypeId)
+
+    (orgType, partnershipType) match {
+      case (Some("UK limited company"), _)                                             => Some(Organisation.OrganisationType.UkLimitedCompany)
+      case (Some("Sole trader"), _)                                                    => Some(Organisation.OrganisationType.SoleTrader)
+      case (Some("Registered society"), _)                                             => Some(Organisation.OrganisationType.RegisteredSociety)
+      case (Some("Charitable Incorporated Organisation (CIO)"), _)                     => Some(Organisation.OrganisationType.CharitableIncorporatedOrganisation)
+      case (Some("Non-UK company with a branch or place of business in the UK"), _)    => Some(Organisation.OrganisationType.NonUkWithPlaceOfBusinessInUk)
+      case (Some("Non-UK company without a branch or place of business in the UK"), _) => Some(Organisation.OrganisationType.NonUkWithoutPlaceOfBusinessInUk)
+      case (Some("Partnership"), Some("General partnership"))                          => Some(Organisation.OrganisationType.GeneralPartnership)
+      case (Some("Partnership"), Some("Limited liability partnership"))                => Some(Organisation.OrganisationType.LimitedLiabilityPartnership)
+      case (Some("Partnership"), Some("Limited partnership"))                          => Some(Organisation.OrganisationType.LimitedPartnership)
+      case (Some("Partnership"), Some("Scottish partnership"))                         => Some(Organisation.OrganisationType.ScottishPartnership)
+      case (Some("Partnership"), Some("Scottish limited partnership"))                 => Some(Organisation.OrganisationType.ScottishLimitedPartnership)
+      case (_, _)                                                                      => None
     }
   }
 }

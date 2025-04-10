@@ -19,6 +19,7 @@ GET         /submission/:sid                        uk.gov.hmrc.apiplatformorgan
 POST        /submission/:sid/question/:qid          uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.recordAnswers(sid: SubmissionId, qid: Question.Id)
 
 POST        /submission/:sid                        uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.submitSubmission(sid: SubmissionId)
+POST        /submission/:sid/approve                uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.approveSubmission(sid: SubmissionId)
 
 GET         /company/:cnumber                       uk.gov.hmrc.apiplatformorganisation.controllers.CompanyController.fetchByCompanyNumber(cnumber: String)
 

@@ -51,6 +51,15 @@ trait SubmissionsServiceMockModule extends MockitoSugar with ArgumentMatchersSug
         when(aMock.submit(*[SubmissionId], *)).thenReturn(successful(Left(error)))
     }
 
+    object Approve {
+
+      def thenReturn(submission: Submission) =
+        when(aMock.approve(*[SubmissionId], *, *)).thenReturn(successful(Right(submission)))
+
+      def thenFails(error: String) =
+        when(aMock.approve(*[SubmissionId], *, *)).thenReturn(successful(Left(error)))
+    }
+
     object FetchLatestByOrganisationId {
 
       def thenReturn(submission: Submission) =

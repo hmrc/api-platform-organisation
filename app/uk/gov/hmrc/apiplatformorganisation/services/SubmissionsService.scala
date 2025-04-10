@@ -34,6 +34,7 @@ class SubmissionsService @Inject() (
     questionnaireDAO: QuestionnaireDAO,
     submissionsDAO: SubmissionsDAO,
     submissionReviewService: SubmissionReviewService,
+    organisationService: OrganisationService,
     val clock: Clock
   )(implicit val ec: ExecutionContext
   ) extends EitherTHelper[String] with ClockNow {
@@ -81,6 +82,23 @@ class SubmissionsService @Inject() (
         submittedSubmission = Submission.submit(instant(), requestedBy)(submission)
         savedSubmission    <- liftF(submissionsDAO.update(submittedSubmission))
         _                  <- liftF(submissionReviewService.create(savedSubmission.id, savedSubmission.latestInstance.index, requestedBy, organisationName))
+      } yield savedSubmission
+    )
+      .value
+  }
+
+  def approve(submissionId: SubmissionId, approvedBy: String, comment: Option[String]): Future[Either[String, Submission]] = {
+    import SubmissionDataExtracter._
+    (
+      for {
+        submission        <- fromOptionF(submissionsDAO.fetch(submissionId), "No such submission")
+        _                 <- cond(submission.status.isSubmitted, (), "Submission not submitted")
+        organisationName  <- fromOption(getOrganisationName(submission), "No organisation name found")
+        organisationType  <- fromOption(getOrganisationType(submission), "No organisation type found")
+        organisation      <- liftF(organisationService.create(organisationName, organisationType, submission.startedBy))
+        approvedSubmission = Submission.grant(instant(), approvedBy, comment, None)(submission)
+        savedSubmission   <- liftF(submissionsDAO.update(approvedSubmission))
+        _                 <- liftF(submissionReviewService.approve(savedSubmission.id, savedSubmission.latestInstance.index, approvedBy, comment))
       } yield savedSubmission
     )
       .value
