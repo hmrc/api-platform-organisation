@@ -33,6 +33,10 @@ class SubmissionReviewService @Inject() (
   )(implicit val ec: ExecutionContext
   ) extends EitherTHelper[String] with ClockNow {
 
+  def fetch(submissionId: SubmissionId, instanceIndex: Int): Future[Option[SubmissionReview]] = {
+    submissionReviewRepository.fetch(submissionId, instanceIndex)
+  }
+
   def search(searchCriteria: SubmissionReviewSearch): Future[Seq[SubmissionReview]] = {
     submissionReviewRepository.search(searchCriteria)
   }
