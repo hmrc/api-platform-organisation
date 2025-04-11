@@ -25,7 +25,7 @@ import cats.data.NonEmptyList
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.common.services.{ClockNow, EitherTHelper}
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationId
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, _}
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services._
 import uk.gov.hmrc.apiplatformorganisation.repositories._
 
@@ -41,6 +41,7 @@ class SubmissionsService @Inject() (
   import cats.instances.future.catsStdInstancesForFuture
 
   private val emptyAnswers = Map.empty[Question.Id, ActualAnswer]
+  private val etValidation = EitherTHelper.make[ValidationErrors]
 
   def extendSubmission(submission: Submission): ExtendedSubmission = {
     val progress = AnswerQuestion.deriveProgressOfQuestionnaires(submission.allQuestionnaires, submission.context, submission.latestInstance.answersToQuestions)
@@ -146,12 +147,12 @@ class SubmissionsService @Inject() (
       .value
   }
 
-  def recordAnswers(submissionId: SubmissionId, questionId: Question.Id, rawAnswers: Map[String, Seq[String]]): Future[Either[String, ExtendedSubmission]] = {
+  def recordAnswers(submissionId: SubmissionId, questionId: Question.Id, rawAnswers: Map[String, Seq[String]]): Future[Either[ValidationErrors, ExtendedSubmission]] = {
     (
       for {
-        initialSubmission <- fromOptionF(submissionsDAO.fetch(submissionId), "No such submission")
-        extSubmission     <- fromEither(AnswerQuestion.recordAnswer(initialSubmission, questionId, rawAnswers))
-        savedSubmission   <- liftF(submissionsDAO.update(extSubmission.submission))
+        initialSubmission <- etValidation.fromOptionF(submissionsDAO.fetch(submissionId), ValidationErrors(ValidationError(message = "No such submission")))
+        extSubmission     <- etValidation.fromEither(AnswerQuestion.recordAnswer(initialSubmission, questionId, rawAnswers))
+        savedSubmission   <- etValidation.liftF(submissionsDAO.update(extSubmission.submission))
       } yield extSubmission.copy(submission = savedSubmission)
     )
       .value
