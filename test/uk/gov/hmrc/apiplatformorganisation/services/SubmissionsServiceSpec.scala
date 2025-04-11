@@ -137,6 +137,8 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
           Organisation.OrganisationType.UkLimitedCompany,
           samplePassSubmittedSubmission.submission.startedBy
         )
+        val updatedSubmission: Submission = SubmissionsDAOMock.Update.verifyCalledWith()
+        updatedSubmission.organisationId shouldBe Some(standardOrg.id)
       }
 
       "fail to approve a submission that hasn't been submitted" in new Setup {
