@@ -22,9 +22,10 @@ import scala.concurrent.Future.successful
 import scala.util.{Failure, Success, Try}
 
 import play.api.libs.json.Json
-import play.api.mvc.{ControllerComponents, Result}
+import play.api.mvc.{ControllerComponents, Result, Results}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apiplatformorganisation.models.ErrorCode._
 import uk.gov.hmrc.apiplatformorganisation.models.{JsErrorResponse, SubmissionReviewSearch}
 import uk.gov.hmrc.apiplatformorganisation.services.SubmissionReviewService
@@ -33,6 +34,14 @@ import uk.gov.hmrc.apiplatformorganisation.utils.ApplicationLogger
 @Singleton()
 class SubmissionReviewController @Inject() (cc: ControllerComponents, submissionReviewService: SubmissionReviewService)(implicit val ec: ExecutionContext)
     extends BackendController(cc) with ApplicationLogger {
+
+  def fetch(submissionId: SubmissionId, instanceIndex: Int) = Action.async { request =>
+    lazy val failed = NotFound(Results.EmptyContent())
+
+    val success = (sr: SubmissionReview) => Ok(Json.toJson(sr))
+
+    submissionReviewService.fetch(submissionId, instanceIndex).map(_.fold(failed)(success))
+  }
 
   def search() = Action.async { request =>
     Try(SubmissionReviewSearch.fromQueryString(request.queryString)) match {
