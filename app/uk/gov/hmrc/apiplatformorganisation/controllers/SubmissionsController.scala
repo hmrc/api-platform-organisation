@@ -26,6 +26,7 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationId
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services.ValidationErrors
 import uk.gov.hmrc.apiplatformorganisation.services.SubmissionsService
 
 object SubmissionsController {
@@ -142,7 +143,7 @@ class SubmissionsController @Inject() (
   }
 
   def recordAnswers(submissionId: SubmissionId, questionId: Question.Id) = Action.async(parse.json) { implicit request =>
-    val failed = (msg: String) => BadRequest(Json.toJson(ErrorMessage(msg)))
+    val failed = (msg: ValidationErrors) => BadRequest(Json.toJson(msg))
 
     val success = (s: ExtendedSubmission) => Ok(Json.toJson(s))
 

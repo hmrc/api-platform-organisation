@@ -24,6 +24,7 @@ import org.scalatest.Inside
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationName}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services.{ValidationError, ValidationErrors}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils._
 import uk.gov.hmrc.apiplatformorganisation.mocks.SubmissionsDAOMockModule
 import uk.gov.hmrc.apiplatformorganisation.mocks.services.{OrganisationServiceMockModule, SubmissionReviewServiceMockModule}
@@ -297,7 +298,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
 
         val result = await(underTest.recordAnswers(submissionId, Question.Id.random, Map(Question.answerKey -> Seq("Yes"))))
 
-        result.left.value shouldBe "Not valid for this submission"
+        result.left.value shouldBe ValidationErrors(ValidationError(message = "Not valid for this submission"))
       }
 
       "fail when given a optional answer to non optional question" in new Setup {
@@ -306,7 +307,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
 
         val result = await(underTest.recordAnswers(submissionId, questionId, Map.empty))
 
-        result.left.value shouldBe "Question requires a single answer"
+        result.left.value shouldBe ValidationErrors(ValidationError(message = "Question requires an answer"))
       }
     }
   }

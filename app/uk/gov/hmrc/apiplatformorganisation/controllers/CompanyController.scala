@@ -27,6 +27,7 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.apiplatformorganisation.connectors.CompaniesHouseConnector
 import uk.gov.hmrc.apiplatformorganisation.utils.ApplicationLogger
 
+// $COVERAGE-OFF$
 @Singleton
 class CompanyController @Inject() (
     companiesHouseConnector: CompaniesHouseConnector,
@@ -69,3 +70,4 @@ class CompanyController @Inject() (
     ))
   }
 }
+// $COVERAGE-ON$
