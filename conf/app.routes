@@ -24,3 +24,4 @@ POST        /submission/:sid/approve                uk.gov.hmrc.apiplatformorgan
 GET         /company/:cnumber                       uk.gov.hmrc.apiplatformorganisation.controllers.CompanyController.fetchByCompanyNumber(cnumber: String)
 
 GET         /submission-reviews                     uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionReviewController.search()
+GET         /submission-review/:sid/:idx            uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionReviewController.fetch(sid: SubmissionId, idx: Int)

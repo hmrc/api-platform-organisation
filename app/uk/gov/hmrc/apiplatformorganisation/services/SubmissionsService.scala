@@ -98,7 +98,7 @@ class SubmissionsService @Inject() (
         organisationType  <- fromOption(getOrganisationType(submission), "No organisation type found")
         organisation      <- liftF(organisationService.create(organisationName, organisationType, submission.startedBy))
         approvedSubmission = Submission.grant(instant(), approvedBy, comment, None)(submission)
-        savedSubmission   <- liftF(submissionsDAO.update(approvedSubmission))
+        savedSubmission   <- liftF(submissionsDAO.update(approvedSubmission.copy(organisationId = Some(organisation.id))))
         _                 <- liftF(submissionReviewService.approve(savedSubmission.id, savedSubmission.latestInstance.index, approvedBy, comment))
       } yield savedSubmission
     )

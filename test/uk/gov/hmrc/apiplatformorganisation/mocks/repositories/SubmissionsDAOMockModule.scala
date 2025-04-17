@@ -18,6 +18,7 @@ package uk.gov.hmrc.apiplatformorganisation.mocks
 
 import scala.concurrent.Future.successful
 
+import org.mockito.captor.{ArgCaptor, Captor}
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
@@ -73,6 +74,12 @@ trait SubmissionsDAOMockModule extends MockitoSugar with ArgumentMatchersSugar {
 
       def verifyCalled() =
         verify(aMock, atLeast(1)).update(*[Submission])
+
+      def verifyCalledWith() = {
+        val capture: Captor[Submission] = ArgCaptor[Submission]
+        verify(aMock, atLeast(1)).update(capture)
+        capture.value
+      }
     }
   }
 
