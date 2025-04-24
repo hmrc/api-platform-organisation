@@ -25,3 +25,4 @@ GET         /company/:cnumber                       uk.gov.hmrc.apiplatformorgan
 
 GET         /submission-reviews                     uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionReviewController.search()
 GET         /submission-review/:sid/:idx            uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionReviewController.fetch(sid: SubmissionId, idx: Int)
+PUT         /submission-review/:sid/:idx            uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionReviewController.update(sid: SubmissionId, idx: Int)
