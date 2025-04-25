@@ -84,7 +84,7 @@ class SubmissionReviewService @Inject() (
 
   def approve(submissionId: SubmissionId, instanceIndex: Int, approvedBy: String, comment: Option[String]): Future[Either[String, SubmissionReview]] = {
     val newEvent = SubmissionReview.Event(
-      "Approve",
+      "Approved",
       approvedBy,
       instant(),
       comment
