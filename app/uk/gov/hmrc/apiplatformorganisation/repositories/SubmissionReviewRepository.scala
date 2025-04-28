@@ -23,7 +23,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import org.mongodb.scala.bson.Document
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Aggregates._
-import org.mongodb.scala.model.Filters.{equal, _}
+import org.mongodb.scala.model.Filters._
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes}
 
 import play.api.libs.json.{Format, Json, OFormat}
@@ -102,6 +102,10 @@ class SubmissionReviewRepository @Inject() (mongo: MongoComponent, val metrics: 
   def update(review: SubmissionReview): Future[SubmissionReview] = {
     val filter = filterBy(review.submissionId, review.instanceIndex)
     collection.findOneAndReplace(filter, review).toFuture().map(_ => review)
+  }
+
+  def delete(submissionId: SubmissionId): Future[Boolean] = {
+    collection.deleteOne(equal("submissionId", Codecs.toBson(submissionId))).headOption().map(o => o.exists(_.getDeletedCount > 0))
   }
 
   def search(searchCriteria: SubmissionReviewSearch): Future[Seq[SubmissionReview]] = {

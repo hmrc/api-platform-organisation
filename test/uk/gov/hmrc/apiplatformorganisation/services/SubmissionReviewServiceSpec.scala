@@ -58,7 +58,13 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec
         result shouldBe submittedSubmissionReview
       }
     }
-
+    "delete" should {
+      "delete record" in new Setup {
+        SubmissionReviewRepositoryMock.Delete.successfully()
+        val result = await(underTest.delete(submittedSubmissionReview.submissionId))
+        result shouldBe true
+      }
+    }
     "search" should {
       "search for submission review records" in new Setup {
         SubmissionReviewRepositoryMock.Search.willReturn(Seq(submittedSubmissionReview, approvedSubmissionReview))

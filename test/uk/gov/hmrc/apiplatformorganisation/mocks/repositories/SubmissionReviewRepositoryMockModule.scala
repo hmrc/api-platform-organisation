@@ -28,6 +28,10 @@ trait SubmissionReviewRepositoryMockModule extends MockitoSugar with ArgumentMat
   object SubmissionReviewRepositoryMock {
     val aMock = mock[SubmissionReviewRepository]
 
+    object Delete {
+      def successfully() = when(aMock.delete(*[SubmissionId])).thenReturn(Future.successful(true))
+    }
+
     object Create {
       def willReturn(review: SubmissionReview) = when(aMock.create(*)).thenReturn(Future.successful(review))
     }

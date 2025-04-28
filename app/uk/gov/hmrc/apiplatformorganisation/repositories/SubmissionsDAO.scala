@@ -69,8 +69,16 @@ class SubmissionsDAO @Inject() (submissionsRepository: SubmissionsRepository)(im
       .headOption()
   }
 
+  def delete(id: SubmissionId): Future[Boolean] = {
+    collection.deleteOne(equal("id", Codecs.toBson(id))).headOption().map(o => o.exists(_.getDeletedCount > 0))
+  }
+
   def fetch(id: SubmissionId): Future[Option[Submission]] = {
     collection.find(equal("id", Codecs.toBson(id)))
       .headOption()
+  }
+
+  def fetchAllByOrganisationId(organisationId: OrganisationId): Future[Seq[Submission]] = {
+    collection.find(equal("organisationId", Codecs.toBson(organisationId))).toFuture()
   }
 }

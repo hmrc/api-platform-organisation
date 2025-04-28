@@ -82,6 +82,13 @@ class SubmissionReviewRepositoryISpec extends AnyWordSpec
       await(underTest.fetchByState(SubmissionReview.State.Approved)) mustBe List(approvedSubmissionReview)
     }
 
+    "delete" in {
+      await(repository.collection.find().toFuture()).length mustBe 0
+      await(underTest.create(submittedSubmissionReview))
+      await(underTest.delete(submittedSubmissionReview.submissionId))
+      await(repository.collection.find().toFuture()).length mustBe 0
+    }
+
     "search" in {
       await(repository.collection.find().toFuture()).length mustBe 0
       await(underTest.create(submittedSubmissionReview))

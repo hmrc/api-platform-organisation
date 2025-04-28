@@ -112,4 +112,12 @@ class SubmissionsDAOISpec
       await(submissionsDao.fetchLatestByOrganisationId(organisationId)).value mustBe aSubmission
     }
   }
+
+  "delete" should {
+    "remove the record" in {
+      await(submissionsDao.save(aSubmission))
+      await(submissionsDao.delete(aSubmission.id))
+      await(submissionsDao.fetch(aSubmission.id)) mustBe None
+    }
+  }
 }
