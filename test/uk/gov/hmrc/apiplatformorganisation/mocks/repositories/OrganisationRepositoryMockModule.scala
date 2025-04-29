@@ -34,6 +34,11 @@ trait OrganisationRepositoryMockModule extends MockitoSugar with ArgumentMatcher
       def willReturn(org: StoredOrganisation) = when(aMock.save(*)).thenReturn(Future.successful(org))
     }
 
+    object Delete {
+      def successfully()   = when(aMock.delete(*[OrganisationId])).thenReturn(Future.successful(true))
+      def unsuccessfully() = when(aMock.delete(*[OrganisationId])).thenReturn(Future.successful(false))
+    }
+
     object Fetch {
       def willReturn(org: StoredOrganisation) = when(aMock.fetch(*[OrganisationId])).thenReturn(Future.successful(Some(org)))
 

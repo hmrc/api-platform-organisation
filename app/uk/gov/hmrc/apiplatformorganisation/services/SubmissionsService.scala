@@ -158,6 +158,21 @@ class SubmissionsService @Inject() (
       .value
   }
 
+  def delete(submissionId: SubmissionId): Future[Boolean] = {
+    for {
+      subDeletion    <- submissionsDAO.delete(submissionId)
+      reviewDeletion <- submissionReviewService.delete(submissionId)
+    } yield subDeletion && reviewDeletion
+  }
+
+  def deleteByOrganisation(organisationId: OrganisationId): Future[Boolean] = {
+    for {
+      subs            <- submissionsDAO.fetchAllByOrganisationId(organisationId)
+      subDeletions    <- Future.sequence(subs.map(s => submissionsDAO.delete(s.id)))
+      reviewDeletions <- Future.sequence(subs.map(s => submissionReviewService.delete(s.id)))
+    } yield subDeletions.forall(a => a) && reviewDeletions.forall(a => a)
+  }
+
   def store(submission: Submission): Future[Submission] =
     submissionsDAO.update(submission)
 }

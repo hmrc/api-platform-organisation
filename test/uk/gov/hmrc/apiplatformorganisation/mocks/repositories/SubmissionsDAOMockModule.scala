@@ -58,6 +58,15 @@ trait SubmissionsDAOMockModule extends MockitoSugar with ArgumentMatchersSugar {
         when(aMock.fetchLatestByOrganisationId(*[OrganisationId])).thenReturn(successful(None))
     }
 
+    object FetchAllByOrganisationId {
+
+      def thenReturn(submission: Submission*) =
+        when(aMock.fetchAllByOrganisationId(*[OrganisationId])).thenReturn(successful(submission))
+
+      def thenReturnNothing() =
+        when(aMock.fetchAllByOrganisationId(*[OrganisationId])).thenReturn(successful(List.empty))
+    }
+
     object FetchLatestByUserId {
 
       def thenReturn(submission: Submission) =
@@ -65,6 +74,17 @@ trait SubmissionsDAOMockModule extends MockitoSugar with ArgumentMatchersSugar {
 
       def thenReturnNothing() =
         when(aMock.fetchLatestByUserId(*[UserId])).thenReturn(successful(None))
+    }
+
+    object Delete {
+      def successfully()   = when(aMock.delete(*[SubmissionId])).thenReturn(successful(true))
+      def unsuccessfully() = when(aMock.delete(*[SubmissionId])).thenReturn(successful(false))
+
+      def verifyCalledWith(): Seq[SubmissionId] = {
+        val capture: Captor[SubmissionId] = ArgCaptor[SubmissionId]
+        verify(aMock, atLeast(1)).delete(capture)
+        capture.values
+      }
     }
 
     object Update {

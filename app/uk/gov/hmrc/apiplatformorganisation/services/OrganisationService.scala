@@ -76,4 +76,8 @@ class OrganisationService @Inject() (
       } yield updatedOrganisation
     ).value
   }
+
+  def delete(organisationId: OrganisationId): Future[Boolean] = {
+    organisationRepository.delete(organisationId: OrganisationId)
+  }
 }
