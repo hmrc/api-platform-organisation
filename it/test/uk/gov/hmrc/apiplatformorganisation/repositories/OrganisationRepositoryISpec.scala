@@ -78,6 +78,14 @@ class OrganisationRepositoryISpec extends AnyWordSpec
       await(repository.collection.find().toFuture()).head shouldBe updatedOrg
     }
 
+    "delete single org" in {
+      await(repository.collection.insertOne(standardStoredOrg).toFuture())
+      await(repository.collection.find().toFuture()).head shouldBe standardStoredOrg
+
+      await(underTest.delete(standardStoredOrg.id))
+      await(repository.collection.find().toFuture()).length shouldBe 0
+    }
+
     "add member" in {
       await(repository.collection.insertOne(standardStoredOrg).toFuture())
       await(repository.collection.find().toFuture()).head shouldBe standardStoredOrg

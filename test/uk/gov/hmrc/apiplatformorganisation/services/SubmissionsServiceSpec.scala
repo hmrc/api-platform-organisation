@@ -310,5 +310,34 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         result.left.value shouldBe ValidationErrors(ValidationError(message = "Question requires an answer"))
       }
     }
+
+    "delete" should {
+      "delete submission and any reviews" in new Setup {
+        SubmissionsDAOMock.Delete.successfully()
+        SubmissionReviewServiceMock.Delete.successfully()
+
+        val result = await(underTest.delete(submissionId))
+
+        result shouldBe true
+        SubmissionsDAOMock.Delete.verifyCalledWith() shouldBe Seq(submissionId)
+        SubmissionReviewServiceMock.Delete.verifyCalledWith() shouldBe Seq(submissionId)
+      }
+    }
+
+    "deleteByOrganisation" should {
+      "delete all submissions and any reviews" in new Setup {
+        SubmissionsDAOMock.FetchAllByOrganisationId.thenReturn(aSubmission, altSubmission)
+        SubmissionsDAOMock.Delete.successfully()
+        SubmissionReviewServiceMock.Delete.successfully()
+
+        val result = await(underTest.deleteByOrganisation(organisationId))
+
+        result shouldBe true
+        SubmissionsDAOMock.Delete.verifyCalledWith() should contain(aSubmission.id)
+        SubmissionsDAOMock.Delete.verifyCalledWith() should contain(altSubmission.id)
+        SubmissionReviewServiceMock.Delete.verifyCalledWith() should contain(aSubmission.id)
+        SubmissionReviewServiceMock.Delete.verifyCalledWith() should contain(altSubmission.id)
+      }
+    }
   }
 }

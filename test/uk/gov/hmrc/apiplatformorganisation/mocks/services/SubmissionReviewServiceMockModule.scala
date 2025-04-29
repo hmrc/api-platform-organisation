@@ -17,7 +17,9 @@
 package uk.gov.hmrc.apiplatformorganisation.mocks.services
 
 import scala.concurrent.Future
+import scala.concurrent.Future.successful
 
+import org.mockito.captor.{ArgCaptor, Captor}
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
@@ -45,6 +47,17 @@ trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatche
       def thenReturn(review: SubmissionReview) = when(aMock.update(*[SubmissionId], *, *, *)).thenReturn(Future.successful(Right(review)))
 
       def thenFails(error: String) = when(aMock.update(*[SubmissionId], *, *, *)).thenReturn(Future.successful(Left(error)))
+    }
+
+    object Delete {
+      def successfully()   = when(aMock.delete(*[SubmissionId])).thenReturn(successful(true))
+      def unsuccessfully() = when(aMock.delete(*[SubmissionId])).thenReturn(successful(false))
+
+      def verifyCalledWith() = {
+        val capture: Captor[SubmissionId] = ArgCaptor[SubmissionId]
+        verify(aMock, atLeast(1)).delete(capture)
+        capture.values
+      }
     }
 
     object Search {

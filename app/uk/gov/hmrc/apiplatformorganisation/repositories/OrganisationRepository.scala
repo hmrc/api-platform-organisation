@@ -23,7 +23,7 @@ import org.bson.conversions.Bson
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.Sorts.descending
-import org.mongodb.scala.model.{FindOneAndUpdateOptions, IndexModel, IndexOptions, ReturnDocument, Updates}
+import org.mongodb.scala.model._
 
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
@@ -99,6 +99,10 @@ class OrganisationRepository @Inject() (mongo: MongoComponent)(implicit val ec: 
         Codecs.toBson(member)
       )
     )
+
+  def delete(organisationId: OrganisationId): Future[Boolean] = {
+    collection.deleteOne(equal("id", Codecs.toBson(organisationId))).headOption().map(o => o.exists(_.getDeletedCount > 0))
+  }
 
   private def updateOrganisation(organisationId: OrganisationId, updateStatement: Bson): Future[StoredOrganisation] = {
     val query = equal("id", Codecs.toBson(organisationId))

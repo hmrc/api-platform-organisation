@@ -147,5 +147,18 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
         result.left.value shouldBe "Organisation not found"
       }
     }
+
+    "delete" should {
+      "delete the org and return it did" in new Setup {
+        OrganisationRepositoryMock.Delete.successfully()
+        val result = await(underTest.delete(standardStoredOrg.id))
+        result shouldBe true
+      }
+      "delete the org and return it didn't" in new Setup {
+        OrganisationRepositoryMock.Delete.unsuccessfully()
+        val result = await(underTest.delete(standardStoredOrg.id))
+        result shouldBe false
+      }
+    }
   }
 }

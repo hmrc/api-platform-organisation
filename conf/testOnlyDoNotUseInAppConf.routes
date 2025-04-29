@@ -9,5 +9,8 @@
 # !!!WARNING!!! Every route defined in this file MUST be prefixed with "/test-only/".
 # Failing to follow this rule may result in test routes deployed in production.
 
+DELETE        /test-only/submission/:id          uk.gov.hmrc.apiplatformorganisation.controllers.testonly.TestOnlyController.deleteSubmission(id: SubmissionId)
+DELETE        /test-only/organisation/:id        uk.gov.hmrc.apiplatformorganisation.controllers.testonly.TestOnlyController.deleteOrganisation(id: OrganisationId)
+
 # Add all the application routes to the prod.routes file
-->         /                          prod.Routes
+->            /                                  prod.Routes

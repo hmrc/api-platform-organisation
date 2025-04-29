@@ -39,6 +39,10 @@ trait OrganisationServiceMockModule extends MockitoSugar with ArgumentMatchersSu
         verify(aMock, never).create(*[OrganisationName], *[Organisation.OrganisationType], *[UserId])(*)
     }
 
+    object Delete {
+      def successfully() = when(aMock.delete(*[OrganisationId])).thenReturn(Future.successful(true))
+    }
+
     object Fetch {
       def thenReturn(org: Organisation) = when(aMock.fetch(*[OrganisationId])(*)).thenReturn(Future.successful(Some(org)))
 

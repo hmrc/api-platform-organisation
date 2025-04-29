@@ -37,6 +37,10 @@ class SubmissionReviewService @Inject() (
     submissionReviewRepository.fetch(submissionId, instanceIndex)
   }
 
+  def delete(submissionId: SubmissionId): Future[Boolean] = {
+    submissionReviewRepository.delete(submissionId)
+  }
+
   def search(searchCriteria: SubmissionReviewSearch): Future[Seq[SubmissionReview]] = {
     submissionReviewRepository.search(searchCriteria)
   }

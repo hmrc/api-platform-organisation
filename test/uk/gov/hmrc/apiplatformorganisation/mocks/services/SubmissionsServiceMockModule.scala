@@ -43,6 +43,14 @@ trait SubmissionsServiceMockModule extends MockitoSugar with ArgumentMatchersSug
         when(aMock.create(*[UserId], *)).thenReturn(successful(Left(error)))
     }
 
+    object Delete {
+      def successfully() = when(aMock.delete(*[SubmissionId])).thenReturn(successful(true))
+    }
+
+    object DeleteByOrganisation {
+      def successfully() = when(aMock.deleteByOrganisation(*[OrganisationId])).thenReturn(successful(true))
+    }
+
     object Submit {
 
       def thenReturn(submission: Submission) =
