@@ -25,6 +25,7 @@ import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionReview
 import uk.gov.hmrc.apiplatformorganisation.SubmissionReviewFixtures
 import uk.gov.hmrc.apiplatformorganisation.mocks.repositories.SubmissionReviewRepositoryMockModule
 import uk.gov.hmrc.apiplatformorganisation.models.{Approved, SubmissionReviewSearch, Submitted}
@@ -47,7 +48,7 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec
 
   "SubmissionReviewService" when {
     "create" should {
-      "ceate new submission review record" in new Setup {
+      "create new submission review record" in new Setup {
         SubmissionReviewRepositoryMock.Create.willReturn(submittedSubmissionReview)
         val result = await(underTest.create(
           submittedSubmissionReview.submissionId,
@@ -58,6 +59,45 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec
         result shouldBe submittedSubmissionReview
       }
     }
+
+    "update" should {
+      "update submission review record" in new Setup {
+        SubmissionReviewRepositoryMock.Fetch.willReturn(submittedSubmissionReview)
+        SubmissionReviewRepositoryMock.Update.willReturn(submittedSubmissionReview)
+        val result = await(underTest.update(
+          submittedSubmissionReview.submissionId,
+          submittedSubmissionReview.instanceIndex,
+          "updateBy@example.com",
+          "Update comment"
+        ))
+        result shouldBe Right(submittedSubmissionReview)
+
+        val updatedSubmissionReview = SubmissionReviewRepositoryMock.Update.verifyCalledWith()
+        updatedSubmissionReview.state shouldBe SubmissionReview.State.InProgress
+        updatedSubmissionReview.events.head.name shouldBe "updateBy@example.com"
+        updatedSubmissionReview.events.head.comment shouldBe Some("Update comment")
+      }
+    }
+
+    "approve" should {
+      "approve submission review record" in new Setup {
+        SubmissionReviewRepositoryMock.Fetch.willReturn(submittedSubmissionReview)
+        SubmissionReviewRepositoryMock.Update.willReturn(submittedSubmissionReview)
+        val result = await(underTest.approve(
+          submittedSubmissionReview.submissionId,
+          submittedSubmissionReview.instanceIndex,
+          "approveBy@example.com",
+          Some("Approve comment")
+        ))
+        result shouldBe Right(submittedSubmissionReview)
+
+        val updatedSubmissionReview = SubmissionReviewRepositoryMock.Update.verifyCalledWith()
+        updatedSubmissionReview.state shouldBe SubmissionReview.State.Approved
+        updatedSubmissionReview.events.head.name shouldBe "approveBy@example.com"
+        updatedSubmissionReview.events.head.comment shouldBe Some("Approve comment")
+      }
+    }
+
     "delete" should {
       "delete record" in new Setup {
         SubmissionReviewRepositoryMock.Delete.successfully()
@@ -65,6 +105,7 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec
         result shouldBe true
       }
     }
+
     "search" should {
       "search for submission review records" in new Setup {
         SubmissionReviewRepositoryMock.Search.willReturn(Seq(submittedSubmissionReview, approvedSubmissionReview))

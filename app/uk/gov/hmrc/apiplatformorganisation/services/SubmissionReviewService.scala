@@ -65,6 +65,27 @@ class SubmissionReviewService @Inject() (
     submissionReviewRepository.create(submissionReview)
   }
 
+  def update(submissionId: SubmissionId, instanceIndex: Int, updatedBy: String, comment: String): Future[Either[String, SubmissionReview]] = {
+    val newEvent = SubmissionReview.Event(
+      "Updated",
+      updatedBy,
+      instant(),
+      Some(comment)
+    )
+    (
+      for {
+        submissionReview       <- fromOptionF(submissionReviewRepository.fetch(submissionId, instanceIndex), "SubmissionReview record not found")
+        currentEvents           = submissionReview.events
+        updatedSubmissionReview = submissionReview.copy(
+                                    state = SubmissionReview.State.InProgress,
+                                    events = newEvent :: currentEvents,
+                                    lastUpdate = instant()
+                                  )
+        savedSubmissionReview  <- liftF(submissionReviewRepository.update(updatedSubmissionReview))
+      } yield savedSubmissionReview
+    ).value
+  }
+
   def approve(submissionId: SubmissionId, instanceIndex: Int, approvedBy: String, comment: Option[String]): Future[Either[String, SubmissionReview]] = {
     val newEvent = SubmissionReview.Event(
       "Approved",

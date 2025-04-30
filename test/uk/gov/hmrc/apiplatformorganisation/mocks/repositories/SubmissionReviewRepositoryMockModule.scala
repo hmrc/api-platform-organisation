@@ -18,6 +18,7 @@ package uk.gov.hmrc.apiplatformorganisation.mocks.repositories
 
 import scala.concurrent.Future
 
+import org.mockito.captor.{ArgCaptor, Captor}
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, SubmissionReview}
@@ -34,6 +35,16 @@ trait SubmissionReviewRepositoryMockModule extends MockitoSugar with ArgumentMat
 
     object Create {
       def willReturn(review: SubmissionReview) = when(aMock.create(*)).thenReturn(Future.successful(review))
+    }
+
+    object Update {
+      def willReturn(review: SubmissionReview) = when(aMock.update(*)).thenReturn(Future.successful(review))
+
+      def verifyCalledWith() = {
+        val capture: Captor[SubmissionReview] = ArgCaptor[SubmissionReview]
+        verify(aMock, atLeast(1)).update(capture)
+        capture.value
+      }
     }
 
     object Fetch {
