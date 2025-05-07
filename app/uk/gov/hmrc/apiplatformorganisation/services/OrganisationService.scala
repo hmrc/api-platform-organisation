@@ -25,6 +25,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.services.{ClockNow, EitherTHelper}
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, Organisation, OrganisationId, OrganisationName}
+import uk.gov.hmrc.apiplatform.modules.tpd.core.dto.{GetRegisteredOrUnregisteredUsersResponse, RegisteredOrUnregisteredUser}
 import uk.gov.hmrc.apiplatformorganisation.connectors.{EmailConnector, ThirdPartyDeveloperConnector}
 import uk.gov.hmrc.apiplatformorganisation.models._
 import uk.gov.hmrc.apiplatformorganisation.repositories.OrganisationRepository
@@ -61,10 +62,33 @@ class OrganisationService @Inject() (
         userId              <- liftF(thirdPartyDeveloperConnector.getOrCreateUserId(email))
         member               = Member(userId)
         _                   <- cond(!organisation.members.contains(member), (), "Organisation already contains member")
+        addedUserDetails    <- fromOptionF(
+                                 thirdPartyDeveloperConnector.getRegisteredOrUnregisteredUsers(List(userId))
+                                   .map(response => response.users.headOption),
+                                 "Added user not found"
+                               )
+        existingUserDetails <- liftF(thirdPartyDeveloperConnector.getRegisteredOrUnregisteredUsers(getMembersUserIds(organisation)))
         updatedOrganisation <- liftF(organisationRepository.addMember(organisationId, member).map(StoredOrganisation.asOrganisation))
-        _                    = emailConnector.sendMemberAddedConfirmation(organisation.name, Set(email))
+        _                    = sendMemberAddedConfirmationEmail(addedUserDetails, organisation.name)
+        _                    = emailConnector.sendMemberAddedNotification(organisation.name, email, "Member", getExistingUserEmails(existingUserDetails))
       } yield updatedOrganisation
     ).value
+  }
+
+  private def sendMemberAddedConfirmationEmail(userDetails: RegisteredOrUnregisteredUser, organisationName: OrganisationName)(implicit hc: HeaderCarrier) = {
+    if (userDetails.isRegistered) {
+      emailConnector.sendRegisteredMemberAddedConfirmation(organisationName, Set(userDetails.email))
+    } else {
+      emailConnector.sendUnregisteredMemberAddedConfirmation(organisationName, Set(userDetails.email))
+    }
+  }
+
+  private def getMembersUserIds(organisation: StoredOrganisation): List[UserId] = {
+    organisation.members.map(member => member.userId).toList
+  }
+
+  private def getExistingUserEmails(response: GetRegisteredOrUnregisteredUsersResponse): Set[LaxEmailAddress] = {
+    response.users.filter(user => user.isVerified).map(user => user.email).toSet
   }
 
   def removeMember(organisationId: OrganisationId, userId: UserId, email: LaxEmailAddress)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Either[String, Organisation]] = {
@@ -73,8 +97,10 @@ class OrganisationService @Inject() (
       for {
         organisation        <- fromOptionF(organisationRepository.fetch(organisationId), "Organisation not found")
         _                   <- cond(organisation.members.contains(member), (), "Organisation does not contain member")
+        existingUserDetails <- liftF(thirdPartyDeveloperConnector.getRegisteredOrUnregisteredUsers(getMembersUserIds(organisation)))
         updatedOrganisation <- liftF(organisationRepository.removeMember(organisationId, member).map(StoredOrganisation.asOrganisation))
         _                    = emailConnector.sendMemberRemovedConfirmation(organisation.name, Set(email))
+        _                    = emailConnector.sendMemberRemovedNotification(organisation.name, email, "Member", getExistingUserEmails(existingUserDetails))
       } yield updatedOrganisation
     ).value
   }

@@ -31,7 +31,7 @@ import uk.gov.hmrc.apiplatformorganisation.models.HasSucceeded
 import uk.gov.hmrc.apiplatformorganisation.utils.ApplicationLogger
 
 object EmailConnector {
-  case class Config(baseUrl: String)
+  case class Config(baseUrl: String, sdstEmailAddress: String, developerHubLink: String)
 
   case class SendEmailRequest(
       to: Set[LaxEmailAddress],
@@ -51,20 +51,48 @@ object EmailConnector {
 class EmailConnector @Inject() (httpClient: HttpClientV2, config: EmailConnector.Config)(implicit val ec: ExecutionContext) extends ApplicationLogger {
   import EmailConnector._
 
-  val serviceUrl = config.baseUrl
+  val serviceUrl       = config.baseUrl
+  val sdstEmailAddress = config.sdstEmailAddress
+  val developerHubLink = config.developerHubLink
 
-  val addedMemberToOrganisationConfirmation     = "apiAddedMemberToOrganisationConfirmation"
-  val removedMemberFromOrganisationConfirmation = "apiRemovedMemberFromOrganisationConfirmation"
+  val addedRegisteredMemberToOrganisationConfirmation   = "apiAddedRegisteredMemberToOrganisationConfirmation"
+  val addedUnregisteredMemberToOrganisationConfirmation = "apiAddedUnregisteredMemberToOrganisationConfirmation"
+  val addedMemberToOrganisationNotification             = "apiAddedMemberToOrganisationNotification"
+  val removedMemberFromOrganisationConfirmation         = "apiRemovedMemberFromOrganisationConfirmation"
+  val removedMemberFromOrganisationNotification         = "apiRemovedMemberFromOrganisationNotification"
 
-  def sendMemberAddedConfirmation(organisationName: OrganisationName, recipients: Set[LaxEmailAddress])(implicit hc: HeaderCarrier): Future[HasSucceeded] = {
-    val article = "a"
-    val role    = "member"
-
+  def sendRegisteredMemberAddedConfirmation(organisationName: OrganisationName, recipients: Set[LaxEmailAddress])(implicit hc: HeaderCarrier): Future[HasSucceeded] = {
     post(SendEmailRequest(
       recipients,
-      addedMemberToOrganisationConfirmation,
+      addedRegisteredMemberToOrganisationConfirmation,
       Map(
-        "article"          -> article,
+        "sdstEmailAddress" -> sdstEmailAddress,
+        "organisationName" -> organisationName.value
+      )
+    ))
+      .map(_ => HasSucceeded)
+  }
+
+  def sendUnregisteredMemberAddedConfirmation(organisationName: OrganisationName, recipients: Set[LaxEmailAddress])(implicit hc: HeaderCarrier): Future[HasSucceeded] = {
+    post(SendEmailRequest(
+      recipients,
+      addedUnregisteredMemberToOrganisationConfirmation,
+      Map(
+        "sdstEmailAddress" -> sdstEmailAddress,
+        "developerHubLink" -> developerHubLink,
+        "organisationName" -> organisationName.value
+      )
+    ))
+      .map(_ => HasSucceeded)
+  }
+
+  def sendMemberAddedNotification(organisationName: OrganisationName, emailAddress: LaxEmailAddress, role: String, recipients: Set[LaxEmailAddress])(implicit hc: HeaderCarrier)
+      : Future[HasSucceeded] = {
+    post(SendEmailRequest(
+      recipients,
+      addedMemberToOrganisationNotification,
+      Map(
+        "emailAddress"     -> emailAddress.text,
         "role"             -> role,
         "organisationName" -> organisationName.value
       )
@@ -74,6 +102,20 @@ class EmailConnector @Inject() (httpClient: HttpClientV2, config: EmailConnector
 
   def sendMemberRemovedConfirmation(organisationName: OrganisationName, recipients: Set[LaxEmailAddress])(implicit hc: HeaderCarrier): Future[HasSucceeded] = {
     post(SendEmailRequest(recipients, removedMemberFromOrganisationConfirmation, Map("organisationName" -> organisationName.value)))
+      .map(_ => HasSucceeded)
+  }
+
+  def sendMemberRemovedNotification(organisationName: OrganisationName, emailAddress: LaxEmailAddress, role: String, recipients: Set[LaxEmailAddress])(implicit hc: HeaderCarrier)
+      : Future[HasSucceeded] = {
+    post(SendEmailRequest(
+      recipients,
+      removedMemberFromOrganisationNotification,
+      Map(
+        "emailAddress"     -> emailAddress.text,
+        "role"             -> role,
+        "organisationName" -> organisationName.value
+      )
+    ))
       .map(_ => HasSucceeded)
   }
 

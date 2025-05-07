@@ -42,7 +42,9 @@ class EmailConfigProvider @Inject() (val configuration: Configuration)
     with Provider[EmailConnector.Config] {
 
   override def get() = {
-    val url = baseUrl("email")
-    EmailConnector.Config(url)
+    val url                      = baseUrl("email")
+    val sdstEmailAddress: String = configuration.get[String]("sdstEmailAddress")
+    val developerHubLink: String = configuration.get[String]("developerHubLink")
+    EmailConnector.Config(url, sdstEmailAddress, developerHubLink)
   }
 }
