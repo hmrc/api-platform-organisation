@@ -95,7 +95,7 @@ class OrganisationControllerSpec extends AnyWordSpec with Matchers with Organisa
     "return 200" in {
       OrganisationServiceMock.AddMember.thenReturn(standardOrg)
       val fakeRequest = FakeRequest("PUT", s"/organisation/${standardOrg.id}/member").withHeaders("content-type" -> "application/json")
-      val result      = controller.addMember(standardOrg.id)(fakeRequest.withBody(standardUpdateMembersRequest))
+      val result      = controller.addMember(standardOrg.id)(fakeRequest.withBody(standardAddMemberRequest))
       status(result) shouldBe Status.OK
       contentAsJson(result) shouldBe Json.toJson(standardOrg)
     }
@@ -103,7 +103,7 @@ class OrganisationControllerSpec extends AnyWordSpec with Matchers with Organisa
     "return 400" in {
       OrganisationServiceMock.AddMember.thenFails("Organisation not found")
       val fakeRequest = FakeRequest("PUT", s"/organisation/${standardOrg.id}/member").withHeaders("content-type" -> "application/json")
-      val result      = controller.addMember(standardOrg.id)(fakeRequest.withBody(standardUpdateMembersRequest))
+      val result      = controller.addMember(standardOrg.id)(fakeRequest.withBody(standardAddMemberRequest))
       status(result) shouldBe Status.BAD_REQUEST
     }
   }
@@ -112,7 +112,7 @@ class OrganisationControllerSpec extends AnyWordSpec with Matchers with Organisa
     "return 200" in {
       OrganisationServiceMock.RemoveMember.thenReturn(standardOrg)
       val fakeRequest = FakeRequest("DELETE", s"/organisation/${standardOrg.id}/remove-member/${UserIdData.one}").withHeaders("content-type" -> "application/json")
-      val result      = controller.removeMember(standardOrg.id, UserIdData.one)(fakeRequest.withBody(standardUpdateMembersRequest))
+      val result      = controller.removeMember(standardOrg.id, UserIdData.one)(fakeRequest.withBody(standardRemoveMemberRequest))
       status(result) shouldBe Status.OK
       contentAsJson(result) shouldBe Json.toJson(standardOrg)
     }
@@ -120,7 +120,7 @@ class OrganisationControllerSpec extends AnyWordSpec with Matchers with Organisa
     "return 400" in {
       OrganisationServiceMock.RemoveMember.thenFails("Organisation not found")
       val fakeRequest = FakeRequest("DELETE", s"/organisation/${standardOrg.id}/remove-member/${UserIdData.one}").withHeaders("content-type" -> "application/json")
-      val result      = controller.removeMember(standardOrg.id, UserIdData.one)(fakeRequest.withBody(standardUpdateMembersRequest))
+      val result      = controller.removeMember(standardOrg.id, UserIdData.one)(fakeRequest.withBody(standardRemoveMemberRequest))
       status(result) shouldBe Status.BAD_REQUEST
     }
   }

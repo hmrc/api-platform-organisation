@@ -25,7 +25,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.services.{ClockNow, EitherTHelper}
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, Organisation, OrganisationId, OrganisationName}
-import uk.gov.hmrc.apiplatformorganisation.connectors.EmailConnector
+import uk.gov.hmrc.apiplatformorganisation.connectors.{EmailConnector, ThirdPartyDeveloperConnector}
 import uk.gov.hmrc.apiplatformorganisation.models._
 import uk.gov.hmrc.apiplatformorganisation.repositories.OrganisationRepository
 
@@ -33,6 +33,7 @@ import uk.gov.hmrc.apiplatformorganisation.repositories.OrganisationRepository
 class OrganisationService @Inject() (
     organisationRepository: OrganisationRepository,
     emailConnector: EmailConnector,
+    thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
     val clock: Clock
   )(implicit val ec: ExecutionContext
   ) extends EitherTHelper[String] with ClockNow {
@@ -53,11 +54,12 @@ class OrganisationService @Inject() (
     }
   }
 
-  def addMember(organisationId: OrganisationId, userId: UserId, email: LaxEmailAddress)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Either[String, Organisation]] = {
-    val member = Member(userId)
+  def addMember(organisationId: OrganisationId, email: LaxEmailAddress)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Either[String, Organisation]] = {
     (
       for {
         organisation        <- fromOptionF(organisationRepository.fetch(organisationId), "Organisation not found")
+        userId              <- liftF(thirdPartyDeveloperConnector.getOrCreateUserId(email))
+        member               = Member(userId)
         _                   <- cond(!organisation.members.contains(member), (), "Organisation already contains member")
         updatedOrganisation <- liftF(organisationRepository.addMember(organisationId, member).map(StoredOrganisation.asOrganisation))
         _                    = emailConnector.sendMemberAddedConfirmation(organisation.name, Set(email))
