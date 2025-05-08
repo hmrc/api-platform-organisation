@@ -39,8 +39,8 @@ trait ThirdPartyDeveloperConnectorMockModule
 
     object GetRegisteredOrUnregisteredUsers {
 
-      def succeeds(response: GetRegisteredOrUnregisteredUsersResponse) =
-        when(aMock.getRegisteredOrUnregisteredUsers(*)(*)).thenReturn(successful(response))
+      def succeeds(userIds: List[UserId], response: GetRegisteredOrUnregisteredUsersResponse) =
+        when(aMock.getRegisteredOrUnregisteredUsers(eqTo(userIds))(*)).thenReturn(successful(response))
     }
 
     object GetOrCreateUserId {
