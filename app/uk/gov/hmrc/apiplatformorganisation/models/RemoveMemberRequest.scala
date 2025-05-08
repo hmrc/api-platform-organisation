@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apiplatformorganisation.config
+package uk.gov.hmrc.apiplatformorganisation.models
 
-import javax.inject.{Inject, Singleton}
+import play.api.libs.json.{Json, OFormat}
 
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 
-@Singleton
-class AppConfig @Inject() (config: Configuration) extends ServicesConfig(config) {
+case class RemoveMemberRequest(userId: UserId, email: LaxEmailAddress)
 
-  val appName: String                = config.get[String]("appName")
-  val companiesHouseKey: String      = config.get[String]("companies-house.api-key")
-  val companiesHouseUri: String      = config.get[String]("companies-house.uri")
-  val thirdPartyDeveloperUrl: String = baseUrl("third-party-developer")
+object RemoveMemberRequest {
+  implicit val format: OFormat[RemoveMemberRequest] = Json.format[RemoveMemberRequest]
 }

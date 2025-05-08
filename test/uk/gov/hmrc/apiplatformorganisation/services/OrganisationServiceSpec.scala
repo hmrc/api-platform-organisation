@@ -26,10 +26,12 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
-import uk.gov.hmrc.apiplatformorganisation.OrganisationFixtures
-import uk.gov.hmrc.apiplatformorganisation.mocks.connectors.EmailConnectorMockModule
+import uk.gov.hmrc.apiplatform.modules.tpd.core.dto.{GetRegisteredOrUnregisteredUsersResponse, RegisteredOrUnregisteredUser}
+import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
+import uk.gov.hmrc.apiplatformorganisation.mocks.connectors.{EmailConnectorMockModule, ThirdPartyDeveloperConnectorMockModule}
 import uk.gov.hmrc.apiplatformorganisation.mocks.repositories.OrganisationRepositoryMockModule
 import uk.gov.hmrc.apiplatformorganisation.util.AsyncHmrcSpec
+import uk.gov.hmrc.apiplatformorganisation.{MemberData, OrganisationFixtures}
 
 class OrganisationServiceSpec extends AsyncHmrcSpec
     with Matchers
@@ -38,13 +40,15 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
     with FutureAwaits
     with OrganisationRepositoryMockModule
     with EmailConnectorMockModule
+    with ThirdPartyDeveloperConnectorMockModule
+    with LocalUserIdTracker
     with OrganisationFixtures
     with FixedClock {
   implicit val ec: ExecutionContext = ExecutionContext.global
   implicit val hc: HeaderCarrier    = HeaderCarrier()
 
   trait Setup {
-    val underTest = new OrganisationService(OrganisationRepositoryMock.aMock, EmailConnectorMock.aMock, clock)
+    val underTest = new OrganisationService(OrganisationRepositoryMock.aMock, EmailConnectorMock.aMock, ThirdPartyDeveloperConnectorMock.aMock, clock)
   }
 
   "OrganisationService" when {
@@ -87,31 +91,53 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
     }
 
     "addMember" should {
-      "add member if not present" in new Setup {
-        val userId = UserId.random
-        val email  = LaxEmailAddress("bob@example.com")
+      "add registered member if not present" in new Setup {
+        val email                 = LaxEmailAddress("bob@example.com")
+        val userId                = UserId.random
+        val response              = GetRegisteredOrUnregisteredUsersResponse(List(RegisteredOrUnregisteredUser(userId, email, true, true)))
+        val existingUsersResponse = GetRegisteredOrUnregisteredUsersResponse(List(RegisteredOrUnregisteredUser(MemberData.one.userId, email, true, true)))
         OrganisationRepositoryMock.Fetch.willReturn(standardStoredOrg)
+        ThirdPartyDeveloperConnectorMock.GetOrCreateUserId.succeeds(userId)
+        ThirdPartyDeveloperConnectorMock.GetRegisteredOrUnregisteredUsers.succeeds(List(userId), response)
+        ThirdPartyDeveloperConnectorMock.GetRegisteredOrUnregisteredUsers.succeeds(standardStoredOrg.members.map(member => member.userId).toList, existingUsersResponse)
         OrganisationRepositoryMock.AddMember.willReturn(standardStoredOrg)
-        EmailConnectorMock.SendMemberAddedConfirmation.succeeds()
-        val result = await(underTest.addMember(standardStoredOrg.id, userId, email))
+        EmailConnectorMock.SendRegisteredMemberAddedConfirmation.succeeds()
+        EmailConnectorMock.SendMemberAddedNotification.succeeds()
+        val result                = await(underTest.addMember(standardStoredOrg.id, email))
         result.value shouldBe standardOrg
-        EmailConnectorMock.SendMemberAddedConfirmation.verifyCalledWith(standardStoredOrg.name, Set(email))
+        EmailConnectorMock.SendRegisteredMemberAddedConfirmation.verifyCalledWith(standardStoredOrg.name, Set(email))
+      }
+
+      "add unregistered member" in new Setup {
+        val email    = LaxEmailAddress("bob@example.com")
+        val userId   = UserId.random
+        val response = GetRegisteredOrUnregisteredUsersResponse(List(RegisteredOrUnregisteredUser(userId, email, false, false)))
+        OrganisationRepositoryMock.Fetch.willReturn(standardStoredOrg)
+        ThirdPartyDeveloperConnectorMock.GetOrCreateUserId.succeeds(userId)
+        ThirdPartyDeveloperConnectorMock.GetRegisteredOrUnregisteredUsers.succeeds(List(userId), response)
+        ThirdPartyDeveloperConnectorMock.GetRegisteredOrUnregisteredUsers.succeeds(standardStoredOrg.members.map(member => member.userId).toList, response)
+        OrganisationRepositoryMock.AddMember.willReturn(standardStoredOrg)
+        EmailConnectorMock.SendUnregisteredMemberAddedConfirmation.succeeds()
+        EmailConnectorMock.SendMemberAddedNotification.succeeds()
+        val result   = await(underTest.addMember(standardStoredOrg.id, email))
+        result.value shouldBe standardOrg
+        EmailConnectorMock.SendUnregisteredMemberAddedConfirmation.verifyCalledWith(standardStoredOrg.name, Set(email))
       }
 
       "add member fails if already present" in new Setup {
-        val userId = standardStoredOrg.members.head.userId
         val email  = LaxEmailAddress("bob@example.com")
+        val userId = standardStoredOrg.members.head.userId
         OrganisationRepositoryMock.Fetch.willReturn(standardStoredOrg)
-        val result = await(underTest.addMember(standardStoredOrg.id, userId, email))
+        ThirdPartyDeveloperConnectorMock.GetOrCreateUserId.succeeds(userId)
+        val result = await(underTest.addMember(standardStoredOrg.id, email))
         result.isLeft shouldBe true
         result.left.value shouldBe "Organisation already contains member"
       }
 
       "add member fails if organisation not found" in new Setup {
-        val userId = UserId.random
         val email  = LaxEmailAddress("bob@example.com")
         OrganisationRepositoryMock.Fetch.willReturnNone()
-        val result = await(underTest.addMember(standardStoredOrg.id, userId, email))
+        val result = await(underTest.addMember(standardStoredOrg.id, email))
         result.isLeft shouldBe true
         result.left.value shouldBe "Organisation not found"
       }
@@ -124,6 +150,7 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
         OrganisationRepositoryMock.Fetch.willReturn(standardStoredOrg)
         OrganisationRepositoryMock.RemoveMember.willReturn(standardStoredOrg)
         EmailConnectorMock.SendMemberRemovedConfirmation.succeeds()
+        EmailConnectorMock.SendMemberRemovedNotification.succeeds()
         val result = await(underTest.removeMember(standardStoredOrg.id, userId, email))
         result.value shouldBe standardOrg
         EmailConnectorMock.SendMemberRemovedConfirmation.verifyCalledWith(standardStoredOrg.name, Set(email))
