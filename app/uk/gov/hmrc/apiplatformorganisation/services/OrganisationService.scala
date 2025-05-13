@@ -70,7 +70,7 @@ class OrganisationService @Inject() (
         existingUserDetails <- liftF(thirdPartyDeveloperConnector.getRegisteredOrUnregisteredUsers(getMembersUserIds(organisation)))
         updatedOrganisation <- liftF(organisationRepository.addMember(organisationId, member).map(StoredOrganisation.asOrganisation))
         _                    = sendMemberAddedConfirmationEmail(addedUserDetails, organisation.name)
-        _                    = emailConnector.sendMemberAddedNotification(organisation.name, email, "Member", getExistingUserEmails(existingUserDetails))
+        _                    = emailConnector.sendMemberAddedNotification(organisation.name, email, "Member", getUserEmails(existingUserDetails))
       } yield updatedOrganisation
     ).value
   }
@@ -87,7 +87,7 @@ class OrganisationService @Inject() (
     organisation.members.map(member => member.userId).toList
   }
 
-  private def getExistingUserEmails(response: GetRegisteredOrUnregisteredUsersResponse): Set[LaxEmailAddress] = {
+  private def getUserEmails(response: GetRegisteredOrUnregisteredUsersResponse): Set[LaxEmailAddress] = {
     response.users.filter(user => user.isVerified).map(user => user.email).toSet
   }
 
@@ -97,10 +97,10 @@ class OrganisationService @Inject() (
       for {
         organisation        <- fromOptionF(organisationRepository.fetch(organisationId), "Organisation not found")
         _                   <- cond(organisation.members.contains(member), (), "Organisation does not contain member")
-        existingUserDetails <- liftF(thirdPartyDeveloperConnector.getRegisteredOrUnregisteredUsers(getMembersUserIds(organisation)))
         updatedOrganisation <- liftF(organisationRepository.removeMember(organisationId, member).map(StoredOrganisation.asOrganisation))
         _                    = emailConnector.sendMemberRemovedConfirmation(organisation.name, Set(email))
-        _                    = emailConnector.sendMemberRemovedNotification(organisation.name, email, "Member", getExistingUserEmails(existingUserDetails))
+        userDetails         <- liftF(thirdPartyDeveloperConnector.getRegisteredOrUnregisteredUsers(getMembersUserIds(organisation)))
+        _                    = emailConnector.sendMemberRemovedNotification(organisation.name, email, "Member", getUserEmails(userDetails))
       } yield updatedOrganisation
     ).value
   }
