@@ -70,7 +70,7 @@ class OrganisationService @Inject() (
         existingUserDetails <- liftF(thirdPartyDeveloperConnector.getRegisteredOrUnregisteredUsers(getMembersUserIds(organisation)))
         updatedOrganisation <- liftF(organisationRepository.addMember(organisationId, member).map(StoredOrganisation.asOrganisation))
         _                    = sendMemberAddedConfirmationEmail(addedUserDetails, organisation.name)
-        _                    = emailConnector.sendMemberAddedNotification(organisation.name, email, "Member", getUserEmails(existingUserDetails))
+        _                    = emailConnector.sendMemberAddedNotification(organisation.name, email, "Member", getVerifiedUserEmails(existingUserDetails))
       } yield updatedOrganisation
     ).value
   }
@@ -87,7 +87,7 @@ class OrganisationService @Inject() (
     organisation.members.map(member => member.userId).toList
   }
 
-  private def getUserEmails(response: GetRegisteredOrUnregisteredUsersResponse): Set[LaxEmailAddress] = {
+  private def getVerifiedUserEmails(response: GetRegisteredOrUnregisteredUsersResponse): Set[LaxEmailAddress] = {
     response.users.filter(user => user.isVerified).map(user => user.email).toSet
   }
 
@@ -100,7 +100,7 @@ class OrganisationService @Inject() (
         updatedOrganisation <- liftF(organisationRepository.removeMember(organisationId, member).map(StoredOrganisation.asOrganisation))
         _                    = emailConnector.sendMemberRemovedConfirmation(organisation.name, Set(email))
         userDetails         <- liftF(thirdPartyDeveloperConnector.getRegisteredOrUnregisteredUsers(getMembersUserIds(organisation)))
-        _                    = emailConnector.sendMemberRemovedNotification(organisation.name, email, "Member", getUserEmails(userDetails))
+        _                    = emailConnector.sendMemberRemovedNotification(organisation.name, email, "Member", getVerifiedUserEmails(userDetails))
       } yield updatedOrganisation
     ).value
   }
