@@ -82,7 +82,7 @@ class EmailConnectorISpec
           SendEmailRequest(
             recipients,
             "apiAddedUnregisteredMemberToOrganisationConfirmation",
-            Map("sdstEmailAddress" -> "SDSTeam@hmrc.gov.uk", "developerHubLink" -> "https://developer.qa.tax.service.gov.uk/", "organisationName" -> orgName.value)
+            Map("sdstEmailAddress" -> "SDSTeam@hmrc.gov.uk", "organisationName" -> orgName.value)
           )
         SendEmail.stubSuccess(request)
 

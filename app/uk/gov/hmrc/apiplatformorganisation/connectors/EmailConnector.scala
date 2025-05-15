@@ -31,7 +31,7 @@ import uk.gov.hmrc.apiplatformorganisation.models.HasSucceeded
 import uk.gov.hmrc.apiplatformorganisation.utils.ApplicationLogger
 
 object EmailConnector {
-  case class Config(baseUrl: String, sdstEmailAddress: String, developerHubLink: String)
+  case class Config(baseUrl: String, sdstEmailAddress: String)
 
   case class SendEmailRequest(
       to: Set[LaxEmailAddress],
@@ -53,7 +53,6 @@ class EmailConnector @Inject() (httpClient: HttpClientV2, config: EmailConnector
 
   val serviceUrl       = config.baseUrl
   val sdstEmailAddress = config.sdstEmailAddress
-  val developerHubLink = config.developerHubLink
 
   val addedRegisteredMemberToOrganisationConfirmation   = "apiAddedRegisteredMemberToOrganisationConfirmation"
   val addedUnregisteredMemberToOrganisationConfirmation = "apiAddedUnregisteredMemberToOrganisationConfirmation"
@@ -79,7 +78,6 @@ class EmailConnector @Inject() (httpClient: HttpClientV2, config: EmailConnector
       addedUnregisteredMemberToOrganisationConfirmation,
       Map(
         "sdstEmailAddress" -> sdstEmailAddress,
-        "developerHubLink" -> developerHubLink,
         "organisationName" -> organisationName.value
       )
     ))
