@@ -32,11 +32,25 @@ trait EmailConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
 
     def verify: EmailConnector = MockitoSugar.verify(aMock)
 
-    object SendMemberAddedConfirmation {
-      def succeeds() = when(aMock.sendMemberAddedConfirmation(*[OrganisationName], *)(*)).thenReturn(Future.successful(HasSucceeded))
+    object SendRegisteredMemberAddedConfirmation {
+      def succeeds() = when(aMock.sendRegisteredMemberAddedConfirmation(*[OrganisationName], *)(*)).thenReturn(Future.successful(HasSucceeded))
 
       def verifyCalledWith(organisationName: OrganisationName, recipients: Set[LaxEmailAddress]) =
-        verify.sendMemberAddedConfirmation(eqTo(organisationName), eqTo(recipients))(*)
+        verify.sendRegisteredMemberAddedConfirmation(eqTo(organisationName), eqTo(recipients))(*)
+    }
+
+    object SendUnregisteredMemberAddedConfirmation {
+      def succeeds() = when(aMock.sendUnregisteredMemberAddedConfirmation(*[OrganisationName], *)(*)).thenReturn(Future.successful(HasSucceeded))
+
+      def verifyCalledWith(organisationName: OrganisationName, recipients: Set[LaxEmailAddress]) =
+        verify.sendUnregisteredMemberAddedConfirmation(eqTo(organisationName), eqTo(recipients))(*)
+    }
+
+    object SendMemberAddedNotification {
+      def succeeds() = when(aMock.sendMemberAddedNotification(*[OrganisationName], *[LaxEmailAddress], *, *)(*)).thenReturn(Future.successful(HasSucceeded))
+
+      def verifyCalledWith(organisationName: OrganisationName, email: LaxEmailAddress, role: String, recipients: Set[LaxEmailAddress]) =
+        verify.sendMemberAddedNotification(eqTo(organisationName), eqTo(email), eqTo(role), eqTo(recipients))(*)
     }
 
     object SendMemberRemovedConfirmation {
@@ -44,6 +58,13 @@ trait EmailConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
 
       def verifyCalledWith(organisationName: OrganisationName, recipients: Set[LaxEmailAddress]) =
         verify.sendMemberRemovedConfirmation(eqTo(organisationName), eqTo(recipients))(*)
+    }
+
+    object SendMemberRemovedNotification {
+      def succeeds() = when(aMock.sendMemberRemovedNotification(*[OrganisationName], *[LaxEmailAddress], *, *)(*)).thenReturn(Future.successful(HasSucceeded))
+
+      def verifyCalledWith(organisationName: OrganisationName, email: LaxEmailAddress, role: String, recipients: Set[LaxEmailAddress]) =
+        verify.sendMemberRemovedNotification(eqTo(organisationName), eqTo(email), eqTo(role), eqTo(recipients))(*)
     }
   }
 }

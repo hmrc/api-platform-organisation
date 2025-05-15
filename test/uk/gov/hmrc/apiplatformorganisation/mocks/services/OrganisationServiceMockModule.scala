@@ -56,9 +56,9 @@ trait OrganisationServiceMockModule extends MockitoSugar with ArgumentMatchersSu
     }
 
     object AddMember {
-      def thenReturn(org: Organisation) = when(aMock.addMember(*[OrganisationId], *[UserId], *[LaxEmailAddress])(*, *)).thenReturn(Future.successful(Right(org)))
+      def thenReturn(org: Organisation) = when(aMock.addMember(*[OrganisationId], *[LaxEmailAddress])(*, *)).thenReturn(Future.successful(Right(org)))
 
-      def thenFails(error: String) = when(aMock.addMember(*[OrganisationId], *[UserId], *[LaxEmailAddress])(*, *)).thenReturn(Future.successful(Left(error)))
+      def thenFails(error: String) = when(aMock.addMember(*[OrganisationId], *[LaxEmailAddress])(*, *)).thenReturn(Future.successful(Left(error)))
     }
 
     object RemoveMember {

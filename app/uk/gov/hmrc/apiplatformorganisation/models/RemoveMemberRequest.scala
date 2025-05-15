@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import play.api.libs.json.{Json, OFormat}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 
-case class UpdateMembersRequest(userId: UserId, email: LaxEmailAddress)
+case class RemoveMemberRequest(userId: UserId, email: LaxEmailAddress)
 
-object UpdateMembersRequest {
-  implicit val format: OFormat[UpdateMembersRequest] = Json.format[UpdateMembersRequest]
+object RemoveMemberRequest {
+  implicit val format: OFormat[RemoveMemberRequest] = Json.format[RemoveMemberRequest]
 }
