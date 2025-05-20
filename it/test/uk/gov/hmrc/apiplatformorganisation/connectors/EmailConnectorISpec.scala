@@ -53,24 +53,60 @@ class EmailConnectorISpec
 
     val orgName    = OrganisationName("My Org Name")
     val recipients = Set(LaxEmailAddress("bob@example.com"))
+    val email      = LaxEmailAddress("test.use@example.com")
   }
 
   "EmailConnector" when {
-    "sendMemberAddedConfirmation" should {
+    "sendRegisteredMemberAddedConfirmation" should {
       "return HasSucceeded when hmrc email returns 200" in new Setup {
-        val request = SendEmailRequest(recipients, "apiAddedMemberToOrganisationConfirmation", Map("article" -> "a", "role" -> "member", "organisationName" -> orgName.value))
+        val request =
+          SendEmailRequest(recipients, "apiAddedRegisteredMemberToOrganisationConfirmation", Map("sdstEmailAddress" -> "SDSTeam@hmrc.gov.uk", "organisationName" -> orgName.value))
         SendEmail.stubSuccess(request)
 
-        val result = await(objInTest.sendMemberAddedConfirmation(orgName, recipients))
+        val result = await(objInTest.sendRegisteredMemberAddedConfirmation(orgName, recipients))
         result shouldBe HasSucceeded
       }
 
-      "throw NotFoundException when Companies House returns 500" in new Setup {
+      "throw NotFoundException when returns 500" in new Setup {
         SendEmail.stubError()
 
         intercept[RuntimeException] {
-          await(objInTest.sendMemberAddedConfirmation(orgName, recipients))
+          await(objInTest.sendRegisteredMemberAddedConfirmation(orgName, recipients))
         }
+      }
+    }
+
+    "sendUnregisteredMemberAddedConfirmation" should {
+      "return HasSucceeded when hmrc email returns 200" in new Setup {
+        val request =
+          SendEmailRequest(
+            recipients,
+            "apiAddedUnregisteredMemberToOrganisationConfirmation",
+            Map("sdstEmailAddress" -> "SDSTeam@hmrc.gov.uk", "organisationName" -> orgName.value)
+          )
+        SendEmail.stubSuccess(request)
+
+        val result = await(objInTest.sendUnregisteredMemberAddedConfirmation(orgName, recipients))
+        result shouldBe HasSucceeded
+      }
+
+      "throw NotFoundException when returns 500" in new Setup {
+        SendEmail.stubError()
+
+        intercept[RuntimeException] {
+          await(objInTest.sendUnregisteredMemberAddedConfirmation(orgName, recipients))
+        }
+      }
+    }
+
+    "sendMemberAddedNotification" should {
+      "return HasSucceeded when hmrc email returns 200" in new Setup {
+        val request =
+          SendEmailRequest(recipients, "apiAddedMemberToOrganisationNotification", Map("emailAddress" -> email.text, "role" -> "Member", "organisationName" -> orgName.value))
+        SendEmail.stubSuccess(request)
+
+        val result = await(objInTest.sendMemberAddedNotification(orgName, email, "Member", recipients))
+        result shouldBe HasSucceeded
       }
     }
 
@@ -80,6 +116,17 @@ class EmailConnectorISpec
         SendEmail.stubSuccess(request)
 
         val result = await(objInTest.sendMemberRemovedConfirmation(orgName, recipients))
+        result shouldBe HasSucceeded
+      }
+    }
+
+    "sendMemberRemovedNotification" should {
+      "return HasSucceeded when hmrc email returns 200" in new Setup {
+        val request =
+          SendEmailRequest(recipients, "apiRemovedMemberFromOrganisationNotification", Map("emailAddress" -> email.text, "role" -> "Member", "organisationName" -> orgName.value))
+        SendEmail.stubSuccess(request)
+
+        val result = await(objInTest.sendMemberRemovedNotification(orgName, email, "Member", recipients))
         result shouldBe HasSucceeded
       }
     }

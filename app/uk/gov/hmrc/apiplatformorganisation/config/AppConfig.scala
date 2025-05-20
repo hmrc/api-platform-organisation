@@ -19,11 +19,13 @@ package uk.gov.hmrc.apiplatformorganisation.config
 import javax.inject.{Inject, Singleton}
 
 import play.api.Configuration
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
-class AppConfig @Inject() (config: Configuration) {
+class AppConfig @Inject() (config: Configuration) extends ServicesConfig(config) {
 
-  val appName: String           = config.get[String]("appName")
-  val companiesHouseKey: String = config.get[String]("companies-house.api-key")
-  val companiesHouseUri: String = config.get[String]("companies-house.uri")
+  val appName: String                = config.get[String]("appName")
+  val companiesHouseKey: String      = config.get[String]("companies-house.api-key")
+  val companiesHouseUri: String      = config.get[String]("companies-house.uri")
+  val thirdPartyDeveloperUrl: String = baseUrl("third-party-developer")
 }
