@@ -58,6 +58,11 @@ class OrganisationController @Inject() (cc: ControllerComponents, organisationSe
     organisationService.fetchLatestByUserId(userId).map(_.fold(failed)(success))
   }
 
+  def searchOrganisations = Action.async { request =>
+    organisationService.search(request.queryString.get("organisationName").map(_.head))
+      .map(orgs => Ok(Json.toJson(orgs)))
+  }
+
   def addMember(organisationId: OrganisationId): Action[AddMemberRequest] = Action.async(parse.json[AddMemberRequest]) { implicit request =>
     val failed  = (msg: String) => BadRequest(Json.toJson(ErrorMessage(msg)))
     val success = (o: Organisation) => Ok(Json.toJson(o))

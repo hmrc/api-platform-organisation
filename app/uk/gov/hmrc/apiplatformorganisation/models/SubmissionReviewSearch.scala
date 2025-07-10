@@ -26,12 +26,12 @@ object SubmissionReviewSearch {
 
     def filters = queryString
       .map {
-        case (key, values) =>
-          key match {
-            case "status" => SubmissionReviewStatusFilter(values)
-            case _        => None // ignore anything that isn't a search filter
-          }
-      }
+      case (key, values) =>
+        key match {
+          case "status" => SubmissionReviewStatusFilter(values)
+          case _        => None // ignore anything that isn't a search filter
+        }
+    }
       .flatten
       .filter(searchFilter => searchFilter.isDefined)
       .flatten

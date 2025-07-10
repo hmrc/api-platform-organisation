@@ -53,8 +53,8 @@ object RemoveMemberRequestData {
   val one: RemoveMemberRequest = RemoveMemberRequest(UserIdData.one, LaxEmailAddress("bob@example.com"))
 }
 
-object OrganisationData {
-  val one: Organisation = Organisation(OrganisationIdData.one, OrganisationNameData.one, OrganisationTypeData.one, Set(MemberData.one))
+object OrganisationData extends FixedClock {
+  val one: Organisation = Organisation(OrganisationIdData.one, OrganisationNameData.one, OrganisationTypeData.one, instant, Set(MemberData.one))
 }
 
 object StoredOrganisationData extends FixedClock {
