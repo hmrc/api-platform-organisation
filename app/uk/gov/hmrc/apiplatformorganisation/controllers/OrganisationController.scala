@@ -25,7 +25,7 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationId}
-import uk.gov.hmrc.apiplatformorganisation.models.{AddMemberRequest, CreateOrganisationRequest, RemoveMemberRequest}
+import uk.gov.hmrc.apiplatformorganisation.models.{AddMemberRequest, CreateOrganisationRequest, RemoveMemberRequest, SearchOrganisationRequest}
 import uk.gov.hmrc.apiplatformorganisation.services.OrganisationService
 
 object OrganisationController {
@@ -56,6 +56,10 @@ class OrganisationController @Inject() (cc: ControllerComponents, organisationSe
     val success = (o: Organisation) => Ok(Json.toJson(o))
 
     organisationService.fetchLatestByUserId(userId).map(_.fold(failed)(success))
+  }
+
+  def searchOrganisations: Action[SearchOrganisationRequest] = Action.async(parse.json[SearchOrganisationRequest]) { request =>
+    organisationService.search(request.body.params.find(_._1 == "organisationName").map(_._2)).map(orgs => Ok(Json.toJson(orgs)))
   }
 
   def addMember(organisationId: OrganisationId): Action[AddMemberRequest] = Action.async(parse.json[AddMemberRequest]) { implicit request =>

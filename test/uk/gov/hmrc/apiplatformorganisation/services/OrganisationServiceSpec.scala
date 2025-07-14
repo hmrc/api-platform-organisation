@@ -27,7 +27,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Member
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, OrganisationId}
 import uk.gov.hmrc.apiplatform.modules.tpd.core.dto.{GetRegisteredOrUnregisteredUsersResponse, RegisteredOrUnregisteredUser}
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 import uk.gov.hmrc.apiplatformorganisation.mocks.connectors.{EmailConnectorMockModule, ThirdPartyDeveloperConnectorMockModule}
@@ -115,6 +115,23 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
         val userId = UserId.random
         val result = await(underTest.fetchLatestByUserId(userId))
         result shouldBe None
+      }
+    }
+
+    "search" should {
+      "return all organisations when no criteria specified" in new Setup {
+        val standardStoredOrg2 = standardStoredOrg.copy(id = OrganisationId.random)
+        OrganisationRepositoryMock.Search.willReturn(List(standardStoredOrg, standardStoredOrg2))
+        val result             = await(underTest.search())
+        result shouldBe List(standardOrg, standardOrg.copy(id = standardStoredOrg2.id))
+        OrganisationRepositoryMock.Search.verifyCalledWith(None)
+      }
+
+      "return matching organisations when organisation name specified" in new Setup {
+        OrganisationRepositoryMock.Search.willReturn(List(standardStoredOrg))
+        val result = await(underTest.search(Some(standardStoredOrg.name.value)))
+        result shouldBe List(standardOrg)
+        OrganisationRepositoryMock.Search.verifyCalledWith(Some(standardStoredOrg.name.value))
       }
     }
 

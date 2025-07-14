@@ -51,6 +51,15 @@ trait OrganisationRepositoryMockModule extends MockitoSugar with ArgumentMatcher
       def willReturnNone() = when(aMock.fetchLatestByUserId(*[UserId])).thenReturn(Future.successful(None))
     }
 
+    object Search {
+      def willReturn(orgs: List[StoredOrganisation]) = when(aMock.search(*)).thenReturn(Future.successful(orgs))
+
+      def willReturnNone() = when(aMock.fetch(*[OrganisationId])).thenReturn(Future.successful(None))
+
+      def verifyCalledWith(organisationName: Option[String]) =
+        verify(aMock).search(eqTo(organisationName))
+    }
+
     object AddMember {
       def willReturn(org: StoredOrganisation) = when(aMock.addMember(*[OrganisationId], *)).thenReturn(Future.successful(org))
     }

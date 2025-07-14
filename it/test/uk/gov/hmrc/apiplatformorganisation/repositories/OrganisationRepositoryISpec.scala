@@ -28,7 +28,7 @@ import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, OrganisationName}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, OrganisationId, OrganisationName}
 import uk.gov.hmrc.apiplatformorganisation.OrganisationFixtures
 import uk.gov.hmrc.apiplatformorganisation.models.StoredOrganisation
 import uk.gov.hmrc.apiplatformorganisation.repositories.OrganisationRepository
@@ -67,6 +67,27 @@ class OrganisationRepositoryISpec extends AnyWordSpec
       await(underTest.save(standardStoredOrg.copy(createdDateTime = FixedClock.Instants.fiveMinsAgo)))
       await(underTest.save(standardStoredOrg))
       await(underTest.fetchLatestByUserId(standardStoredOrg.requestedBy)) shouldBe Some(standardStoredOrg)
+    }
+
+    "return all organisations when search is called with no criteria" in {
+      val standardStoredOrg2 = standardStoredOrg.copy(id = OrganisationId.random)
+      await(repository.collection.find().toFuture()).length shouldBe 0
+      await(underTest.save(standardStoredOrg))
+      await(underTest.save(standardStoredOrg2))
+      await(underTest.search()) should contain theSameElementsAs List(standardStoredOrg, standardStoredOrg2)
+    }
+
+    "return matching organisations when search is called with organisation name" in {
+      val standardStoredOrg2 = standardStoredOrg.copy(id = OrganisationId.random, name = OrganisationName("Example1"))
+      await(repository.collection.find().toFuture()).length shouldBe 0
+      await(underTest.save(standardStoredOrg))
+      await(underTest.save(standardStoredOrg2))
+      await(underTest.search(Some(standardStoredOrg2.name.value))) should contain theSameElementsAs List(standardStoredOrg2)
+    }
+
+    "return empty list when search is called with organisation name which doesn't exist" in {
+      await(repository.collection.find().toFuture()).length shouldBe 0
+      await(underTest.search(Some("test"))) shouldBe List.empty
     }
 
     "update single org" in {

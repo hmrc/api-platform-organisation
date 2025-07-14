@@ -55,6 +55,12 @@ class OrganisationService @Inject() (
     }
   }
 
+  def search(organisationName: Option[String] = None)(implicit ec: ExecutionContext): Future[List[Organisation]] = {
+    organisationRepository.search(organisationName) map {
+      _.map(org => StoredOrganisation.asOrganisation(org))
+    }
+  }
+
   def addMember(organisationId: OrganisationId, email: LaxEmailAddress)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Either[String, Organisation]] = {
     (
       for {

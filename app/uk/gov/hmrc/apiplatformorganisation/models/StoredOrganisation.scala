@@ -43,6 +43,6 @@ object StoredOrganisation {
   }
 
   def asOrganisation(data: StoredOrganisation): Organisation = {
-    Organisation(data.id, data.name, data.organisationType, data.members)
+    Organisation(data.id, data.name, data.organisationType, data.createdDateTime, data.members)
   }
 }

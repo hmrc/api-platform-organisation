@@ -31,7 +31,6 @@ lazy val microservice = Project("api-platform-organisation", file("."))
     Test / unmanagedSourceDirectories += baseDirectory.value / "test-utils",
     Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-eT")
   )
-  .settings(resolvers += Resolver.jcenterRepo)
   .settings(CodeCoverageSettings.settings: _*)
 
 lazy val it = (project in file("it"))

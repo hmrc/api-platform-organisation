@@ -51,6 +51,12 @@ class OrganisationRepository @Inject() (mongo: MongoComponent)(implicit val ec: 
           IndexOptions()
             .name("requestedByIndex")
             .background(true)
+        ),
+        IndexModel(
+          ascending("name"),
+          IndexOptions()
+            .name("nameIndex")
+            .background(true)
         )
       ),
       replaceIndexes = true
@@ -67,6 +73,15 @@ class OrganisationRepository @Inject() (mongo: MongoComponent)(implicit val ec: 
       .find(equal("requestedBy", Codecs.toBson(id)))
       .sort(descending("createdDateTime"))
       .headOption()
+  }
+
+  def search(organisationName: Option[String] = None): Future[List[StoredOrganisation]] = {
+    val filters = organisationName match {
+      case Some(name) => Filters.regex("name", name, "i")
+      case None       => Filters.empty()
+    }
+
+    collection.find(filters).toFuture().map(seq => seq.toList)
   }
 
   def save(organisation: StoredOrganisation): Future[StoredOrganisation] = {

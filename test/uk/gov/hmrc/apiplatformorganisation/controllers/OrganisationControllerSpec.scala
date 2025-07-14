@@ -29,8 +29,10 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{UserId, UserIdData}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationId
 import uk.gov.hmrc.apiplatformorganisation.OrganisationFixtures
 import uk.gov.hmrc.apiplatformorganisation.mocks.services.OrganisationServiceMockModule
+import uk.gov.hmrc.apiplatformorganisation.models.SearchOrganisationRequest
 
 class OrganisationControllerSpec extends AnyWordSpec with Matchers with OrganisationServiceMockModule with OrganisationFixtures {
   implicit val ec: ExecutionContext = ExecutionContext.global
@@ -88,6 +90,44 @@ class OrganisationControllerSpec extends AnyWordSpec with Matchers with Organisa
       val fakeRequest = FakeRequest("GET", s"/organisation/${userId}").withHeaders("content-type" -> "application/json")
       val result      = controller.fetchLatestByUserId(userId)(fakeRequest)
       status(result) shouldBe Status.NOT_FOUND
+    }
+  }
+
+  "searchOrganisations" should {
+    "return 200 with all organisations when no params specified" in {
+      val standardOrg2 = standardOrg.copy(id = OrganisationId.random)
+      OrganisationServiceMock.Search.thenReturn(List(standardOrg, standardOrg2))
+      val fakeRequest  = FakeRequest("POST", "/organisations")
+        .withBody(SearchOrganisationRequest(Seq.empty)).withHeaders("content-type" -> "application/json")
+
+      val result = controller.searchOrganisations(fakeRequest)
+
+      status(result) shouldBe Status.OK
+      contentAsJson(result) shouldBe Json.toJson(List(standardOrg, standardOrg2))
+      OrganisationServiceMock.Search.verifyCalledWith(None)
+    }
+
+    "return matching organisation when organisation name specified" in {
+      OrganisationServiceMock.Search.thenReturn(List(standardOrg))
+      val fakeRequest = FakeRequest("POST", "/organisations")
+        .withBody(SearchOrganisationRequest(Seq(("organisationName", standardOrg.organisationName.value)))).withHeaders("content-type" -> "application/json")
+
+      val result = controller.searchOrganisations(fakeRequest)
+
+      status(result) shouldBe Status.OK
+      contentAsJson(result) shouldBe Json.toJson(List(standardOrg))
+      OrganisationServiceMock.Search.verifyCalledWith(Some(standardOrg.organisationName.value))
+    }
+
+    "return empty list when no organisations found" in {
+      OrganisationServiceMock.Search.thenReturnNone()
+      val fakeRequest = FakeRequest("GET", s"/organisations")
+        .withBody(SearchOrganisationRequest(Seq(("organisationName", "Test")))).withHeaders("content-type" -> "application/json")
+
+      val result = controller.searchOrganisations(fakeRequest)
+
+      status(result) shouldBe Status.OK
+      contentAsString(result) shouldBe "[]"
     }
   }
 
