@@ -49,8 +49,8 @@ class OrganisationService @Inject() (
     }
   }
 
-  def fetchLatestByUserId(userId: UserId)(implicit ec: ExecutionContext): Future[Option[Organisation]] = {
-    organisationRepository.fetchLatestByUserId(userId) map {
+  def fetchByUserId(userId: UserId)(implicit ec: ExecutionContext): Future[List[Organisation]] = {
+    organisationRepository.fetchByUserId(userId) map {
       _.map(org => StoredOrganisation.asOrganisation(org))
     }
   }

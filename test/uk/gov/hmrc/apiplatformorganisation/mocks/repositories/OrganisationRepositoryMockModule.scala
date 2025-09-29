@@ -45,10 +45,10 @@ trait OrganisationRepositoryMockModule extends MockitoSugar with ArgumentMatcher
       def willReturnNone() = when(aMock.fetch(*[OrganisationId])).thenReturn(Future.successful(None))
     }
 
-    object FetchLatestByUserId {
-      def willReturn(org: StoredOrganisation) = when(aMock.fetchLatestByUserId(*[UserId])).thenReturn(Future.successful(Some(org)))
+    object FetchByUserId {
+      def willReturn(orgs: List[StoredOrganisation]) = when(aMock.fetchByUserId(*[UserId])).thenReturn(Future.successful(orgs))
 
-      def willReturnNone() = when(aMock.fetchLatestByUserId(*[UserId])).thenReturn(Future.successful(None))
+      def willReturnNone() = when(aMock.fetchByUserId(*[UserId])).thenReturn(Future.successful(List.empty))
     }
 
     object Search {

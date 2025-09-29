@@ -102,19 +102,19 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
       }
     }
 
-    "fetchLatestByUserId" should {
+    "fetchByUserId" should {
       "transform returned storedOrg" in new Setup {
-        OrganisationRepositoryMock.FetchLatestByUserId.willReturn(standardStoredOrg)
+        OrganisationRepositoryMock.FetchByUserId.willReturn(List(standardStoredOrg))
         val userId = UserId.random
-        val result = await(underTest.fetchLatestByUserId(userId))
-        result shouldBe Some(standardOrg)
+        val result = await(underTest.fetchByUserId(userId))
+        result shouldBe List(standardOrg)
       }
 
       "return none when not found" in new Setup {
-        OrganisationRepositoryMock.FetchLatestByUserId.willReturnNone()
+        OrganisationRepositoryMock.FetchByUserId.willReturnNone()
         val userId = UserId.random
-        val result = await(underTest.fetchLatestByUserId(userId))
-        result shouldBe None
+        val result = await(underTest.fetchByUserId(userId))
+        result shouldBe List.empty
       }
     }
 

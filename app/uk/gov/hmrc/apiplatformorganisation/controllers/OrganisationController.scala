@@ -50,12 +50,8 @@ class OrganisationController @Inject() (cc: ControllerComponents, organisationSe
     organisationService.fetch(organisationId).map(_.fold(failed)(success))
   }
 
-  def fetchLatestByUserId(userId: UserId) = Action.async { _ =>
-    lazy val failed = NotFound(Results.EmptyContent())
-
-    val success = (o: Organisation) => Ok(Json.toJson(o))
-
-    organisationService.fetchLatestByUserId(userId).map(_.fold(failed)(success))
+  def fetchByUserId(userId: UserId) = Action.async { _ =>
+    organisationService.fetchByUserId(userId).map(orgs => Ok(Json.toJson(orgs)))
   }
 
   def searchOrganisations: Action[SearchOrganisationRequest] = Action.async(parse.json[SearchOrganisationRequest]) { request =>

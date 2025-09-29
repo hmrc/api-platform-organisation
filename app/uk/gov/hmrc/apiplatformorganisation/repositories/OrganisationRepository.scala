@@ -57,6 +57,12 @@ class OrganisationRepository @Inject() (mongo: MongoComponent)(implicit val ec: 
           IndexOptions()
             .name("nameIndex")
             .background(true)
+        ),
+        IndexModel(
+          ascending("members.userId"),
+          IndexOptions()
+            .name("membersUserIdIndex")
+            .background(true)
         )
       ),
       replaceIndexes = true
@@ -67,13 +73,12 @@ class OrganisationRepository @Inject() (mongo: MongoComponent)(implicit val ec: 
     collection.find(equal("id", Codecs.toBson(id))).headOption()
   }
 
-  def fetchLatestByUserId(id: UserId): Future[Option[StoredOrganisation]] = {
+  def fetchByUserId(id: UserId): Future[List[StoredOrganisation]] = {
     collection
       .withReadPreference(com.mongodb.ReadPreference.primary())
-      .find(equal("requestedBy", Codecs.toBson(id)))
+      .find(equal("members.userId", Codecs.toBson(id)))
       .sort(descending("createdDateTime"))
-      .headOption()
-  }
+  }.toFuture().map(seq => seq.toList)
 
   def search(organisationName: Option[String] = None): Future[List[StoredOrganisation]] = {
     val filters = organisationName match {

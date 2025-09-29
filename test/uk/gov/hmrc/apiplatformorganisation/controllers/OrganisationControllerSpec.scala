@@ -24,7 +24,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 import play.api.http.Status
-import play.api.libs.json.Json
+import play.api.libs.json.{JsArray, Json}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 
@@ -74,22 +74,22 @@ class OrganisationControllerSpec extends AnyWordSpec with Matchers with Organisa
     }
   }
 
-  "fetchLatestByUserId" should {
+  "fetchByUserId" should {
     "return 200" in {
-      OrganisationServiceMock.FetchLatestByUserId.thenReturn(standardOrg)
+      OrganisationServiceMock.FetchByUserId.thenReturn(List(standardOrg))
       val userId      = UserId.random
-      val fakeRequest = FakeRequest("GET", s"/organisation/user/${userId}").withHeaders("content-type" -> "application/json")
-      val result      = controller.fetchLatestByUserId(userId)(fakeRequest)
+      val fakeRequest = FakeRequest("GET", s"/organisation/user/${userId}/all").withHeaders("content-type" -> "application/json")
+      val result      = controller.fetchByUserId(userId)(fakeRequest)
       status(result) shouldBe Status.OK
-      contentAsJson(result) shouldBe Json.toJson(standardOrg)
+      contentAsJson(result) shouldBe Json.toJson(List(standardOrg))
     }
 
-    "return not found when not found" in {
-      OrganisationServiceMock.FetchLatestByUserId.thenReturnNone()
+    "return empty list when none found" in {
+      OrganisationServiceMock.FetchByUserId.thenReturnNone()
       val userId      = UserId.random
-      val fakeRequest = FakeRequest("GET", s"/organisation/${userId}").withHeaders("content-type" -> "application/json")
-      val result      = controller.fetchLatestByUserId(userId)(fakeRequest)
-      status(result) shouldBe Status.NOT_FOUND
+      val fakeRequest = FakeRequest("GET", s"/organisation/${userId}/all").withHeaders("content-type" -> "application/json")
+      val result      = controller.fetchByUserId(userId)(fakeRequest)
+      contentAsJson(result) shouldBe JsArray.empty
     }
   }
 
