@@ -28,8 +28,8 @@ import org.mongodb.scala.model._
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, OrganisationId}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Member
 import uk.gov.hmrc.apiplatformorganisation.models.StoredOrganisation
 
 @Singleton

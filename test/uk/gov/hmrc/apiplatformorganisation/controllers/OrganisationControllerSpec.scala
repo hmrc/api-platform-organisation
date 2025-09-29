@@ -28,8 +28,7 @@ import play.api.libs.json.{JsArray, Json}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.{UserId, UserIdData}
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationId
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId, UserIdData}
 import uk.gov.hmrc.apiplatformorganisation.OrganisationFixtures
 import uk.gov.hmrc.apiplatformorganisation.mocks.services.OrganisationServiceMockModule
 import uk.gov.hmrc.apiplatformorganisation.models.SearchOrganisationRequest

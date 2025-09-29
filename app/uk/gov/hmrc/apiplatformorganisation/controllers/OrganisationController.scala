@@ -23,8 +23,8 @@ import play.api.libs.json.{Json, OWrites}
 import play.api.mvc.{Action, ControllerComponents, Results}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationId}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Organisation
 import uk.gov.hmrc.apiplatformorganisation.models.{AddMemberRequest, CreateOrganisationRequest, RemoveMemberRequest, SearchOrganisationRequest}
 import uk.gov.hmrc.apiplatformorganisation.services.OrganisationService
 
