@@ -26,9 +26,9 @@ import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, OrganisationId, OrganisationName}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, OrganisationName}
 import uk.gov.hmrc.apiplatformorganisation.OrganisationFixtures
 import uk.gov.hmrc.apiplatformorganisation.models.StoredOrganisation
 import uk.gov.hmrc.apiplatformorganisation.repositories.OrganisationRepository
@@ -61,12 +61,18 @@ class OrganisationRepositoryISpec extends AnyWordSpec
       await(underTest.fetch(standardStoredOrg.id)) shouldBe Some(standardStoredOrg)
     }
 
-    "fetchLatestByUserId" in {
+    "fetchByUserId" in {
       await(repository.collection.find().toFuture()).length shouldBe 0
-      await(underTest.save(standardStoredOrg.copy(createdDateTime = FixedClock.Instants.anHourAgo)))
-      await(underTest.save(standardStoredOrg.copy(createdDateTime = FixedClock.Instants.fiveMinsAgo)))
+      val member1       = standardStoredOrg.members.head
+      val organisation1 = standardStoredOrg.copy(id = OrganisationId.random, members = Set(member1, Member(UserId.random)), createdDateTime = FixedClock.Instants.anHourAgo)
+      val organisation2 = standardStoredOrg.copy(id = OrganisationId.random, members = Set(Member(UserId.random)))
+
+      await(underTest.save(organisation1))
+      await(underTest.save(organisation2))
       await(underTest.save(standardStoredOrg))
-      await(underTest.fetchLatestByUserId(standardStoredOrg.requestedBy)) shouldBe Some(standardStoredOrg)
+      await(repository.collection.find().toFuture()).length shouldBe 3
+
+      await(underTest.fetchByUserId(member1.userId)) shouldBe List(standardStoredOrg, organisation1)
     }
 
     "return all organisations when search is called with no criteria" in {

@@ -25,9 +25,9 @@ import org.scalatest.{BeforeAndAfterAll, Inside}
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
 import uk.gov.hmrc.http.HeaderCarrier
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, OrganisationId, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, OrganisationId}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Member
 import uk.gov.hmrc.apiplatform.modules.tpd.core.dto.{GetRegisteredOrUnregisteredUsersResponse, RegisteredOrUnregisteredUser}
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 import uk.gov.hmrc.apiplatformorganisation.mocks.connectors.{EmailConnectorMockModule, ThirdPartyDeveloperConnectorMockModule}
@@ -102,19 +102,19 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
       }
     }
 
-    "fetchLatestByUserId" should {
+    "fetchByUserId" should {
       "transform returned storedOrg" in new Setup {
-        OrganisationRepositoryMock.FetchLatestByUserId.willReturn(standardStoredOrg)
+        OrganisationRepositoryMock.FetchByUserId.willReturn(List(standardStoredOrg))
         val userId = UserId.random
-        val result = await(underTest.fetchLatestByUserId(userId))
-        result shouldBe Some(standardOrg)
+        val result = await(underTest.fetchByUserId(userId))
+        result shouldBe List(standardOrg)
       }
 
       "return none when not found" in new Setup {
-        OrganisationRepositoryMock.FetchLatestByUserId.willReturnNone()
+        OrganisationRepositoryMock.FetchByUserId.willReturnNone()
         val userId = UserId.random
-        val result = await(underTest.fetchLatestByUserId(userId))
-        result shouldBe None
+        val result = await(underTest.fetchByUserId(userId))
+        result shouldBe List.empty
       }
     }
 

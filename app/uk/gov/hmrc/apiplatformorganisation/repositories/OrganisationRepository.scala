@@ -28,8 +28,8 @@ import org.mongodb.scala.model._
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, OrganisationId}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Member
 import uk.gov.hmrc.apiplatformorganisation.models.StoredOrganisation
 
 @Singleton
@@ -57,6 +57,12 @@ class OrganisationRepository @Inject() (mongo: MongoComponent)(implicit val ec: 
           IndexOptions()
             .name("nameIndex")
             .background(true)
+        ),
+        IndexModel(
+          ascending("members.userId"),
+          IndexOptions()
+            .name("membersUserIdIndex")
+            .background(true)
         )
       ),
       replaceIndexes = true
@@ -67,13 +73,12 @@ class OrganisationRepository @Inject() (mongo: MongoComponent)(implicit val ec: 
     collection.find(equal("id", Codecs.toBson(id))).headOption()
   }
 
-  def fetchLatestByUserId(id: UserId): Future[Option[StoredOrganisation]] = {
+  def fetchByUserId(id: UserId): Future[List[StoredOrganisation]] = {
     collection
       .withReadPreference(com.mongodb.ReadPreference.primary())
-      .find(equal("requestedBy", Codecs.toBson(id)))
+      .find(equal("members.userId", Codecs.toBson(id)))
       .sort(descending("createdDateTime"))
-      .headOption()
-  }
+  }.toFuture().map(seq => seq.toList)
 
   def search(organisationName: Option[String] = None): Future[List[StoredOrganisation]] = {
     val filters = organisationName match {

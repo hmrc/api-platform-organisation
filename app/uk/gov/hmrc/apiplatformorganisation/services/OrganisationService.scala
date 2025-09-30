@@ -22,9 +22,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import uk.gov.hmrc.http.HeaderCarrier
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, OrganisationId, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.services.{ClockNow, EitherTHelper}
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, Organisation, OrganisationId, OrganisationName}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, Organisation, OrganisationName}
 import uk.gov.hmrc.apiplatform.modules.tpd.core.dto.{GetRegisteredOrUnregisteredUsersResponse, RegisteredOrUnregisteredUser}
 import uk.gov.hmrc.apiplatformorganisation.connectors.{EmailConnector, ThirdPartyDeveloperConnector}
 import uk.gov.hmrc.apiplatformorganisation.models._
@@ -49,8 +49,8 @@ class OrganisationService @Inject() (
     }
   }
 
-  def fetchLatestByUserId(userId: UserId)(implicit ec: ExecutionContext): Future[Option[Organisation]] = {
-    organisationRepository.fetchLatestByUserId(userId) map {
+  def fetchByUserId(userId: UserId)(implicit ec: ExecutionContext): Future[List[Organisation]] = {
+    organisationRepository.fetchByUserId(userId) map {
       _.map(org => StoredOrganisation.asOrganisation(org))
     }
   }
