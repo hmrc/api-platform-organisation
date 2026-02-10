@@ -69,6 +69,7 @@ object QuestionnaireDAO {
     organisationNameSoleId = OrganisationDetails.questionSoleFullName.id,
     organisationNameRsId = OrganisationDetails.questionRsOrgName.id,
     organisationNameCioId = OrganisationDetails.questionCioOrgName.id,
+//    organisationNameUnincId = OrganisationDetails.questionUnincName.id,  // TODO add new entry to library
     organisationNameNonUkWithId = OrganisationDetails.questionNonUkWithOrgName.id,
     organisationNameNonUkWithoutId = OrganisationDetails.questionNonUkWithoutOrgName.id,
     organisationNameGpId = OrganisationDetails.questionGpOrgName.id,
@@ -195,14 +196,14 @@ object QuestionnaireDAO {
         Wording("What is the company name?"),
         statement = None,
         validation = TextValidation.OrganisationName.some,
-        errorInfo = ErrorInfo("Your company name cannot be blank", "Enter your organisation name").some
+        errorInfo = ErrorInfo("Your company name cannot be blank", "Enter your company name").some
       )
 
       val questionLtdOrgAddress = Question.AddressQuestion(
         Question.Id("e1dbf1a3-e28b-1c83-a739-86f1319ca8cc"),
         Wording("Enter the company’s registered address"),
         statement = None,
-        errorInfo = ErrorInfo("Your organisation address line one and postcode cannot be blank", "Enter your organisation address").some
+        errorInfo = ErrorInfo("Your company address line one and postcode cannot be blank", "Enter your company address").some
       )
 
       val questionLtdCorporationUTR = Question.TextQuestion(
@@ -221,7 +222,7 @@ object QuestionnaireDAO {
         Wording("What is your website URL?"),
         statement = None,
         hintText = StatementText("Website URL").some,
-        absence = ("My organisation doesn't have a website", Mark.Fail).some,
+        absence = ("My company doesn't have a website", Mark.Fail).some,
         validation = TextValidation.Url.some,
         errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some
       )
@@ -778,8 +779,8 @@ object QuestionnaireDAO {
         GroupOfQuestionnaires(
           heading = "About your organisation",
           links = NonEmptyList.of(
-            OrganisationDetails.questionnaire,
-            ResponsibleIndividualDetails.questionnaire
+            ResponsibleIndividualDetails.questionnaire,
+            OrganisationDetails.questionnaire
           )
         )
       )
