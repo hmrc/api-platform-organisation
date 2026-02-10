@@ -100,8 +100,9 @@ object QuestionnaireDAO {
 
       val question3 = Question.YesNoQuestion(
         Question.Id("fb9b8036-cc88-4f4e-ad84-c02caa4cebae"),
-        Wording("Is your email address as given?"),
+        Wording("Is the email address that you've registered with the Developer Hub the one that we should use to contact you?"),
         statement = None,
+        hintText = StatementText("This email address cannot be a shared mailbox.").some,
         yesMarking = Mark.Pass,
         noMarking = Mark.Pass,
         errorInfo = ErrorInfo("Select Yes if your email address is correct").some
@@ -119,7 +120,7 @@ object QuestionnaireDAO {
 
       val question5 = Question.TextQuestion(
         Question.Id("f2089e95-d0d7-4c31-835c-29c79f957733"),
-        Wording("What is your job title?"),
+        Wording("What's your job title?"),
         statement = None,
         label = Question.Label("Job title").some,
         errorInfo = ErrorInfo("Enter a job title", "Job title cannot be blank").some
