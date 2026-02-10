@@ -79,6 +79,75 @@ object QuestionnaireDAO {
 
   object Questionnaires {
 
+    object ResponsibleIndividualDetails {
+
+      val question1 = Question.YesNoQuestion(
+        Question.Id("a8f3a6b4-cff0-4bb5-b38f-fd224b4715d5"),
+        Wording("Is your name as shown above?"),
+        statement = None,
+        yesMarking = Mark.Pass,
+        noMarking = Mark.Pass,
+        errorInfo = ErrorInfo("Select Yes if your name is correct").some
+      )
+
+      val question2 = Question.TextQuestion(
+        Question.Id("f04afc8a-08e6-4a90-b6f3-3d6ffed6a373"),
+        Wording("What is your name?"),
+        statement = None,
+        label = Question.Label("First and last name").some,
+        errorInfo = ErrorInfo("Enter a first and last name", "First and last name cannot be blank").some
+      )
+
+      val question3 = Question.YesNoQuestion(
+        Question.Id("fb9b8036-cc88-4f4e-ad84-c02caa4cebae"),
+        Wording("Is your email address as given?"),
+        statement = None,
+        yesMarking = Mark.Pass,
+        noMarking = Mark.Pass,
+        errorInfo = ErrorInfo("Select Yes if your email address is correct").some
+      )
+
+      val question4 = Question.TextQuestion(
+        Question.Id("0a49e1d6-0b28-45c5-94b7-adee5756d80e"),
+        Wording("What's your email address?"),
+        statement = None,
+        label = Question.Label("Email address").some,
+        hintText = StatementText("Cannot be a shared mailbox").some,
+        validation = TextValidation.Email.some,
+        errorInfo = ErrorInfo("Enter an email address in the correct format, like yourname@example.com", "Email address cannot be blank").some
+      )
+
+      val question5 = Question.TextQuestion(
+        Question.Id("f2089e95-d0d7-4c31-835c-29c79f957733"),
+        Wording("What is your job title?"),
+        statement = None,
+        label = Question.Label("Job title").some,
+        errorInfo = ErrorInfo("Enter a job title", "Job title cannot be blank").some
+      )
+
+      val question6 = Question.TextQuestion(
+        Question.Id("a27b8039-cc32-4f2e-ad88-c96caa1cebae"),
+        Wording("What's your phone number?"),
+        statement = None,
+        label = Question.Label("Telephone").some,
+        hintText = StatementText("Include the country code for international numbers.").some,
+        errorInfo = ErrorInfo("Enter a telephone number", "Telephone number cannot be blank").some
+      )
+
+      val questionnaire = Questionnaire(
+        id = Questionnaire.Id("be15b318-524a-4d10-89a5-4bfa52ed49c2"),
+        label = Questionnaire.Label("About you"),
+        questions = NonEmptyList.of(
+          QuestionItem(question1),
+          QuestionItem(question2, AskWhen.AskWhenAnswer(question1, "No")),
+          QuestionItem(question3),
+          QuestionItem(question4, AskWhen.AskWhenAnswer(question3, "No")),
+          QuestionItem(question5),
+          QuestionItem(question6)
+        )
+      )
+    }
+
     object OrganisationDetails {
 
       val questionOrgType = Question.ChooseOneOfQuestion(
@@ -722,7 +791,7 @@ object QuestionnaireDAO {
 
       val questionnaire = Questionnaire(
         id = Questionnaire.Id("ba16b123-524a-4d10-89a5-4bfa12ed42c9"),
-        label = Questionnaire.Label("Enter organisation details"),
+        label = Questionnaire.Label("Your business"),
         questions = NonEmptyList.of(
           QuestionItem(questionOrgType),
           // UK limited company
@@ -797,85 +866,9 @@ object QuestionnaireDAO {
       )
     }
 
-    object ResponsibleIndividualDetails {
-
-      val question1 = Question.YesNoQuestion(
-        Question.Id("99d9362d-e365-4af1-aa46-88e95f9858f7"),
-        Wording("Are you the individual responsible for the software in your organisation?"),
-        statement = Statement(
-          StatementText("As the responsible individual you:"),
-          StatementBullets(
-            CompoundFragment(
-              StatementText("ensure your software conforms to the "),
-              StatementLink("terms of use (opens in new tab)", "/api-documentation/docs/terms-of-use")
-            ),
-            CompoundFragment(
-              StatementText("understand the "),
-              StatementLink("consequences of not conforming to the terms of use (opens in new tab)", "/api-documentation/docs/terms-of-use")
-            )
-          )
-        ).some,
-        yesMarking = Mark.Pass,
-        noMarking = Mark.Pass,
-        errorInfo = ErrorInfo("Select Yes if you are the individual responsible for the software in your organisation").some
-      )
-
-      val question2 = Question.TextQuestion(
-        Question.Id("36b7e670-83fc-4b31-8f85-4d3394908495"),
-        Wording("Who is responsible for the software in your organisation?"),
-        statement = None,
-        label = Question.Label("First and last name").some,
-        errorInfo = ErrorInfo("Enter a first and last name", "First and last name cannot be blank").some
-      )
-
-      val question3 = Question.TextQuestion(
-        Question.Id("f2089e95-d0d7-4c31-835c-29c79f957733"),
-        Wording("What is the responsible individual's job title in your organisation?"),
-        statement = None,
-        label = Question.Label("Job title").some,
-        errorInfo = ErrorInfo("Enter a job title", "Job title cannot be blank").some
-      )
-
-      val question4 = Question.TextQuestion(
-        Question.Id("fb9b8036-cc88-4f4e-ad84-c02caa4cebae"),
-        Wording("Give us the email address of the individual responsible for the software"),
-        statement = Statement(
-          StatementText("We will use this email to invite the responsible individual to create an account on the Developer Hub."),
-          StatementText("The responsible individual must verify before your registration can be completed.")
-        ).some,
-        label = Question.Label("Email address").some,
-        hintText = StatementText("Cannot be a shared mailbox").some,
-        validation = TextValidation.Email.some,
-        errorInfo = ErrorInfo("Enter an email address in the correct format, like yourname@example.com", "Email address cannot be blank").some
-      )
-
-      val question5 = Question.TextQuestion(
-        Question.Id("a27b8039-cc32-4f2e-ad88-c96caa1cebae"),
-        Wording("Give us the telephone number of the individual responsible for the software"),
-        statement = Statement(
-          StatementText("We'll only use this to contact you about your organisation's Developer Hub account.")
-        ).some,
-        label = Question.Label("Telephone").some,
-        hintText = StatementText("You can enter an organisation, personal or extension number. Include the country code for international numbers.").some,
-        errorInfo = ErrorInfo("Enter a telephone number", "Telephone number cannot be blank").some
-      )
-
-      val questionnaire = Questionnaire(
-        id = Questionnaire.Id("be15b318-524a-4d10-89a5-4bfa52ed49c2"),
-        label = Questionnaire.Label("Enter responsible individual details"),
-        questions = NonEmptyList.of(
-          QuestionItem(question1),
-          QuestionItem(question2, AskWhen.AskWhenAnswer(question1, "No")),
-          QuestionItem(question3),
-          QuestionItem(question4, AskWhen.AskWhenAnswer(question1, "No")),
-          QuestionItem(question5)
-        )
-      )
-    }
-
     val allIndividualQuestionnaires = List(
-      OrganisationDetails.questionnaire,
-      ResponsibleIndividualDetails.questionnaire
+      ResponsibleIndividualDetails.questionnaire,
+      OrganisationDetails.questionnaire
     )
 
     val activeQuestionnaireGroupings =
