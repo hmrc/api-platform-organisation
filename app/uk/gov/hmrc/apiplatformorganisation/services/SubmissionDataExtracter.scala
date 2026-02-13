@@ -46,7 +46,6 @@ object SubmissionDataExtracter {
       case (Some("Sole trader"), _)                                                    => getTextQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationNameSoleId)
       case (Some("Registered society"), _)                                             => getTextQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationNameRsId)
       case (Some("Charitable Incorporated Organisation (CIO)"), _)                     => getTextQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationNameCioId)
-      case (Some("Unincorporated association"), _)                                     => getTextQuestionOfInterest(submission, Question.Id("7f6f52b5-a1e1-44c2-a794-0d2a03bd13ef")) // TODO - need to add to library
       case (Some("Non-UK company with a branch or place of business in the UK"), _)    =>
         getTextQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationNameNonUkWithId)
       case (Some("Non-UK company without a branch or place of business in the UK"), _) =>
@@ -73,7 +72,6 @@ object SubmissionDataExtracter {
       case (Some("Sole trader"), _)                                                    => Some(Organisation.OrganisationType.SoleTrader)
       case (Some("Registered society"), _)                                             => Some(Organisation.OrganisationType.RegisteredSociety)
       case (Some("Charitable Incorporated Organisation (CIO)"), _)                     => Some(Organisation.OrganisationType.CharitableIncorporatedOrganisation)
-      case (Some("Unincorporated association"), _)                                     => Some(Organisation.OrganisationType.UkLimitedCompany) // TODO - add new organisation type to lib
       case (Some("Non-UK company with a branch or place of business in the UK"), _)    => Some(Organisation.OrganisationType.NonUkWithPlaceOfBusinessInUk)
       case (Some("Non-UK company without a branch or place of business in the UK"), _) => Some(Organisation.OrganisationType.NonUkWithoutPlaceOfBusinessInUk)
       case (Some("Partnership"), Some("General partnership"))                          => Some(Organisation.OrganisationType.GeneralPartnership)
