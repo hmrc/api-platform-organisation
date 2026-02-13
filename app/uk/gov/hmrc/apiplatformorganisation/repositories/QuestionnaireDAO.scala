@@ -208,17 +208,6 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo("Your company address line one and postcode cannot be blank", "Enter your company address").some
       )
 
-      val questionLtdCorporationUTR = Question.TextQuestion(
-        Question.Id("6be23951-ac69-47bf-aa56-86d3d690ee0b"),
-        Wording("What’s the Unique Taxpayer Reference (UTR)?"),
-        statement = Statement(
-          StatementText("You can find it on tax returns or other tax documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’."),
-          StatementLink("Ask for a copy of your Corporation Tax UTR (opens in new tab)", "https://www.gov.uk/find-lost-utr-number")
-        ).some,
-        hintText = StatementText("Your UTR can be 10 or 13 digits long.").some,
-        errorInfo = ErrorInfo("Your Unique Taxpayer Reference cannot be blank", "Enter your Unique Taxpayer Reference, like 1234567890").some
-      )
-
       val questionLtdOrgWebsite = Question.TextQuestion(
         Question.Id("b2dbf6a1-e39b-4c38-a524-19f0854ca1cc"),
         Wording("What is your website URL?"),
@@ -298,10 +287,10 @@ object QuestionnaireDAO {
 
       val questionLpOrgName = Question.TextQuestion(
         Question.Id("3e215854-a596-4713-82e5-2b91cd2696b4"),
-        Wording("What is the company name?"),
+        Wording("What is the partnership name?"),
         statement = None,
         validation = TextValidation.OrganisationName.some,
-        errorInfo = ErrorInfo("Your company name cannot be blank", "Enter your company name").some
+        errorInfo = ErrorInfo("Your partnership name cannot be blank", "Enter your partnership name").some
       )
 
       val questionLpOrgAddress = Question.AddressQuestion(
@@ -344,10 +333,10 @@ object QuestionnaireDAO {
 
       val questionSlpOrgName = Question.TextQuestion(
         Question.Id("44fbfee9-d688-4f96-8c69-9781b318c210"),
-        Wording("What is the company name?"),
+        Wording("What is the partnership name?"),
         statement = None,
         validation = TextValidation.OrganisationName.some,
-        errorInfo = ErrorInfo("Your company name cannot be blank", "Enter your company name").some
+        errorInfo = ErrorInfo("Your partnership name cannot be blank", "Enter your partnership name").some
       )
 
       val questionSlpOrgAddress = Question.AddressQuestion(
@@ -382,7 +371,6 @@ object QuestionnaireDAO {
           // UK limited company
           QuestionItem(questionLtdCompanyNumber, AskWhen.AskWhenAnswer(questionOrgType, ukLimitedCompany)),
           QuestionItem(questionLtdOrgName, AskWhen.AskWhenAnswer(questionOrgType, ukLimitedCompany)),
-          QuestionItem(questionLtdCorporationUTR, AskWhen.AskWhenAnswer(questionOrgType, ukLimitedCompany)),
           QuestionItem(questionLtdOrgAddress, AskWhen.AskWhenAnswer(questionOrgType, ukLimitedCompany)),
           QuestionItem(questionLtdOrgWebsite, AskWhen.AskWhenAnswer(questionOrgType, ukLimitedCompany)),
           // Limited liability partnership
