@@ -107,7 +107,6 @@ object QuestionnaireDAO {
         Question.Id("0a49e1d6-0b28-45c5-94b7-adee5756d80e"),
         Wording("What’s your email address?"),
         statement = None,
-        label = Question.Label("Email address").some,
         hintText = StatementText("Cannot be a shared mailbox").some,
         validation = TextValidation.Email.some,
         errorInfo = ErrorInfo("Enter an email address in the correct format, like yourname@example.com", "Email address cannot be blank").some
@@ -125,7 +124,6 @@ object QuestionnaireDAO {
         Question.Id("a27b8039-cc32-4f2e-ad88-c96caa1cebae"),
         Wording("What’s your phone number?"),
         statement = None,
-        label = Question.Label("Telephone").some,
         hintText = StatementText("Include the country code for international numbers.").some,
         errorInfo = ErrorInfo("Enter a telephone number", "Telephone number cannot be blank").some
       )
@@ -191,22 +189,22 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo("Your company name cannot be blank", "Enter your company name").some
       )
 
-      val questionLtdOrgUTR = Question.TextQuestion(
-        Question.Id("6be23951-ac69-47bf-aa56-86d3d690ee0b"),
-        Wording("What’s the Unique Taxpayer Reference (UTR)?"),
-        statement = Statement(
-          StatementText("It will be on tax returns and other letters about Corporation Tax. It may be called ‘reference’, ‘UTR’ or ‘official use’."),
-          StatementLink("Ask for a copy of your Corporation Tax UTR (opens in new tab)", "https://www.gov.uk/find-lost-utr-number")
-        ).some,
-        hintText = StatementText("Your UTR can be 10 or 13 digits long.").some,
-        errorInfo = ErrorInfo("Your  Unique Taxpayer Reference cannot be blank", "Enter your Unique Taxpayer Reference, like 1234567890").some
-      )
-
       val questionLtdOrgAddress = Question.AddressQuestion(
         Question.Id("e1dbf1a3-e28b-1c83-a739-86f1319ca8cc"),
         Wording("Enter the company’s registered address"),
         statement = None,
         errorInfo = ErrorInfo("Your company address line one and postcode cannot be blank", "Enter your company address").some
+      )
+
+      val questionLtdOrgUTR = Question.TextQuestion(
+        Question.Id("6be23951-ac69-47bf-aa56-86d3d690ee0b"),
+        Wording("What’s the Unique Taxpayer Reference (UTR)?"),
+        statement = Statement(
+          StatementText("You can find it on tax returns or other tax documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’."),
+          StatementLink("Ask for a copy of your Corporation Tax UTR (opens in new tab)", "https://www.gov.uk/find-lost-utr-number")
+        ).some,
+        hintText = StatementText("Your UTR can be 10 or 13 digits long.").some,
+        errorInfo = ErrorInfo("Your  Unique Taxpayer Reference cannot be blank", "Enter your Unique Taxpayer Reference, like 1234567890").some
       )
 
       val questionLtdOrgWebsite = Question.TextQuestion(
@@ -248,6 +246,13 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo("Your partnership name cannot be blank", "Enter your partnership name").some
       )
 
+      val questionLlpOrgAddress = Question.AddressQuestion(
+        Question.Id("cac2fd7a-954f-4e91-a248-0b23fe4b0245"),
+        Wording("Enter the registered address of the partnership"),
+        statement = None,
+        errorInfo = ErrorInfo("Your partnership address cannot be blank", "Enter your partnership address").some
+      )
+
       val questionLlpOrgUTR = Question.TextQuestion(
         Question.Id("9afb292a-692a-4b85-b13b-71c048a39b77"),
         Wording("Your Partnership Unique Taxpayer Reference (UTR)"),
@@ -257,13 +262,6 @@ object QuestionnaireDAO {
         ).some,
         hintText = StatementText("Your UTR can be 10 or 13 digits long.").some,
         errorInfo = ErrorInfo("Your  Unique Taxpayer Reference cannot be blank", "Enter your Unique Taxpayer Reference, like 1234567890").some
-      )
-
-      val questionLlpOrgAddress = Question.AddressQuestion(
-        Question.Id("cac2fd7a-954f-4e91-a248-0b23fe4b0245"),
-        Wording("Enter the registered address of the partnership"),
-        statement = None,
-        errorInfo = ErrorInfo("Your partnership address cannot be blank", "Enter your partnership address").some
       )
 
       val questionLlpOrgWebsite = Question.TextQuestion(
@@ -305,6 +303,13 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo("Your partnership name cannot be blank", "Enter your partnership name").some
       )
 
+      val questionLpOrgAddress = Question.AddressQuestion(
+        Question.Id("5094e40c-aebe-4381-9af6-c7b42d0163cb"),
+        Wording("Enter the registered address for the partnership"),
+        statement = None,
+        errorInfo = ErrorInfo("Your partnership address cannot be blank", "Enter your partnership address").some
+      )
+
       val questionLpOrgUTR = Question.TextQuestion(
         Question.Id("6503f9bd-6305-4cb6-bce1-780ded71e23f"),
         Wording("Your Partnership Unique Taxpayer Reference (UTR)"),
@@ -314,13 +319,6 @@ object QuestionnaireDAO {
         ).some,
         hintText = StatementText("Your UTR can be 10 or 13 digits long.").some,
         errorInfo = ErrorInfo("Your  Unique Taxpayer Reference cannot be blank", "Enter your Unique Taxpayer Reference, like 1234567890").some
-      )
-
-      val questionLpOrgAddress = Question.AddressQuestion(
-        Question.Id("5094e40c-aebe-4381-9af6-c7b42d0163cb"),
-        Wording("Enter the registered address for the partnership"),
-        statement = None,
-        errorInfo = ErrorInfo("Your partnership address cannot be blank", "Enter your partnership address").some
       )
 
       val questionLpOrgWebsite = Question.TextQuestion(
@@ -362,6 +360,13 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo("Your partnership name cannot be blank", "Enter your partnership name").some
       )
 
+      val questionSlpOrgAddress = Question.AddressQuestion(
+        Question.Id("e4419ecd-b79a-4a04-aa1b-8d3bcfecd286"),
+        Wording("Enter the registered address for the partnership"),
+        statement = None,
+        errorInfo = ErrorInfo("Your partnership address cannot be blank", "Enter your partnership address").some
+      )
+
       val questionSlpOrgUTR = Question.TextQuestion(
         Question.Id("6503f9bd-6305-4cb6-bce1-780ded71e23f"),
         Wording("Your Partnership Unique Taxpayer Reference (UTR)"),
@@ -371,13 +376,6 @@ object QuestionnaireDAO {
         ).some,
         hintText = StatementText("Your UTR can be 10 or 13 digits long.").some,
         errorInfo = ErrorInfo("Your  Unique Taxpayer Reference cannot be blank", "Enter your Unique Taxpayer Reference, like 1234567890").some
-      )
-
-      val questionSlpOrgAddress = Question.AddressQuestion(
-        Question.Id("e4419ecd-b79a-4a04-aa1b-8d3bcfecd286"),
-        Wording("Enter the registered address for the partnership"),
-        statement = None,
-        errorInfo = ErrorInfo("Your partnership address cannot be blank", "Enter your partnership address").some
       )
 
       val questionSlpOrgWebsite = Question.TextQuestion(
@@ -405,26 +403,26 @@ object QuestionnaireDAO {
           // UK limited company
           QuestionItem(questionLtdCompanyNumber, AskWhen.AskWhenAnswer(questionOrgType, ukLimitedCompany)),
           QuestionItem(questionLtdOrgName, AskWhen.AskWhenAnswer(questionOrgType, ukLimitedCompany)),
-          QuestionItem(questionLtdOrgUTR, AskWhen.AskWhenAnswer(questionOrgType, ukLimitedCompany)),
           QuestionItem(questionLtdOrgAddress, AskWhen.AskWhenAnswer(questionOrgType, ukLimitedCompany)),
+          QuestionItem(questionLtdOrgUTR, AskWhen.AskWhenAnswer(questionOrgType, ukLimitedCompany)),
           QuestionItem(questionLtdOrgWebsite, AskWhen.AskWhenAnswer(questionOrgType, ukLimitedCompany)),
           // Limited liability partnership
           QuestionItem(questionLlpCompanyNumber, AskWhen.AskWhenAnswer(questionOrgType, limitedLiabilityPartnership)),
           QuestionItem(questionLlpOrgName, AskWhen.AskWhenAnswer(questionOrgType, limitedLiabilityPartnership)),
-          QuestionItem(questionLlpOrgUTR, AskWhen.AskWhenAnswer(questionOrgType, limitedLiabilityPartnership)),
           QuestionItem(questionLlpOrgAddress, AskWhen.AskWhenAnswer(questionOrgType, limitedLiabilityPartnership)),
+          QuestionItem(questionLlpOrgUTR, AskWhen.AskWhenAnswer(questionOrgType, limitedLiabilityPartnership)),
           QuestionItem(questionLlpOrgWebsite, AskWhen.AskWhenAnswer(questionOrgType, limitedLiabilityPartnership)),
           // Limited partnership
           QuestionItem(questionLpCompanyNumber, AskWhen.AskWhenAnswer(questionOrgType, limitedPartnership)),
           QuestionItem(questionLpOrgName, AskWhen.AskWhenAnswer(questionOrgType, limitedPartnership)),
-          QuestionItem(questionLpOrgUTR, AskWhen.AskWhenAnswer(questionOrgType, limitedPartnership)),
           QuestionItem(questionLpOrgAddress, AskWhen.AskWhenAnswer(questionOrgType, limitedPartnership)),
+          QuestionItem(questionLpOrgUTR, AskWhen.AskWhenAnswer(questionOrgType, limitedPartnership)),
           QuestionItem(questionLpOrgWebsite, AskWhen.AskWhenAnswer(questionOrgType, limitedPartnership)),
           // Scottish limited partnership
           QuestionItem(questionSlpCompanyNumber, AskWhen.AskWhenAnswer(questionOrgType, scottishLimitedPartnership)),
           QuestionItem(questionSlpOrgName, AskWhen.AskWhenAnswer(questionOrgType, scottishLimitedPartnership)),
-          QuestionItem(questionSlpOrgUTR, AskWhen.AskWhenAnswer(questionOrgType, scottishLimitedPartnership)),
           QuestionItem(questionSlpOrgAddress, AskWhen.AskWhenAnswer(questionOrgType, scottishLimitedPartnership)),
+          QuestionItem(questionSlpOrgUTR, AskWhen.AskWhenAnswer(questionOrgType, scottishLimitedPartnership)),
           QuestionItem(questionSlpOrgWebsite, AskWhen.AskWhenAnswer(questionOrgType, scottishLimitedPartnership)),
           // None of the above
           QuestionItem(questionNoneOfTheAbove, AskWhen.AskWhenAnswer(questionOrgType, noneOfTheAbove))
