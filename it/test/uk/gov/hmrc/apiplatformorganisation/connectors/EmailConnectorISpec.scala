@@ -60,7 +60,7 @@ class EmailConnectorISpec
     "sendRegisteredMemberAddedConfirmation" should {
       "return HasSucceeded when hmrc email returns 200" in new Setup {
         val request =
-          SendEmailRequest(recipients, "apiAddedRegisteredMemberToOrganisationConfirmation", Map("sdstEmailAddress" -> "SDSTeam@hmrc.gov.uk", "organisationName" -> orgName.value))
+          SendEmailRequest(recipients, "apiAddedRegisteredMemberToOrganisationConfirmation", Map("organisationName" -> orgName.value))
         SendEmail.stubSuccess(request)
 
         val result = await(objInTest.sendRegisteredMemberAddedConfirmation(orgName, recipients))
@@ -82,7 +82,7 @@ class EmailConnectorISpec
           SendEmailRequest(
             recipients,
             "apiAddedUnregisteredMemberToOrganisationConfirmation",
-            Map("sdstEmailAddress" -> "SDSTeam@hmrc.gov.uk", "organisationName" -> orgName.value)
+            Map("organisationName" -> orgName.value)
           )
         SendEmail.stubSuccess(request)
 
