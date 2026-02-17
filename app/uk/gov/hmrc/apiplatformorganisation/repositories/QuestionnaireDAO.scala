@@ -93,26 +93,7 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo("Enter a first and last name", "First and last name cannot be blank").some
       )
 
-      val question3 = Question.YesNoQuestion(
-        Question.Id("fb9b8036-cc88-4f4e-ad84-c02caa4cebae"),
-        Wording("Is this the email address we should use to contact you?"),
-        statement = None,
-        hintText = StatementText("This email address cannot be a shared mailbox.").some,
-        yesMarking = Mark.Pass,
-        noMarking = Mark.Pass,
-        errorInfo = ErrorInfo("Select Yes if your email address is correct").some
-      )
-
-      val question4 = Question.TextQuestion(
-        Question.Id("0a49e1d6-0b28-45c5-94b7-adee5756d80e"),
-        Wording("What’s your email address?"),
-        statement = None,
-        hintText = StatementText("Cannot be a shared mailbox").some,
-        validation = TextValidation.Email.some,
-        errorInfo = ErrorInfo("Enter an email address in the correct format, like yourname@example.com", "Email address cannot be blank").some
-      )
-
-      val question5 = Question.TextQuestion(
+      val question3 = Question.TextQuestion(
         Question.Id("f2089e95-d0d7-4c31-835c-29c79f957733"),
         Wording("What’s your job title?"),
         statement = None,
@@ -120,11 +101,11 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo("Enter a job title", "Job title cannot be blank").some
       )
 
-      val question6 = Question.TextQuestion(
+      val question4 = Question.TextQuestion(
         Question.Id("a27b8039-cc32-4f2e-ad88-c96caa1cebae"),
         Wording("What’s your phone number?"),
         statement = None,
-        hintText = StatementText("Include the country code for international numbers.").some,
+        hintText = StatementText("For international numbers include the country code.").some,
         errorInfo = ErrorInfo("Enter a telephone number", "Telephone number cannot be blank").some
       )
 
@@ -135,9 +116,7 @@ object QuestionnaireDAO {
           QuestionItem(question1),
           QuestionItem(question2, AskWhen.AskWhenAnswer(question1, "No")),
           QuestionItem(question3),
-          QuestionItem(question4, AskWhen.AskWhenAnswer(question3, "No")),
-          QuestionItem(question5),
-          QuestionItem(question6)
+          QuestionItem(question4)
         )
       )
     }
