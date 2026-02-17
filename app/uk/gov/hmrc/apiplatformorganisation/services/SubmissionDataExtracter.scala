@@ -21,47 +21,16 @@ import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
 
 object SubmissionDataExtracter {
 
-  private def getTextQuestionOfInterest(submission: Submission, questionId: Question.Id) = {
-    val actualAnswer: ActualAnswer = submission.latestInstance.answersToQuestions.getOrElse(questionId, ActualAnswer.NoAnswer)
-    actualAnswer match {
-      case ActualAnswer.TextAnswer(answer) => Some(answer)
-      case _                               => None
-    }
-  }
-
-  private def getSingleChoiceQuestionOfInterest(submission: Submission, questionId: Question.Id) = {
-    val actualAnswer: ActualAnswer = submission.latestInstance.answersToQuestions.getOrElse(questionId, ActualAnswer.NoAnswer)
-    actualAnswer match {
-      case ActualAnswer.SingleChoiceAnswer(answer) => Some(answer)
-      case _                                       => None
-    }
-  }
-
   def getOrganisationName(submission: Submission): Option[OrganisationName] = {
-    val orgType = getSingleChoiceQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationTypeId)
+    val orgName = submission.organisationName
 
-    val maybeOrgName: Option[String] = orgType match {
-      case Some("UK limited company")            => getTextQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationNameLtdId)
-      case Some("Limited liability partnership") => getTextQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationNameLlpId)
-      case Some("Limited partnership")           => getTextQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationNameLpId)
-      case Some("Scottish limited partnership")  => getTextQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationNameSlpId)
-      case _                                     => None
-    }
-    maybeOrgName match {
-      case Some(orgName) => Some(OrganisationName(orgName))
-      case _             => None
+    orgName match {
+      case "n/a" => None
+      case _     => Some(OrganisationName(orgName))
     }
   }
 
   def getOrganisationType(submission: Submission): Option[Organisation.OrganisationType] = {
-    val orgType = getSingleChoiceQuestionOfInterest(submission, submission.questionIdsOfInterest.organisationTypeId)
-
-    orgType match {
-      case Some("UK limited company")            => Some(Organisation.OrganisationType.UkLimitedCompany)
-      case Some("Limited liability partnership") => Some(Organisation.OrganisationType.LimitedLiabilityPartnership)
-      case Some("Limited partnership")           => Some(Organisation.OrganisationType.LimitedPartnership)
-      case Some("Scottish limited partnership")  => Some(Organisation.OrganisationType.ScottishLimitedPartnership)
-      case _                                     => None
-    }
+    submission.organisationType
   }
 }

@@ -55,19 +55,13 @@ object QuestionnaireDAO {
 
   // *** Note - change this if the questions change. ***
   val questionIdsOfInterest = QuestionIdsOfInterest(
-    organisationTypeId = OrganisationDetails.questionOrgType.id,
-    partnershipTypeId = notApplicableQuestionId,
-    organisationNameLtdId = OrganisationDetails.questionLtdOrgName.id,
-    organisationNameSoleId = notApplicableQuestionId,
-    organisationNameRsId = notApplicableQuestionId,
-    organisationNameCioId = notApplicableQuestionId,
-    organisationNameNonUkWithId = notApplicableQuestionId,
-    organisationNameNonUkWithoutId = notApplicableQuestionId,
-    organisationNameGpId = notApplicableQuestionId,
-    organisationNameLlpId = OrganisationDetails.questionLlpOrgName.id,
-    organisationNameLpId = OrganisationDetails.questionLpOrgName.id,
-    organisationNameSpId = notApplicableQuestionId,
-    organisationNameSlpId = OrganisationDetails.questionSlpOrgName.id
+    Map(
+      "organisationTypeId"    -> OrganisationDetails.questionOrgType.id,
+      "organisationNameLtdId" -> OrganisationDetails.questionLtdOrgName.id,
+      "organisationNameLlpId" -> OrganisationDetails.questionLlpOrgName.id,
+      "organisationNameLpId"  -> OrganisationDetails.questionLpOrgName.id,
+      "organisationNameSlpId" -> OrganisationDetails.questionSlpOrgName.id
+    )
   )
 
   object Questionnaires {
