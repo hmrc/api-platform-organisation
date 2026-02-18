@@ -25,7 +25,7 @@ import cats.data.NonEmptyList
 import cats.implicits._
 
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
-import uk.gov.hmrc.apiplatformorganisation.repositories.QuestionnaireDAO.Questionnaires.OrganisationDetails
+import uk.gov.hmrc.apiplatformorganisation.repositories.QuestionnaireDAO.Questionnaires.{OrganisationDetails, ResponsibleIndividualDetails}
 
 @Singleton
 class QuestionnaireDAO @Inject() (implicit ec: ExecutionContext) {
@@ -56,11 +56,12 @@ object QuestionnaireDAO {
   // *** Note - change this if the questions change. ***
   val questionIdsOfInterest = QuestionIdsOfInterest(
     Map(
-      "organisationTypeId"    -> OrganisationDetails.questionOrgType.id,
-      "organisationNameLtdId" -> OrganisationDetails.questionLtdOrgName.id,
-      "organisationNameLlpId" -> OrganisationDetails.questionLlpOrgName.id,
-      "organisationNameLpId"  -> OrganisationDetails.questionLpOrgName.id,
-      "organisationNameSlpId" -> OrganisationDetails.questionSlpOrgName.id
+      "organisationTypeId"          -> OrganisationDetails.questionOrgType.id,
+      "organisationNameLtdId"       -> OrganisationDetails.questionLtdOrgName.id,
+      "organisationNameLlpId"       -> OrganisationDetails.questionLlpOrgName.id,
+      "organisationNameLpId"        -> OrganisationDetails.questionLpOrgName.id,
+      "organisationNameSlpId"       -> OrganisationDetails.questionSlpOrgName.id,
+      "responsibleIndividualNameId" -> ResponsibleIndividualDetails.questionRIName.id
     )
   )
 
@@ -70,7 +71,7 @@ object QuestionnaireDAO {
 
     object ResponsibleIndividualDetails {
 
-      val question1 = Question.YesNoQuestion(
+      val questionRIConfirmName = Question.YesNoQuestion(
         Question.Id("a8f3a6b4-cff0-4bb5-b38f-fd224b4715d5"),
         Wording("Is this your name?"),
         statement = None,
@@ -79,7 +80,7 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo("Select Yes if your name is correct").some
       )
 
-      val question2 = Question.TextQuestion(
+      val questionRIName = Question.TextQuestion(
         Question.Id("f04afc8a-08e6-4a90-b6f3-3d6ffed6a373"),
         Wording("What is your name?"),
         statement = None,
@@ -87,7 +88,7 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo("Enter a first and last name", "First and last name cannot be blank").some
       )
 
-      val question3 = Question.TextQuestion(
+      val questionRIJobTitle = Question.TextQuestion(
         Question.Id("f2089e95-d0d7-4c31-835c-29c79f957733"),
         Wording("What’s your job title?"),
         statement = None,
@@ -95,7 +96,7 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo("Enter a job title", "Job title cannot be blank").some
       )
 
-      val question4 = Question.TextQuestion(
+      val questionRIPhone = Question.TextQuestion(
         Question.Id("a27b8039-cc32-4f2e-ad88-c96caa1cebae"),
         Wording("What’s your phone number?"),
         statement = None,
@@ -107,10 +108,10 @@ object QuestionnaireDAO {
         id = Questionnaire.Id("be15b318-524a-4d10-89a5-4bfa52ed49c2"),
         label = Questionnaire.Label("About you"),
         questions = NonEmptyList.of(
-          QuestionItem(question1),
-          QuestionItem(question2, AskWhen.AskWhenAnswer(question1, "No")),
-          QuestionItem(question3),
-          QuestionItem(question4)
+          QuestionItem(questionRIConfirmName),
+          QuestionItem(questionRIName, AskWhen.AskWhenAnswer(questionRIConfirmName, "No")),
+          QuestionItem(questionRIJobTitle),
+          QuestionItem(questionRIPhone)
         )
       )
     }
