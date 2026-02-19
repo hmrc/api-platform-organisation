@@ -74,7 +74,7 @@ object QuestionnaireDAO {
       val questionRIConfirmName = Question.YesNoQuestion(
         Question.Id("a8f3a6b4-cff0-4bb5-b38f-fd224b4715d5"),
         Wording("Is this your name?"),
-        statement = None,
+        statement = Some(Statement(StatementText("{userName}"))),
         yesMarking = Mark.Pass,
         noMarking = Mark.Pass,
         errorInfo = ErrorInfo("Select Yes if your name is correct").some
