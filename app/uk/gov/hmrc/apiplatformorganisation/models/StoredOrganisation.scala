@@ -22,7 +22,7 @@ import play.api.libs.json._
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, Organisation, OrganisationName}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Collaborator, Collaborators, Organisation, OrganisationName}
 
 case class StoredOrganisation(
     id: OrganisationId,
@@ -30,7 +30,7 @@ case class StoredOrganisation(
     organisationType: Organisation.OrganisationType,
     createdDateTime: Instant,
     requestedBy: UserId,
-    members: Set[Member]
+    collaborators: Set[Collaborator]
   )
 
 object StoredOrganisation {
@@ -38,11 +38,11 @@ object StoredOrganisation {
   implicit val storedOrganisationFormat: OFormat[StoredOrganisation] = Json.format[StoredOrganisation]
 
   def create(organisationName: OrganisationName, organisationType: Organisation.OrganisationType, requestedBy: UserId, createdTime: Instant): StoredOrganisation = {
-    val member = Member(requestedBy)
-    StoredOrganisation(OrganisationId.random, organisationName, organisationType, createdTime, requestedBy, Set(member))
+    val responsibleIndividual = Collaborators.ResponsibleIndividual(requestedBy)
+    StoredOrganisation(OrganisationId.random, organisationName, organisationType, createdTime, requestedBy, Set(responsibleIndividual))
   }
 
   def asOrganisation(data: StoredOrganisation): Organisation = {
-    Organisation(data.id, data.name, data.organisationType, data.createdDateTime, data.members)
+    Organisation(data.id, data.name, data.organisationType, data.createdDateTime, data.collaborators)
   }
 }

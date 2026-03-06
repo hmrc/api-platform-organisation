@@ -59,12 +59,12 @@ trait OrganisationRepositoryMockModule extends MockitoSugar with ArgumentMatcher
         verify(aMock).search(eqTo(organisationName))
     }
 
-    object AddMember {
-      def willReturn(org: StoredOrganisation) = when(aMock.addMember(*[OrganisationId], *)).thenReturn(Future.successful(org))
+    object AddCollaborator {
+      def willReturn(org: StoredOrganisation) = when(aMock.addCollaborator(*[OrganisationId], *)).thenReturn(Future.successful(org))
     }
 
-    object RemoveMember {
-      def willReturn(org: StoredOrganisation) = when(aMock.removeMember(*[OrganisationId], *)).thenReturn(Future.successful(org))
+    object RemoveCollaborator {
+      def willReturn(org: StoredOrganisation) = when(aMock.removeCollaborator(*[OrganisationId], *[UserId])).thenReturn(Future.successful(org))
     }
   }
 }

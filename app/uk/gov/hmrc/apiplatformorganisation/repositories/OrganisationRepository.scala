@@ -25,11 +25,12 @@ import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.Sorts.descending
 import org.mongodb.scala.model._
 
+import play.api.libs.json.Json
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Member
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Collaborator
 import uk.gov.hmrc.apiplatformorganisation.models.StoredOrganisation
 
 @Singleton
@@ -59,9 +60,9 @@ class OrganisationRepository @Inject() (mongo: MongoComponent)(implicit val ec: 
             .background(true)
         ),
         IndexModel(
-          ascending("members.userId"),
+          ascending("collaborators.userId"),
           IndexOptions()
-            .name("membersUserIdIndex")
+            .name("collaboratorsUserIdIndex")
             .background(true)
         )
       ),
@@ -76,7 +77,7 @@ class OrganisationRepository @Inject() (mongo: MongoComponent)(implicit val ec: 
   def fetchByUserId(id: UserId): Future[List[StoredOrganisation]] = {
     collection
       .withReadPreference(com.mongodb.ReadPreference.primary())
-      .find(equal("members.userId", Codecs.toBson(id)))
+      .find(equal("collaborators.userId", Codecs.toBson(id)))
       .sort(descending("createdDateTime"))
   }.toFuture().map(seq => seq.toList)
 
@@ -102,21 +103,21 @@ class OrganisationRepository @Inject() (mongo: MongoComponent)(implicit val ec: 
     }
   }
 
-  def addMember(organisationId: OrganisationId, member: Member): Future[StoredOrganisation] =
+  def addCollaborator(organisationId: OrganisationId, collaborator: Collaborator): Future[StoredOrganisation] =
     updateOrganisation(
       organisationId,
       Updates.push(
-        "members",
-        Codecs.toBson(member)
+        "collaborators",
+        Codecs.toBson(collaborator)
       )
     )
 
-  def removeMember(organisationId: OrganisationId, member: Member): Future[StoredOrganisation] =
+  def removeCollaborator(organisationId: OrganisationId, userId: UserId): Future[StoredOrganisation] =
     updateOrganisation(
       organisationId,
       Updates.pull(
-        "members",
-        Codecs.toBson(member)
+        "collaborators",
+        Codecs.toBson(Json.obj("userId" -> userId))
       )
     )
 
