@@ -24,7 +24,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, OrganisationId, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.services.{ClockNow, EitherTHelper}
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, Organisation, OrganisationName}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Collaborator, Organisation, OrganisationName}
 import uk.gov.hmrc.apiplatform.modules.tpd.core.dto.{GetRegisteredOrUnregisteredUsersResponse, RegisteredOrUnregisteredUser}
 import uk.gov.hmrc.apiplatformorganisation.connectors.{EmailConnector, ThirdPartyDeveloperConnector}
 import uk.gov.hmrc.apiplatformorganisation.models._
@@ -61,27 +61,28 @@ class OrganisationService @Inject() (
     }
   }
 
-  def addMember(organisationId: OrganisationId, email: LaxEmailAddress)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Either[String, Organisation]] = {
+  def addCollaborator(organisationId: OrganisationId, email: LaxEmailAddress, role: Collaborator.Role)(implicit ec: ExecutionContext, hc: HeaderCarrier)
+      : Future[Either[String, Organisation]] = {
     (
       for {
         organisation        <- fromOptionF(organisationRepository.fetch(organisationId), "Organisation not found")
         userId              <- liftF(thirdPartyDeveloperConnector.getOrCreateUserId(email))
-        member               = Member(userId)
-        _                   <- cond(!organisation.members.contains(member), (), "Organisation already contains member")
+        collaborator         = Collaborator.apply(role, userId)
+        _                   <- cond(!isCollaboratorOnApp(organisation.collaborators, userId), (), "Organisation already contains member")
         addedUserDetails    <- fromOptionF(
                                  thirdPartyDeveloperConnector.getRegisteredOrUnregisteredUsers(List(userId))
                                    .map(response => response.users.headOption),
                                  "Added user not found"
                                )
-        existingUserDetails <- liftF(thirdPartyDeveloperConnector.getRegisteredOrUnregisteredUsers(getMembersUserIds(organisation)))
-        updatedOrganisation <- liftF(organisationRepository.addMember(organisationId, member).map(StoredOrganisation.asOrganisation))
-        _                    = sendMemberAddedConfirmationEmail(addedUserDetails, organisation.name)
-        _                    = emailConnector.sendMemberAddedNotification(organisation.name, email, "Member", getVerifiedUserEmails(existingUserDetails))
+        existingUserDetails <- liftF(thirdPartyDeveloperConnector.getRegisteredOrUnregisteredUsers(getCollaboratorsUserIds(organisation)))
+        updatedOrganisation <- liftF(organisationRepository.addCollaborator(organisationId, collaborator).map(StoredOrganisation.asOrganisation))
+        _                    = sendCollaboratorAddedConfirmationEmail(addedUserDetails, organisation.name)
+        _                    = emailConnector.sendMemberAddedNotification(organisation.name, email, role.displayText, getVerifiedUserEmails(existingUserDetails))
       } yield updatedOrganisation
     ).value
   }
 
-  private def sendMemberAddedConfirmationEmail(userDetails: RegisteredOrUnregisteredUser, organisationName: OrganisationName)(implicit hc: HeaderCarrier) = {
+  private def sendCollaboratorAddedConfirmationEmail(userDetails: RegisteredOrUnregisteredUser, organisationName: OrganisationName)(implicit hc: HeaderCarrier) = {
     if (userDetails.isRegistered) {
       emailConnector.sendRegisteredMemberAddedConfirmation(organisationName, Set(userDetails.email))
     } else {
@@ -89,23 +90,30 @@ class OrganisationService @Inject() (
     }
   }
 
-  private def getMembersUserIds(organisation: StoredOrganisation): List[UserId] = {
-    organisation.members.map(member => member.userId).toList
+  private def getCollaboratorsUserIds(organisation: StoredOrganisation): List[UserId] = {
+    organisation.collaborators.map(collaborator => collaborator.userId).toList
   }
 
   private def getVerifiedUserEmails(response: GetRegisteredOrUnregisteredUsersResponse): Set[LaxEmailAddress] = {
     response.users.filter(user => user.isVerified).map(user => user.email).toSet
   }
 
-  def removeMember(organisationId: OrganisationId, userId: UserId, email: LaxEmailAddress)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Either[String, Organisation]] = {
-    val member = Member(userId)
+  private def isCollaboratorOnApp(collaborators: Set[Collaborator], userId: UserId): Boolean = {
+    collaborators.find(collaborator => collaborator.userId == userId) match {
+      case Some(c) => true
+      case _       => false
+    }
+  }
+
+  def removeCollaborator(organisationId: OrganisationId, userId: UserId, email: LaxEmailAddress)(implicit ec: ExecutionContext, hc: HeaderCarrier)
+      : Future[Either[String, Organisation]] = {
     (
       for {
         organisation        <- fromOptionF(organisationRepository.fetch(organisationId), "Organisation not found")
-        _                   <- cond(organisation.members.contains(member), (), "Organisation does not contain member")
-        updatedOrganisation <- liftF(organisationRepository.removeMember(organisationId, member).map(StoredOrganisation.asOrganisation))
+        _                   <- cond(isCollaboratorOnApp(organisation.collaborators, userId), (), "Organisation does not contain member")
+        updatedOrganisation <- liftF(organisationRepository.removeCollaborator(organisationId, userId).map(StoredOrganisation.asOrganisation))
         _                    = emailConnector.sendMemberRemovedConfirmation(organisation.name, Set(email))
-        userDetails         <- liftF(thirdPartyDeveloperConnector.getRegisteredOrUnregisteredUsers(getMembersUserIds(organisation)))
+        userDetails         <- liftF(thirdPartyDeveloperConnector.getRegisteredOrUnregisteredUsers(getCollaboratorsUserIds(organisation)))
         _                    = emailConnector.sendMemberRemovedNotification(organisation.name, email, "Member", getVerifiedUserEmails(userDetails))
       } yield updatedOrganisation
     ).value

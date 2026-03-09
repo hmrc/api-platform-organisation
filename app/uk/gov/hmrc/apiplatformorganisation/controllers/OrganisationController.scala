@@ -58,15 +58,15 @@ class OrganisationController @Inject() (cc: ControllerComponents, organisationSe
     organisationService.search(request.body.params.find(_._1 == "organisationName").map(_._2)).map(orgs => Ok(Json.toJson(orgs)))
   }
 
-  def addMember(organisationId: OrganisationId): Action[AddMemberRequest] = Action.async(parse.json[AddMemberRequest]) { implicit request =>
+  def addCollaborator(organisationId: OrganisationId): Action[AddMemberRequest] = Action.async(parse.json[AddMemberRequest]) { implicit request =>
     val failed  = (msg: String) => BadRequest(Json.toJson(ErrorMessage(msg)))
     val success = (o: Organisation) => Ok(Json.toJson(o))
-    organisationService.addMember(organisationId, request.body.email).map(_.fold(failed, success))
+    organisationService.addCollaborator(organisationId, request.body.email, request.body.role).map(_.fold(failed, success))
   }
 
-  def removeMember(organisationId: OrganisationId, userId: UserId) = Action.async(parse.json[RemoveMemberRequest]) { implicit request =>
+  def removeCollaborator(organisationId: OrganisationId, userId: UserId) = Action.async(parse.json[RemoveMemberRequest]) { implicit request =>
     val failed  = (msg: String) => BadRequest(Json.toJson(ErrorMessage(msg)))
     val success = (o: Organisation) => Ok(Json.toJson(o))
-    organisationService.removeMember(organisationId, userId, request.body.email).map(_.fold(failed, success))
+    organisationService.removeCollaborator(organisationId, userId, request.body.email).map(_.fold(failed, success))
   }
 }

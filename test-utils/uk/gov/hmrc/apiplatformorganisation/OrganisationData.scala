@@ -18,7 +18,8 @@ package uk.gov.hmrc.apiplatformorganisation
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, OrganisationId, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, Organisation, OrganisationName}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Collaborator.Roles
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Collaborator, Collaborators, Organisation, OrganisationName}
 import uk.gov.hmrc.apiplatformorganisation.models._
 
 object OrganisationIdData {
@@ -38,7 +39,7 @@ object UserIdData {
 }
 
 object MemberData {
-  val one: Member = Member(UserIdData.one)
+  val one: Collaborator = Collaborators.ResponsibleIndividual(UserIdData.one)
 }
 
 object CreateOrganisationRequestData {
@@ -46,7 +47,7 @@ object CreateOrganisationRequestData {
 }
 
 object AddMemberRequestData {
-  val one: AddMemberRequest = AddMemberRequest(LaxEmailAddress("bob@example.com"))
+  val one: AddMemberRequest = AddMemberRequest(LaxEmailAddress("bob@example.com"), Roles.Member)
 }
 
 object RemoveMemberRequestData {

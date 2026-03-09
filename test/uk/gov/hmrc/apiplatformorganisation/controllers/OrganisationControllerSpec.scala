@@ -130,36 +130,36 @@ class OrganisationControllerSpec extends AnyWordSpec with Matchers with Organisa
     }
   }
 
-  "addMember" should {
+  "addCollaborator" should {
     "return 200" in {
-      OrganisationServiceMock.AddMember.thenReturn(standardOrg)
+      OrganisationServiceMock.AddCollaborator.thenReturn(standardOrg)
       val fakeRequest = FakeRequest("PUT", s"/organisation/${standardOrg.id}/member").withHeaders("content-type" -> "application/json")
-      val result      = controller.addMember(standardOrg.id)(fakeRequest.withBody(standardAddMemberRequest))
+      val result      = controller.addCollaborator(standardOrg.id)(fakeRequest.withBody(standardAddMemberRequest))
       status(result) shouldBe Status.OK
       contentAsJson(result) shouldBe Json.toJson(standardOrg)
     }
 
     "return 400" in {
-      OrganisationServiceMock.AddMember.thenFails("Organisation not found")
+      OrganisationServiceMock.AddCollaborator.thenFails("Organisation not found")
       val fakeRequest = FakeRequest("PUT", s"/organisation/${standardOrg.id}/member").withHeaders("content-type" -> "application/json")
-      val result      = controller.addMember(standardOrg.id)(fakeRequest.withBody(standardAddMemberRequest))
+      val result      = controller.addCollaborator(standardOrg.id)(fakeRequest.withBody(standardAddMemberRequest))
       status(result) shouldBe Status.BAD_REQUEST
     }
   }
 
-  "removeMember" should {
+  "removeCollaborator" should {
     "return 200" in {
-      OrganisationServiceMock.RemoveMember.thenReturn(standardOrg)
+      OrganisationServiceMock.RemoveCollaborator.thenReturn(standardOrg)
       val fakeRequest = FakeRequest("DELETE", s"/organisation/${standardOrg.id}/remove-member/${UserIdData.one}").withHeaders("content-type" -> "application/json")
-      val result      = controller.removeMember(standardOrg.id, UserIdData.one)(fakeRequest.withBody(standardRemoveMemberRequest))
+      val result      = controller.removeCollaborator(standardOrg.id, UserIdData.one)(fakeRequest.withBody(standardRemoveMemberRequest))
       status(result) shouldBe Status.OK
       contentAsJson(result) shouldBe Json.toJson(standardOrg)
     }
 
     "return 400" in {
-      OrganisationServiceMock.RemoveMember.thenFails("Organisation not found")
+      OrganisationServiceMock.RemoveCollaborator.thenFails("Organisation not found")
       val fakeRequest = FakeRequest("DELETE", s"/organisation/${standardOrg.id}/remove-member/${UserIdData.one}").withHeaders("content-type" -> "application/json")
-      val result      = controller.removeMember(standardOrg.id, UserIdData.one)(fakeRequest.withBody(standardRemoveMemberRequest))
+      val result      = controller.removeCollaborator(standardOrg.id, UserIdData.one)(fakeRequest.withBody(standardRemoveMemberRequest))
       status(result) shouldBe Status.BAD_REQUEST
     }
   }

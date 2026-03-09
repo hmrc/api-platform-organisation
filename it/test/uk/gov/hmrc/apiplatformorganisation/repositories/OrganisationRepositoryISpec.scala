@@ -28,7 +28,7 @@ import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Member, OrganisationName}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Collaborators, OrganisationName}
 import uk.gov.hmrc.apiplatformorganisation.OrganisationFixtures
 import uk.gov.hmrc.apiplatformorganisation.models.StoredOrganisation
 import uk.gov.hmrc.apiplatformorganisation.repositories.OrganisationRepository
@@ -63,9 +63,10 @@ class OrganisationRepositoryISpec extends AnyWordSpec
 
     "fetchByUserId" in {
       await(repository.collection.find().toFuture()).length shouldBe 0
-      val member1       = standardStoredOrg.members.head
-      val organisation1 = standardStoredOrg.copy(id = OrganisationId.random, members = Set(member1, Member(UserId.random)), createdDateTime = FixedClock.Instants.anHourAgo)
-      val organisation2 = standardStoredOrg.copy(id = OrganisationId.random, members = Set(Member(UserId.random)))
+      val member1       = standardStoredOrg.collaborators.head
+      val organisation1 =
+        standardStoredOrg.copy(id = OrganisationId.random, collaborators = Set(member1, Collaborators.Member(UserId.random)), createdDateTime = FixedClock.Instants.anHourAgo)
+      val organisation2 = standardStoredOrg.copy(id = OrganisationId.random, collaborators = Set(Collaborators.Member(UserId.random)))
 
       await(underTest.save(organisation1))
       await(underTest.save(organisation2))
@@ -113,23 +114,24 @@ class OrganisationRepositoryISpec extends AnyWordSpec
       await(repository.collection.find().toFuture()).length shouldBe 0
     }
 
-    "add member" in {
+    "add collaborator" in {
       await(repository.collection.insertOne(standardStoredOrg).toFuture())
       await(repository.collection.find().toFuture()).head shouldBe standardStoredOrg
 
-      val newMember  = Member(UserId.random)
-      await(underTest.addMember(standardStoredOrg.id, newMember))
-      val updatedOrg = standardStoredOrg.copy(members = standardStoredOrg.members + newMember)
+      val newMember  = Collaborators.Member(UserId.random)
+      await(underTest.addCollaborator(standardStoredOrg.id, newMember))
+      val updatedOrg = standardStoredOrg.copy(collaborators = standardStoredOrg.collaborators + newMember)
       await(repository.collection.find().toFuture()).head shouldBe updatedOrg
     }
 
-    "remove member" in {
-      val member        = Member(UserId.random)
-      val twoMembersOrg = standardStoredOrg.copy(members = standardStoredOrg.members + member)
+    "remove collaborator" in {
+      val memberUserId  = UserId.random
+      val member        = Collaborators.Member(memberUserId)
+      val twoMembersOrg = standardStoredOrg.copy(collaborators = standardStoredOrg.collaborators + member)
       await(repository.collection.insertOne(twoMembersOrg).toFuture())
       await(repository.collection.find().toFuture()).head shouldBe twoMembersOrg
 
-      await(underTest.removeMember(standardStoredOrg.id, member))
+      await(underTest.removeCollaborator(standardStoredOrg.id, memberUserId))
       await(repository.collection.find().toFuture()).head shouldBe standardStoredOrg
     }
   }

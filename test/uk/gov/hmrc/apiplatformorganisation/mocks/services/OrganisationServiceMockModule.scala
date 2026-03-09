@@ -64,16 +64,16 @@ trait OrganisationServiceMockModule extends MockitoSugar with ArgumentMatchersSu
         verify(aMock).search(eqTo(organisationName))(*)
     }
 
-    object AddMember {
-      def thenReturn(org: Organisation) = when(aMock.addMember(*[OrganisationId], *[LaxEmailAddress])(*, *)).thenReturn(Future.successful(Right(org)))
+    object AddCollaborator {
+      def thenReturn(org: Organisation) = when(aMock.addCollaborator(*[OrganisationId], *[LaxEmailAddress], *)(*, *)).thenReturn(Future.successful(Right(org)))
 
-      def thenFails(error: String) = when(aMock.addMember(*[OrganisationId], *[LaxEmailAddress])(*, *)).thenReturn(Future.successful(Left(error)))
+      def thenFails(error: String) = when(aMock.addCollaborator(*[OrganisationId], *[LaxEmailAddress], *)(*, *)).thenReturn(Future.successful(Left(error)))
     }
 
-    object RemoveMember {
-      def thenReturn(org: Organisation) = when(aMock.removeMember(*[OrganisationId], *[UserId], *[LaxEmailAddress])(*, *)).thenReturn(Future.successful(Right(org)))
+    object RemoveCollaborator {
+      def thenReturn(org: Organisation) = when(aMock.removeCollaborator(*[OrganisationId], *[UserId], *[LaxEmailAddress])(*, *)).thenReturn(Future.successful(Right(org)))
 
-      def thenFails(error: String) = when(aMock.removeMember(*[OrganisationId], *[UserId], *[LaxEmailAddress])(*, *)).thenReturn(Future.successful(Left(error)))
+      def thenFails(error: String) = when(aMock.removeCollaborator(*[OrganisationId], *[UserId], *[LaxEmailAddress])(*, *)).thenReturn(Future.successful(Left(error)))
     }
   }
 }
