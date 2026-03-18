@@ -49,16 +49,16 @@ class SubmissionReviewService @Inject() (
     val event            = SubmissionReview.Event(
       "Submitted",
       requestedBy,
-      instant(),
+      instant,
       None
     )
     val submissionReview = SubmissionReview(
       submissionId,
       instanceIndex,
       organisationName,
-      instant(),
+      instant,
       requestedBy,
-      instant(),
+      instant,
       SubmissionReview.State.Submitted,
       List(event)
     )
@@ -69,7 +69,7 @@ class SubmissionReviewService @Inject() (
     val newEvent = SubmissionReview.Event(
       "Updated",
       updatedBy,
-      instant(),
+      instant,
       Some(comment)
     )
     (
@@ -79,7 +79,7 @@ class SubmissionReviewService @Inject() (
         updatedSubmissionReview = submissionReview.copy(
                                     state = SubmissionReview.State.InProgress,
                                     events = newEvent :: currentEvents,
-                                    lastUpdate = instant()
+                                    lastUpdate = instant
                                   )
         savedSubmissionReview  <- liftF(submissionReviewRepository.update(updatedSubmissionReview))
       } yield savedSubmissionReview
@@ -90,7 +90,7 @@ class SubmissionReviewService @Inject() (
     val newEvent = SubmissionReview.Event(
       "Approved",
       approvedBy,
-      instant(),
+      instant,
       comment
     )
     (
@@ -100,7 +100,7 @@ class SubmissionReviewService @Inject() (
         updatedSubmissionReview = submissionReview.copy(
                                     state = SubmissionReview.State.Approved,
                                     events = newEvent :: currentEvents,
-                                    lastUpdate = instant()
+                                    lastUpdate = instant
                                   )
         savedSubmissionReview  <- liftF(submissionReviewRepository.update(updatedSubmissionReview))
       } yield savedSubmissionReview
