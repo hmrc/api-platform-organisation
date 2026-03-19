@@ -64,8 +64,8 @@ class SubmissionsService @Inject() (
         groups           <- liftF(questionnaireDAO.fetchActiveGroupsOfQuestionnaires())
         allQuestionnaires = groups.flatMap(_.links)
         submissionId      = SubmissionId.random
-        newInstance       = Submission.Instance(0, emptyAnswers, NonEmptyList.of(Submission.Status.Created(instant(), requestedBy)))
-        submission        = Submission(submissionId, None, instant(), startedBy, groups, QuestionnaireDAO.questionIdsOfInterest, NonEmptyList.of(newInstance), emptyContext)
+        newInstance       = Submission.Instance(0, emptyAnswers, NonEmptyList.of(Submission.Status.Created(instant, requestedBy)))
+        submission        = Submission(submissionId, None, instant, startedBy, groups, QuestionnaireDAO.questionIdsOfInterest, NonEmptyList.of(newInstance), emptyContext)
         savedSubmission  <- liftF(submissionsDAO.save(submission))
       } yield savedSubmission
     )
@@ -79,7 +79,7 @@ class SubmissionsService @Inject() (
         submission         <- fromOptionF(submissionsDAO.fetch(submissionId), "No such submission")
         _                  <- cond(submission.status.isAnsweredCompletely, (), "Submission not completely answered")
         organisationName   <- fromOption(getOrganisationName(submission), "No organisation name found")
-        submittedSubmission = Submission.submit(instant(), requestedBy)(submission)
+        submittedSubmission = Submission.submit(instant, requestedBy)(submission)
         savedSubmission    <- liftF(submissionsDAO.update(submittedSubmission))
         _                  <- liftF(submissionReviewService.create(savedSubmission.id, savedSubmission.latestInstance.index, requestedBy, organisationName))
       } yield savedSubmission
@@ -96,7 +96,7 @@ class SubmissionsService @Inject() (
         organisationName  <- fromOption(getOrganisationName(submission), "No organisation name found")
         organisationType  <- fromOption(getOrganisationType(submission), "No organisation type found")
         organisation      <- liftF(organisationService.create(organisationName, organisationType, submission.startedBy))
-        approvedSubmission = Submission.grant(instant(), approvedBy, comment, None)(submission)
+        approvedSubmission = Submission.grant(instant, approvedBy, comment, None)(submission)
         savedSubmission   <- liftF(submissionsDAO.update(approvedSubmission.copy(organisationId = Some(organisation.id))))
         _                 <- liftF(submissionReviewService.approve(savedSubmission.id, savedSubmission.latestInstance.index, approvedBy, comment))
       } yield savedSubmission
