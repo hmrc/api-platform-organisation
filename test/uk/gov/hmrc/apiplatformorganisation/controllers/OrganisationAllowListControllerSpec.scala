@@ -33,6 +33,7 @@ import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.OrganisationAllowList
 import uk.gov.hmrc.apiplatformorganisation.mocks.services.OrganisationAllowListServiceMockModule
+import uk.gov.hmrc.apiplatformorganisation.models.AddOrganisationAllowListRequest
 
 class OrganisationAllowListControllerSpec extends AnyWordSpec
     with Matchers
@@ -46,6 +47,24 @@ class OrganisationAllowListControllerSpec extends AnyWordSpec
     val userId                = UserId.random
     val organisationAllowList = OrganisationAllowList(userId, OrganisationName("Org Name 1"), "requestedBy", instant)
     val underTest             = new OrganisationAllowListController(OrganisationAllowListServiceMock.aMock, Helpers.stubControllerComponents())
+  }
+
+  "create" should {
+    "return 200" in new Setup {
+      OrganisationAllowListServiceMock.Create.thenReturn(organisationAllowList)
+      val fakeRequest = FakeRequest("POST", s"/allow-list/$userId").withHeaders("content-type" -> "application/json")
+      val addRequest  = AddOrganisationAllowListRequest("requestedBy", OrganisationName("My Org"))
+      val result      = underTest.create(userId)(fakeRequest.withBody(addRequest))
+
+      status(result) shouldBe Status.OK
+      contentAsJson(result) shouldBe Json.toJson(organisationAllowList)
+    }
+
+    "return 400 when no body request" in new Setup {
+      val fakeRequest = FakeRequest("POST", s"/allow-list/$userId").withHeaders("content-type" -> "application/json")
+      val result      = underTest.create(userId)(fakeRequest.withBody(Json.parse("{}")))
+      status(result) shouldBe Status.BAD_REQUEST
+    }
   }
 
   "fetch" should {

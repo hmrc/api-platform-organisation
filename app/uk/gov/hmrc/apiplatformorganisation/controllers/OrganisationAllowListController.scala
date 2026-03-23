@@ -20,11 +20,12 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 import play.api.libs.json.Json
-import play.api.mvc.{ControllerComponents, Results}
+import play.api.mvc.{Action, ControllerComponents, Results}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.OrganisationAllowList
+import uk.gov.hmrc.apiplatformorganisation.models.AddOrganisationAllowListRequest
 import uk.gov.hmrc.apiplatformorganisation.services.OrganisationAllowListService
 import uk.gov.hmrc.apiplatformorganisation.utils.ApplicationLogger
 
@@ -34,6 +35,10 @@ class OrganisationAllowListController @Inject() (
     cc: ControllerComponents
   )(implicit val ec: ExecutionContext
   ) extends BackendController(cc) with ApplicationLogger {
+
+  def create(userId: UserId): Action[AddOrganisationAllowListRequest] = Action.async(parse.json[AddOrganisationAllowListRequest]) { implicit request =>
+    organisationAllowListService.create(userId, request.body.requestedBy, request.body.organisationName).map(org => Ok(Json.toJson(org)))
+  }
 
   def fetch(userId: UserId) = Action.async { request =>
     lazy val failed = NotFound(Results.EmptyContent())
