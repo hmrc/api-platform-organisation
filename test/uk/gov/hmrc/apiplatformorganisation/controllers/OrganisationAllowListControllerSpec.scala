@@ -32,6 +32,7 @@ import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.OrganisationAllowList
+import uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationAllowListController.ErrorMessage
 import uk.gov.hmrc.apiplatformorganisation.mocks.services.OrganisationAllowListServiceMockModule
 import uk.gov.hmrc.apiplatformorganisation.models.AddOrganisationAllowListRequest
 
@@ -64,6 +65,16 @@ class OrganisationAllowListControllerSpec extends AnyWordSpec
       val fakeRequest = FakeRequest("POST", s"/allow-list/$userId").withHeaders("content-type" -> "application/json")
       val result      = underTest.create(userId)(fakeRequest.withBody(Json.parse("{}")))
       status(result) shouldBe Status.BAD_REQUEST
+    }
+
+    "return 400 with message when user already exists" in new Setup {
+      OrganisationAllowListServiceMock.Create.failed("User exists")
+      val fakeRequest = FakeRequest("POST", s"/allow-list/$userId").withHeaders("content-type" -> "application/json")
+      val addRequest  = AddOrganisationAllowListRequest("requestedBy", OrganisationName("My Org"))
+      val result      = underTest.create(userId)(fakeRequest.withBody(addRequest))
+
+      status(result) shouldBe Status.BAD_REQUEST
+      contentAsJson(result) shouldBe Json.toJson(ErrorMessage("User exists"))
     }
   }
 

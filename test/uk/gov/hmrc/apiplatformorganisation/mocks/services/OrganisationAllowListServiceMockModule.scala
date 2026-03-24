@@ -33,7 +33,9 @@ trait OrganisationAllowListServiceMockModule extends MockitoSugar with ArgumentM
     val aMock = mock[OrganisationAllowListService]
 
     object Create {
-      def thenReturn(allowList: OrganisationAllowList) = when(aMock.create(*[UserId], *, *[OrganisationName])).thenReturn(Future.successful(allowList))
+      def thenReturn(allowList: OrganisationAllowList) = when(aMock.create(*[UserId], *, *[OrganisationName])).thenReturn(Future.successful(Right(allowList)))
+
+      def failed(msg: String) = when(aMock.create(*[UserId], *, *[OrganisationName])).thenReturn(Future.successful(Left(msg)))
     }
 
     object Fetch {

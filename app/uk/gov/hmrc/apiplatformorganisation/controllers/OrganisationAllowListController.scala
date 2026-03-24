@@ -19,7 +19,7 @@ package uk.gov.hmrc.apiplatformorganisation.controllers
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OWrites}
 import play.api.mvc.{Action, ControllerComponents, Results}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -29,6 +29,11 @@ import uk.gov.hmrc.apiplatformorganisation.models.AddOrganisationAllowListReques
 import uk.gov.hmrc.apiplatformorganisation.services.OrganisationAllowListService
 import uk.gov.hmrc.apiplatformorganisation.utils.ApplicationLogger
 
+object OrganisationAllowListController {
+  case class ErrorMessage(message: String)
+  implicit val writesErrorMessage: OWrites[ErrorMessage] = Json.writes[ErrorMessage]
+}
+
 @Singleton()
 class OrganisationAllowListController @Inject() (
     organisationAllowListService: OrganisationAllowListService,
@@ -36,8 +41,14 @@ class OrganisationAllowListController @Inject() (
   )(implicit val ec: ExecutionContext
   ) extends BackendController(cc) with ApplicationLogger {
 
+  import OrganisationAllowListController._
+
   def create(userId: UserId): Action[AddOrganisationAllowListRequest] = Action.async(parse.json[AddOrganisationAllowListRequest]) { implicit request =>
-    organisationAllowListService.create(userId, request.body.requestedBy, request.body.organisationName).map(org => Ok(Json.toJson(org)))
+    val failed = (msg: String) => BadRequest(Json.toJson(ErrorMessage(msg)))
+
+    val success = (a: OrganisationAllowList) => Ok(Json.toJson(a))
+
+    organisationAllowListService.create(userId, request.body.requestedBy, request.body.organisationName).map(_.fold(failed, success))
   }
 
   def fetch(userId: UserId) = Action.async { request =>

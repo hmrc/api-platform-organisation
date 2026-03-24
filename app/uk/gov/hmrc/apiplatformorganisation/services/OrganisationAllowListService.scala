@@ -45,13 +45,13 @@ class OrganisationAllowListService @Inject() (
     organisationAllowListRepository.delete(userId)
   }
 
-  def create(userId: UserId, requestedBy: String, organisationName: OrganisationName): Future[OrganisationAllowList] = {
-    val organisationAllowList = OrganisationAllowList(
-      userId,
-      organisationName,
-      requestedBy,
-      instant
-    )
-    organisationAllowListRepository.create(organisationAllowList)
+  def create(userId: UserId, requestedBy: String, organisationName: OrganisationName): Future[Either[String, OrganisationAllowList]] = {
+    (
+      for {
+        existingRecord <- liftF(organisationAllowListRepository.fetch(userId))
+        _              <- cond(!existingRecord.isDefined, (), "User already exists in allow list")
+        allowList      <- liftF(organisationAllowListRepository.create(OrganisationAllowList(userId, organisationName, requestedBy, instant)))
+      } yield allowList
+    ).value
   }
 }
