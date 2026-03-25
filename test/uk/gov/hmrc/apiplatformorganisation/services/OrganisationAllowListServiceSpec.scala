@@ -50,11 +50,21 @@ class OrganisationAllowListServiceSpec extends AsyncHmrcSpec
   "OrganisationAllowListService" when {
     "create" should {
       "create new OrganisationAllowList record" in new Setup {
+        OrganisationAllowListRepositoryMock.Fetch.willReturnNone()
         OrganisationAllowListRepositoryMock.Create.willReturn(organisationAllowList)
 
         val result = await(underTest.create(userId, "requestedBy", OrganisationName("Org Name 1")))
 
-        result shouldBe organisationAllowList
+        result shouldBe Right(organisationAllowList)
+      }
+
+      "fail to create new OrganisationAllowList record when user already exists" in new Setup {
+        OrganisationAllowListRepositoryMock.Fetch.willReturn(organisationAllowList)
+        OrganisationAllowListRepositoryMock.Create.willReturn(organisationAllowList)
+
+        val result = await(underTest.create(userId, "requestedBy", OrganisationName("Org Name 1")))
+
+        result shouldBe Left("User already exists in allow list")
       }
     }
 
