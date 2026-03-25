@@ -41,8 +41,14 @@ class OrganisationAllowListService @Inject() (
     organisationAllowListRepository.fetchAll()
   }
 
-  def delete(userId: UserId): Future[Boolean] = {
-    organisationAllowListRepository.delete(userId)
+  def delete(userId: UserId): Future[Either[String, Boolean]] = {
+    (
+      for {
+        existingRecord <- liftF(organisationAllowListRepository.fetch(userId))
+        _              <- cond(existingRecord.isDefined, (), "User does not exist in allow list")
+        result         <- liftF(organisationAllowListRepository.delete(userId))
+      } yield result
+    ).value
   }
 
   def create(userId: UserId, requestedBy: String, organisationName: OrganisationName): Future[Either[String, OrganisationAllowList]] = {

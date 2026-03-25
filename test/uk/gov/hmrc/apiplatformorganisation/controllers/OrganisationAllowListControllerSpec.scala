@@ -78,6 +78,26 @@ class OrganisationAllowListControllerSpec extends AnyWordSpec
     }
   }
 
+  "delete" should {
+    "return 200" in new Setup {
+      OrganisationAllowListServiceMock.Delete.successfully()
+      val fakeRequest = FakeRequest("DELETE", s"/allow-list/$userId").withHeaders("content-type" -> "application/json")
+      val result      = underTest.delete(userId)(fakeRequest)
+
+      status(result) shouldBe Status.OK
+      contentAsJson(result) shouldBe Json.toJson(true)
+    }
+
+    "return 400 with message when user not found" in new Setup {
+      OrganisationAllowListServiceMock.Delete.unsuccessfully()
+      val fakeRequest = FakeRequest("DELETE", s"/allow-list/$userId").withHeaders("content-type" -> "application/json")
+      val result      = underTest.delete(userId)(fakeRequest)
+
+      status(result) shouldBe Status.BAD_REQUEST
+      contentAsJson(result) shouldBe Json.toJson(ErrorMessage("User does not exist"))
+    }
+  }
+
   "fetch" should {
     "return 200" in new Setup {
       OrganisationAllowListServiceMock.Fetch.thenReturn(Some(organisationAllowList))

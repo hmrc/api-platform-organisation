@@ -51,6 +51,14 @@ class OrganisationAllowListController @Inject() (
     organisationAllowListService.create(userId, request.body.requestedBy, request.body.organisationName).map(_.fold(failed, success))
   }
 
+  def delete(userId: UserId) = Action.async { request =>
+    val failed = (msg: String) => BadRequest(Json.toJson(ErrorMessage(msg)))
+
+    val success = (a: Boolean) => Ok(Json.toJson(a))
+
+    organisationAllowListService.delete(userId).map(_.fold(failed, success))
+  }
+
   def fetch(userId: UserId) = Action.async { request =>
     lazy val failed = NotFound(Results.EmptyContent())
 

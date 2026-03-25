@@ -89,12 +89,21 @@ class OrganisationAllowListServiceSpec extends AsyncHmrcSpec
     }
 
     "delete" should {
-      "delete record" in new Setup {
+      "delete record successfully" in new Setup {
+        OrganisationAllowListRepositoryMock.Fetch.willReturn(organisationAllowList)
         OrganisationAllowListRepositoryMock.Delete.successfully()
 
         val result = await(underTest.delete(userId))
 
-        result shouldBe true
+        result shouldBe Right(true)
+      }
+
+      "delete record not found" in new Setup {
+        OrganisationAllowListRepositoryMock.Fetch.willReturnNone()
+
+        val result = await(underTest.delete(userId))
+
+        result shouldBe Left("User does not exist in allow list")
       }
     }
   }
