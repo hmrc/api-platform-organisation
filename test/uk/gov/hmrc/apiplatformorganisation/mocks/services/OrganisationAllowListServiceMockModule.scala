@@ -47,8 +47,8 @@ trait OrganisationAllowListServiceMockModule extends MockitoSugar with ArgumentM
     }
 
     object Delete {
-      def successfully()   = when(aMock.delete(*[UserId])).thenReturn(successful(true))
-      def unsuccessfully() = when(aMock.delete(*[UserId])).thenReturn(successful(false))
+      def successfully()   = when(aMock.delete(*[UserId])).thenReturn(successful(Right(true)))
+      def unsuccessfully() = when(aMock.delete(*[UserId])).thenReturn(successful(Left("User does not exist")))
 
       def verifyCalledWith() = {
         val capture: Captor[UserId] = ArgCaptor[UserId]

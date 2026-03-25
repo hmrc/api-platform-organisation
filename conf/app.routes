@@ -31,3 +31,4 @@ PUT         /submission-review/:sid/:idx            uk.gov.hmrc.apiplatformorgan
 GET         /allow-lists                            uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationAllowListController.fetchAll()
 GET         /allow-list/:uid                        uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationAllowListController.fetch(uid: UserId)
 POST        /allow-list/:uid                        uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationAllowListController.create(uid: UserId)
+DELETE      /allow-list/:uid                        uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationAllowListController.delete(uid: UserId)
