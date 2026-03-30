@@ -106,4 +106,25 @@ class SubmissionReviewService @Inject() (
       } yield savedSubmissionReview
     ).value
   }
+
+  def decline(submissionId: SubmissionId, instanceIndex: Int, declinedBy: String, comment: String): Future[Either[String, SubmissionReview]] = {
+    val newEvent = SubmissionReview.Event(
+      "Declined",
+      declinedBy,
+      instant,
+      Some(comment)
+    )
+    (
+      for {
+        submissionReview       <- fromOptionF(submissionReviewRepository.fetch(submissionId, instanceIndex), "SubmissionReview record not found")
+        currentEvents           = submissionReview.events
+        updatedSubmissionReview = submissionReview.copy(
+                                    state = SubmissionReview.State.Declined,
+                                    events = newEvent :: currentEvents,
+                                    lastUpdate = instant
+                                  )
+        savedSubmissionReview  <- liftF(submissionReviewRepository.update(updatedSubmissionReview))
+      } yield savedSubmissionReview
+    ).value
+  }
 }

@@ -44,6 +44,9 @@ object SubmissionsController {
 
   case class ApproveSubmissionRequest(approvedBy: String, comment: Option[String])
   implicit val readsApproveSubmissionRequest: Reads[ApproveSubmissionRequest] = Json.reads[ApproveSubmissionRequest]
+
+  case class DeclineSubmissionRequest(declinedBy: String, comment: String)
+  implicit val readsDeclineSubmissionRequest: Reads[DeclineSubmissionRequest] = Json.reads[DeclineSubmissionRequest]
 }
 
 @Singleton
@@ -82,6 +85,16 @@ class SubmissionsController @Inject() (
 
     withJsonBody[ApproveSubmissionRequest] { approveRequest =>
       service.approve(submissionId, approveRequest.approvedBy, approveRequest.comment).map(_.fold(failed, success))
+    }
+  }
+
+  def declineSubmission(submissionId: SubmissionId) = Action.async(parse.json) { implicit request =>
+    val failed = (msg: String) => BadRequest(Json.toJson(ErrorMessage(msg)))
+
+    val success = (s: Submission) => Ok(Json.toJson(s))
+
+    withJsonBody[DeclineSubmissionRequest] { declineRequest =>
+      service.decline(submissionId, declineRequest.declinedBy, declineRequest.comment).map(_.fold(failed, success))
     }
   }
 

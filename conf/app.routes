@@ -21,6 +21,7 @@ POST        /submission/:sid/question/:qid          uk.gov.hmrc.apiplatformorgan
 
 POST        /submission/:sid                        uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.submitSubmission(sid: SubmissionId)
 POST        /submission/:sid/approve                uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.approveSubmission(sid: SubmissionId)
+POST        /submission/:sid/decline                uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.declineSubmission(sid: SubmissionId)
 
 GET         /company/:cnumber                       uk.gov.hmrc.apiplatformorganisation.controllers.CompanyController.fetchByCompanyNumber(cnumber: String)
 

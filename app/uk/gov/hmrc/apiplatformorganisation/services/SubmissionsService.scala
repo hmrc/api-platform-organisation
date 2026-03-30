@@ -104,6 +104,19 @@ class SubmissionsService @Inject() (
       .value
   }
 
+  def decline(submissionId: SubmissionId, declinedBy: String, comment: String): Future[Either[String, Submission]] = {
+    (
+      for {
+        submission        <- fromOptionF(submissionsDAO.fetch(submissionId), "No such submission")
+        _                 <- cond(submission.status.isSubmitted, (), "Submission not submitted")
+        declinedSubmission = Submission.decline(instant, declinedBy, comment)(submission)
+        savedSubmission   <- liftF(submissionsDAO.update(declinedSubmission))
+        _                 <- liftF(submissionReviewService.decline(submission.id, submission.latestInstance.index, declinedBy, comment))
+      } yield savedSubmission
+    )
+      .value
+  }
+
   def fetchLatestByOrganisationId(organisationId: OrganisationId): Future[Option[Submission]] = {
     submissionsDAO.fetchLatestByOrganisationId(organisationId)
   }
