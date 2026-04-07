@@ -122,6 +122,34 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
     }
   }
 
+  "decline a submission" should {
+    implicit val writer: OWrites[SubmissionsController.DeclineSubmissionRequest] = Json.writes[SubmissionsController.DeclineSubmissionRequest]
+    val fakeRequest                                                              =
+      FakeRequest(POST, s"/submission/$submissionId/decline").withBody(Json.toJson(SubmissionsController.DeclineSubmissionRequest("bob@example.com", "comment")))
+
+    "return an ok response" in new Setup {
+      SubmissionsServiceMock.Decline.thenReturn(aSubmission)
+
+      val result = underTest.declineSubmission(submissionId)(fakeRequest)
+
+      status(result) shouldBe OK
+
+      contentAsJson(result).validate[Submission] match {
+        case JsSuccess(submission, _) =>
+          submission shouldBe aSubmission
+        case JsError(f)               => fail(s"Not parsed as a response $f")
+      }
+    }
+
+    "return a bad request response" in new Setup {
+      SubmissionsServiceMock.Decline.thenFails("Test Error")
+
+      val result = underTest.declineSubmission(submissionId)(fakeRequest)
+
+      status(result) shouldBe BAD_REQUEST
+    }
+  }
+
   "fetchLatestByOrgansationId" should {
     "return ok response with submission when found" in new Setup {
       SubmissionsServiceMock.FetchLatestByOrganisationId.thenReturn(aSubmission)

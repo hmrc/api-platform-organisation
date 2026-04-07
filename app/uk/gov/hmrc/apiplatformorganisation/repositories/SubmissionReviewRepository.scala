@@ -129,7 +129,7 @@ class SubmissionReviewRepository @Inject() (mongo: MongoComponent, val metrics: 
         case Submitted  => SubmissionReview.State.Submitted
         case InProgress => SubmissionReview.State.InProgress
         case Approved   => SubmissionReview.State.Approved
-        case Failed     => SubmissionReview.State.Failed
+        case Declined   => SubmissionReview.State.Declined
       }
     }
 

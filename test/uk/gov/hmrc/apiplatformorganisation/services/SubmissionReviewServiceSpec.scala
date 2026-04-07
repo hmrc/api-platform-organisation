@@ -98,6 +98,25 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec
       }
     }
 
+    "decline" should {
+      "decline submission review record" in new Setup {
+        SubmissionReviewRepositoryMock.Fetch.willReturn(submittedSubmissionReview)
+        SubmissionReviewRepositoryMock.Update.willReturn(submittedSubmissionReview)
+        val result = await(underTest.decline(
+          submittedSubmissionReview.submissionId,
+          submittedSubmissionReview.instanceIndex,
+          "declineBy@example.com",
+          "Decline comment"
+        ))
+        result shouldBe Right(submittedSubmissionReview)
+
+        val updatedSubmissionReview = SubmissionReviewRepositoryMock.Update.verifyCalledWith()
+        updatedSubmissionReview.state shouldBe SubmissionReview.State.Declined
+        updatedSubmissionReview.events.head.name shouldBe "declineBy@example.com"
+        updatedSubmissionReview.events.head.comment shouldBe Some("Decline comment")
+      }
+    }
+
     "delete" should {
       "delete record" in new Setup {
         SubmissionReviewRepositoryMock.Delete.successfully()

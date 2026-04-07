@@ -163,6 +163,43 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
       }
     }
 
+    "decline submission" should {
+      "decline a submission" in new Setup {
+        val samplePassSubmittedSubmission = aSubmission.copy(id = completedSubmissionId)
+          .hasCompletelyAnsweredWith(samplePassAnswersToQuestions)
+          .withSubmittedProgress()
+
+        SubmissionsDAOMock.Fetch.thenReturn(samplePassSubmittedSubmission.submission)
+        SubmissionsDAOMock.Update.thenReturn()
+        SubmissionReviewServiceMock.DeclineSubmissionReview.thenReturn(declinedSubmissionReview)
+
+        val result = await(underTest.decline(submissionId, "bob@example.com", "comment"))
+
+        result.value.status shouldBe Submission.Status.Answering(instant, true)
+
+        val updatedSubmission: Submission = SubmissionsDAOMock.Update.verifyCalledWith()
+        updatedSubmission.instances.size shouldBe 2
+      }
+
+      "fail to decline a submission that hasn't been submitted" in new Setup {
+        SubmissionsDAOMock.Fetch.thenReturn(aSubmission)
+
+        val result = await(underTest.decline(submissionId, "bob@example.com", "comment"))
+
+        result.isLeft shouldBe true
+        result.left.value shouldBe "Submission not submitted"
+      }
+
+      "fail to decline a submission that doesn't exist" in new Setup {
+        SubmissionsDAOMock.Fetch.thenReturnNothing()
+
+        val result = await(underTest.decline(submissionId, "bob@example.com", "comment"))
+
+        result.isLeft shouldBe true
+        result.left.value shouldBe "No such submission"
+      }
+    }
+
     "fetchLatestByOrganisationId" should {
       "fetch latest submission for an organisation id" in new Setup {
         SubmissionsDAOMock.FetchLatestByOrganisationId.thenReturn(aSubmission)

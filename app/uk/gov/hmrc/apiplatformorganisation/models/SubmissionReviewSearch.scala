@@ -47,7 +47,7 @@ sealed trait SubmissionReviewStatusFilter extends SubmissionReviewSearchFilter
 case object Submitted                     extends SubmissionReviewStatusFilter
 case object InProgress                    extends SubmissionReviewStatusFilter
 case object Approved                      extends SubmissionReviewStatusFilter
-case object Failed                        extends SubmissionReviewStatusFilter
+case object Declined                      extends SubmissionReviewStatusFilter
 
 case object SubmissionReviewStatusFilter {
 
@@ -57,7 +57,7 @@ case object SubmissionReviewStatusFilter {
         case "SUBMITTED"   => Some(Submitted)
         case "IN_PROGRESS" => Some(InProgress)
         case "APPROVED"    => Some(Approved)
-        case "FAILED"      => Some(Failed)
+        case "DECLINED"    => Some(Declined)
         case _             => None
       }
     )
