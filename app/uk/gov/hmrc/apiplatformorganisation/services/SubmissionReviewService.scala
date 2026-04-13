@@ -69,6 +69,7 @@ class SubmissionReviewService @Inject() (
       updatedSubmissionReview                  = submissionReview.copy(
                                                    state = SubmissionReview.State.Submitted,
                                                    events = newEvent :: currentEvents,
+                                                   organisationName = organisationName,
                                                    lastUpdate = instant
                                                  )
       savedSubmissionReview: SubmissionReview <- submissionReviewRepository.save(updatedSubmissionReview)

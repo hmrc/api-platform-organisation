@@ -46,13 +46,13 @@ class SubmissionReviewRepositoryISpec extends AnyWordSpec
   val underTest: SubmissionReviewRepository                                = app.injector.instanceOf[SubmissionReviewRepository]
 
   "SubmissionReviewRepository" should {
-    "create submission review" in {
+    "save submission review where none exists (create)" in {
       await(repository.collection.find().toFuture()).length mustBe 0
       await(underTest.save(submittedSubmissionReview))
       await(repository.collection.find().toFuture()).head mustBe submittedSubmissionReview
     }
 
-    "update submission review" in {
+    "save submission review where one already exists (update)" in {
       await(repository.collection.find().toFuture()).length mustBe 0
       await(underTest.save(submittedSubmissionReview))
       val updatedSubmissionReview = submittedSubmissionReview.copy(state = SubmissionReview.State.InProgress)

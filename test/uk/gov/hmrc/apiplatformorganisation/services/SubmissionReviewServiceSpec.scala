@@ -47,16 +47,37 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec
   }
 
   "SubmissionReviewService" when {
-    "create" should {
+    "createOrUpdate" should {
       "create new submission review record" in new Setup {
+        SubmissionReviewRepositoryMock.Fetch.willReturnNone()
+        SubmissionReviewRepositoryMock.Update.willReturn(submittedSubmissionReview)
+        val result = await(underTest.createOrUpdate(
+          submittedSubmissionReview.submissionId,
+          "requestedBy@example.com",
+          submittedSubmissionReview.organisationName
+        ))
+        result shouldBe submittedSubmissionReview
+
+        val createdSubmissionReview = SubmissionReviewRepositoryMock.Update.verifyCalledWith()
+        createdSubmissionReview.state shouldBe SubmissionReview.State.Submitted
+        createdSubmissionReview.events.head.name shouldBe "requestedBy@example.com"
+        createdSubmissionReview.events.head.description shouldBe "Submitted"
+      }
+
+      "update existing submission review record" in new Setup {
         SubmissionReviewRepositoryMock.Fetch.willReturn(submittedSubmissionReview)
         SubmissionReviewRepositoryMock.Update.willReturn(submittedSubmissionReview)
         val result = await(underTest.createOrUpdate(
           submittedSubmissionReview.submissionId,
-          submittedSubmissionReview.requestedBy,
+          "requestedBy@example.com",
           submittedSubmissionReview.organisationName
         ))
         result shouldBe submittedSubmissionReview
+
+        val createdSubmissionReview = SubmissionReviewRepositoryMock.Update.verifyCalledWith()
+        createdSubmissionReview.state shouldBe SubmissionReview.State.Submitted
+        createdSubmissionReview.events.head.name shouldBe "requestedBy@example.com"
+        createdSubmissionReview.events.head.description shouldBe "Submitted"
       }
     }
 
