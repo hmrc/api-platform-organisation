@@ -67,7 +67,7 @@ class SubmissionReviewService @Inject() (
       submissionReview                         = maybeSubmissionReview.getOrElse(newSubmissionReview)
       currentEvents                            = submissionReview.events
       updatedSubmissionReview                  = submissionReview.copy(
-                                                   state = SubmissionReview.State.InProgress,
+                                                   state = SubmissionReview.State.Submitted,
                                                    events = newEvent :: currentEvents,
                                                    lastUpdate = instant
                                                  )
