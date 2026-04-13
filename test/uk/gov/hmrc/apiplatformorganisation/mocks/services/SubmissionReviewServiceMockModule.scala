@@ -32,25 +32,25 @@ trait SubmissionReviewServiceMockModule extends MockitoSugar with ArgumentMatche
     val aMock = mock[SubmissionReviewService]
 
     object CreateSubmissionReview {
-      def thenReturn(review: SubmissionReview) = when(aMock.create(*[SubmissionId], *, *, *[OrganisationName])).thenReturn(Future.successful(review))
+      def thenReturn(review: SubmissionReview) = when(aMock.createOrUpdate(*[SubmissionId], *, *[OrganisationName])).thenReturn(Future.successful(review))
     }
 
     object Fetch {
-      def thenReturn(review: Option[SubmissionReview]) = when(aMock.fetch(*[SubmissionId], *)).thenReturn(Future.successful(review))
+      def thenReturn(review: Option[SubmissionReview]) = when(aMock.fetch(*[SubmissionId])).thenReturn(Future.successful(review))
     }
 
     object ApproveSubmissionReview {
-      def thenReturn(review: SubmissionReview) = when(aMock.approve(*[SubmissionId], *, *, *)).thenReturn(Future.successful(Right(review)))
+      def thenReturn(review: SubmissionReview) = when(aMock.approve(*[SubmissionId], *, *)).thenReturn(Future.successful(Right(review)))
     }
 
     object DeclineSubmissionReview {
-      def thenReturn(review: SubmissionReview) = when(aMock.decline(*[SubmissionId], *, *, *)).thenReturn(Future.successful(Right(review)))
+      def thenReturn(review: SubmissionReview) = when(aMock.decline(*[SubmissionId], *, *)).thenReturn(Future.successful(Right(review)))
     }
 
     object UpdateSubmissionReview {
-      def thenReturn(review: SubmissionReview) = when(aMock.update(*[SubmissionId], *, *, *)).thenReturn(Future.successful(Right(review)))
+      def thenReturn(review: SubmissionReview) = when(aMock.update(*[SubmissionId], *, *)).thenReturn(Future.successful(Right(review)))
 
-      def thenFails(error: String) = when(aMock.update(*[SubmissionId], *, *, *)).thenReturn(Future.successful(Left(error)))
+      def thenFails(error: String) = when(aMock.update(*[SubmissionId], *, *)).thenReturn(Future.successful(Left(error)))
     }
 
     object Delete {

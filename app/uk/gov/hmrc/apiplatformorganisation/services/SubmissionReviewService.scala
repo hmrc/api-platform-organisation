@@ -33,8 +33,8 @@ class SubmissionReviewService @Inject() (
   )(implicit val ec: ExecutionContext
   ) extends EitherTHelper[String] with ClockNow {
 
-  def fetch(submissionId: SubmissionId, instanceIndex: Int): Future[Option[SubmissionReview]] = {
-    submissionReviewRepository.fetch(submissionId, instanceIndex)
+  def fetch(submissionId: SubmissionId): Future[Option[SubmissionReview]] = {
+    submissionReviewRepository.fetch(submissionId)
   }
 
   def delete(submissionId: SubmissionId): Future[Boolean] = {
@@ -45,27 +45,38 @@ class SubmissionReviewService @Inject() (
     submissionReviewRepository.search(searchCriteria)
   }
 
-  def create(submissionId: SubmissionId, instanceIndex: Int, requestedBy: String, organisationName: OrganisationName): Future[SubmissionReview] = {
-    val event            = SubmissionReview.Event(
+  def createOrUpdate(submissionId: SubmissionId, requestedBy: String, organisationName: OrganisationName): Future[SubmissionReview] = {
+    val newEvent            = SubmissionReview.Event(
       "Submitted",
       requestedBy,
       instant,
       None
     )
-    val submissionReview = SubmissionReview(
+    val newSubmissionReview = SubmissionReview(
       submissionId,
-      instanceIndex,
       organisationName,
       instant,
       requestedBy,
       instant,
       SubmissionReview.State.Submitted,
-      List(event)
+      List.empty
     )
-    submissionReviewRepository.create(submissionReview)
+
+    for {
+      maybeSubmissionReview                   <- submissionReviewRepository.fetch(submissionId)
+      submissionReview                         = maybeSubmissionReview.getOrElse(newSubmissionReview)
+      currentEvents                            = submissionReview.events
+      updatedSubmissionReview                  = submissionReview.copy(
+                                                   state = SubmissionReview.State.InProgress,
+                                                   events = newEvent :: currentEvents,
+                                                   lastUpdate = instant
+                                                 )
+      savedSubmissionReview: SubmissionReview <- submissionReviewRepository.save(updatedSubmissionReview)
+    } yield savedSubmissionReview
+
   }
 
-  def update(submissionId: SubmissionId, instanceIndex: Int, updatedBy: String, comment: String): Future[Either[String, SubmissionReview]] = {
+  def update(submissionId: SubmissionId, updatedBy: String, comment: String): Future[Either[String, SubmissionReview]] = {
     val newEvent = SubmissionReview.Event(
       "Updated",
       updatedBy,
@@ -74,19 +85,19 @@ class SubmissionReviewService @Inject() (
     )
     (
       for {
-        submissionReview       <- fromOptionF(submissionReviewRepository.fetch(submissionId, instanceIndex), "SubmissionReview record not found")
+        submissionReview       <- fromOptionF(submissionReviewRepository.fetch(submissionId), "SubmissionReview record not found")
         currentEvents           = submissionReview.events
         updatedSubmissionReview = submissionReview.copy(
                                     state = SubmissionReview.State.InProgress,
                                     events = newEvent :: currentEvents,
                                     lastUpdate = instant
                                   )
-        savedSubmissionReview  <- liftF(submissionReviewRepository.update(updatedSubmissionReview))
+        savedSubmissionReview  <- liftF(submissionReviewRepository.save(updatedSubmissionReview))
       } yield savedSubmissionReview
     ).value
   }
 
-  def approve(submissionId: SubmissionId, instanceIndex: Int, approvedBy: String, comment: Option[String]): Future[Either[String, SubmissionReview]] = {
+  def approve(submissionId: SubmissionId, approvedBy: String, comment: Option[String]): Future[Either[String, SubmissionReview]] = {
     val newEvent = SubmissionReview.Event(
       "Approved",
       approvedBy,
@@ -95,19 +106,19 @@ class SubmissionReviewService @Inject() (
     )
     (
       for {
-        submissionReview       <- fromOptionF(submissionReviewRepository.fetch(submissionId, instanceIndex), "SubmissionReview record not found")
+        submissionReview       <- fromOptionF(submissionReviewRepository.fetch(submissionId), "SubmissionReview record not found")
         currentEvents           = submissionReview.events
         updatedSubmissionReview = submissionReview.copy(
                                     state = SubmissionReview.State.Approved,
                                     events = newEvent :: currentEvents,
                                     lastUpdate = instant
                                   )
-        savedSubmissionReview  <- liftF(submissionReviewRepository.update(updatedSubmissionReview))
+        savedSubmissionReview  <- liftF(submissionReviewRepository.save(updatedSubmissionReview))
       } yield savedSubmissionReview
     ).value
   }
 
-  def decline(submissionId: SubmissionId, instanceIndex: Int, declinedBy: String, comment: String): Future[Either[String, SubmissionReview]] = {
+  def decline(submissionId: SubmissionId, declinedBy: String, comment: String): Future[Either[String, SubmissionReview]] = {
     val newEvent = SubmissionReview.Event(
       "Declined",
       declinedBy,
@@ -116,14 +127,14 @@ class SubmissionReviewService @Inject() (
     )
     (
       for {
-        submissionReview       <- fromOptionF(submissionReviewRepository.fetch(submissionId, instanceIndex), "SubmissionReview record not found")
+        submissionReview       <- fromOptionF(submissionReviewRepository.fetch(submissionId), "SubmissionReview record not found")
         currentEvents           = submissionReview.events
         updatedSubmissionReview = submissionReview.copy(
                                     state = SubmissionReview.State.Declined,
                                     events = newEvent :: currentEvents,
                                     lastUpdate = instant
                                   )
-        savedSubmissionReview  <- liftF(submissionReviewRepository.update(updatedSubmissionReview))
+        savedSubmissionReview  <- liftF(submissionReviewRepository.save(updatedSubmissionReview))
       } yield savedSubmissionReview
     ).value
   }

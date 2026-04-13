@@ -33,6 +33,8 @@ class CompaniesHouseConnector @Inject() (http: HttpClientV2, config: AppConfig)(
   private lazy val serviceBaseUrl: String = config.companiesHouseUri
 
   def getCompanyByNumber(companyNumber: String)(implicit hc: HeaderCarrier): Future[CompaniesHouseCompanyProfile] = {
+    println(s"**** ${config.companiesHouseKey}")
+
     http.get(url"${requestUrl(s"/company/$companyNumber")}")
       .setHeader(AUTHORIZATION -> config.companiesHouseKey)
       .withProxy

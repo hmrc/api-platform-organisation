@@ -47,21 +47,21 @@ class SubmissionReviewController @Inject() (
   ) extends BackendController(cc) with ApplicationLogger {
   import SubmissionReviewController._
 
-  def fetch(submissionId: SubmissionId, instanceIndex: Int) = Action.async { request =>
+  def fetch(submissionId: SubmissionId) = Action.async { request =>
     lazy val failed = NotFound(Results.EmptyContent())
 
     val success = (sr: SubmissionReview) => Ok(Json.toJson(sr))
 
-    submissionReviewService.fetch(submissionId, instanceIndex).map(_.fold(failed)(success))
+    submissionReviewService.fetch(submissionId).map(_.fold(failed)(success))
   }
 
-  def update(submissionId: SubmissionId, instanceIndex: Int) = Action.async(parse.json) { implicit request =>
+  def update(submissionId: SubmissionId) = Action.async(parse.json) { implicit request =>
     val failed = (msg: String) => BadRequest(Json.toJson(ErrorMessage(msg)))
 
     val success = (s: SubmissionReview) => Ok(Json.toJson(s))
 
     withJsonBody[UpdateSubmissionReviewRequest] { updateRequest =>
-      submissionReviewService.update(submissionId, instanceIndex, updateRequest.updatedBy, updateRequest.comment).map(_.fold(failed, success))
+      submissionReviewService.update(submissionId, updateRequest.updatedBy, updateRequest.comment).map(_.fold(failed, success))
     }
   }
 

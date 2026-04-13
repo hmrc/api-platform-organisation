@@ -81,7 +81,7 @@ class SubmissionsService @Inject() (
         organisationName   <- fromOption(getOrganisationName(submission), "No organisation name found")
         submittedSubmission = Submission.submit(instant, requestedBy)(submission)
         savedSubmission    <- liftF(submissionsDAO.update(submittedSubmission))
-        _                  <- liftF(submissionReviewService.create(savedSubmission.id, savedSubmission.latestInstance.index, requestedBy, organisationName))
+        _                  <- liftF(submissionReviewService.createOrUpdate(savedSubmission.id, requestedBy, organisationName))
       } yield savedSubmission
     )
       .value
@@ -98,7 +98,7 @@ class SubmissionsService @Inject() (
         organisation      <- liftF(organisationService.create(organisationName, organisationType, submission.startedBy))
         approvedSubmission = Submission.grant(instant, approvedBy, comment, None)(submission)
         savedSubmission   <- liftF(submissionsDAO.update(approvedSubmission.copy(organisationId = Some(organisation.id))))
-        _                 <- liftF(submissionReviewService.approve(savedSubmission.id, savedSubmission.latestInstance.index, approvedBy, comment))
+        _                 <- liftF(submissionReviewService.approve(savedSubmission.id, approvedBy, comment))
       } yield savedSubmission
     )
       .value
@@ -111,7 +111,7 @@ class SubmissionsService @Inject() (
         _                 <- cond(submission.status.isSubmitted, (), "Submission not submitted")
         declinedSubmission = Submission.decline(instant, declinedBy, comment)(submission)
         savedSubmission   <- liftF(submissionsDAO.update(declinedSubmission))
-        _                 <- liftF(submissionReviewService.decline(submission.id, submission.latestInstance.index, declinedBy, comment))
+        _                 <- liftF(submissionReviewService.decline(submission.id, declinedBy, comment))
       } yield savedSubmission
     )
       .value

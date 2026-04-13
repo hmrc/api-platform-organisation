@@ -49,10 +49,10 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec
   "SubmissionReviewService" when {
     "create" should {
       "create new submission review record" in new Setup {
-        SubmissionReviewRepositoryMock.Create.willReturn(submittedSubmissionReview)
-        val result = await(underTest.create(
+        SubmissionReviewRepositoryMock.Fetch.willReturn(submittedSubmissionReview)
+        SubmissionReviewRepositoryMock.Update.willReturn(submittedSubmissionReview)
+        val result = await(underTest.createOrUpdate(
           submittedSubmissionReview.submissionId,
-          submittedSubmissionReview.instanceIndex,
           submittedSubmissionReview.requestedBy,
           submittedSubmissionReview.organisationName
         ))
@@ -66,7 +66,6 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec
         SubmissionReviewRepositoryMock.Update.willReturn(submittedSubmissionReview)
         val result = await(underTest.update(
           submittedSubmissionReview.submissionId,
-          submittedSubmissionReview.instanceIndex,
           "updateBy@example.com",
           "Update comment"
         ))
@@ -85,7 +84,6 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec
         SubmissionReviewRepositoryMock.Update.willReturn(submittedSubmissionReview)
         val result = await(underTest.approve(
           submittedSubmissionReview.submissionId,
-          submittedSubmissionReview.instanceIndex,
           "approveBy@example.com",
           Some("Approve comment")
         ))
@@ -104,7 +102,6 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec
         SubmissionReviewRepositoryMock.Update.willReturn(submittedSubmissionReview)
         val result = await(underTest.decline(
           submittedSubmissionReview.submissionId,
-          submittedSubmissionReview.instanceIndex,
           "declineBy@example.com",
           "Decline comment"
         ))

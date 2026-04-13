@@ -33,24 +33,20 @@ trait SubmissionReviewRepositoryMockModule extends MockitoSugar with ArgumentMat
       def successfully() = when(aMock.delete(*[SubmissionId])).thenReturn(Future.successful(true))
     }
 
-    object Create {
-      def willReturn(review: SubmissionReview) = when(aMock.create(*)).thenReturn(Future.successful(review))
-    }
-
     object Update {
-      def willReturn(review: SubmissionReview) = when(aMock.update(*)).thenReturn(Future.successful(review))
+      def willReturn(review: SubmissionReview) = when(aMock.save(*)).thenReturn(Future.successful(review))
 
       def verifyCalledWith() = {
         val capture: Captor[SubmissionReview] = ArgCaptor[SubmissionReview]
-        verify(aMock, atLeast(1)).update(capture)
+        verify(aMock, atLeast(1)).save(capture)
         capture.value
       }
     }
 
     object Fetch {
-      def willReturn(review: SubmissionReview) = when(aMock.fetch(*[SubmissionId], *)).thenReturn(Future.successful(Some(review)))
+      def willReturn(review: SubmissionReview) = when(aMock.fetch(*[SubmissionId])).thenReturn(Future.successful(Some(review)))
 
-      def willReturnNone() = when(aMock.fetch(*[SubmissionId], *)).thenReturn(Future.successful(None))
+      def willReturnNone() = when(aMock.fetch(*[SubmissionId])).thenReturn(Future.successful(None))
     }
 
     object FetchAll {

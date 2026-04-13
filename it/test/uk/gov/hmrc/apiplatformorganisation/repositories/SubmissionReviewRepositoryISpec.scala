@@ -48,52 +48,52 @@ class SubmissionReviewRepositoryISpec extends AnyWordSpec
   "SubmissionReviewRepository" should {
     "create submission review" in {
       await(repository.collection.find().toFuture()).length mustBe 0
-      await(underTest.create(submittedSubmissionReview))
+      await(underTest.save(submittedSubmissionReview))
       await(repository.collection.find().toFuture()).head mustBe submittedSubmissionReview
     }
 
     "update submission review" in {
       await(repository.collection.find().toFuture()).length mustBe 0
-      await(underTest.create(submittedSubmissionReview))
+      await(underTest.save(submittedSubmissionReview))
       val updatedSubmissionReview = submittedSubmissionReview.copy(state = SubmissionReview.State.InProgress)
-      await(underTest.update(updatedSubmissionReview))
+      await(underTest.save(updatedSubmissionReview))
       await(repository.collection.find().toFuture()).head mustBe updatedSubmissionReview
     }
 
     "fetch" in {
       await(repository.collection.find().toFuture()).length mustBe 0
-      await(underTest.create(submittedSubmissionReview))
-      await(underTest.create(approvedSubmissionReview))
-      await(underTest.fetch(submittedSubmissionReview.submissionId, submittedSubmissionReview.instanceIndex)) mustBe Some(submittedSubmissionReview)
+      await(underTest.save(submittedSubmissionReview))
+      await(underTest.save(approvedSubmissionReview))
+      await(underTest.fetch(submittedSubmissionReview.submissionId)) mustBe Some(submittedSubmissionReview)
     }
 
     "fetchAll" in {
       await(repository.collection.find().toFuture()).length mustBe 0
-      await(underTest.create(submittedSubmissionReview))
-      await(underTest.create(approvedSubmissionReview))
+      await(underTest.save(submittedSubmissionReview))
+      await(underTest.save(approvedSubmissionReview))
       await(underTest.fetchAll()) mustBe List(submittedSubmissionReview, approvedSubmissionReview)
     }
 
     "fetchByState" in {
       await(repository.collection.find().toFuture()).length mustBe 0
-      await(underTest.create(submittedSubmissionReview))
-      await(underTest.create(inProgressSubmissionReview))
-      await(underTest.create(approvedSubmissionReview))
+      await(underTest.save(submittedSubmissionReview))
+      await(underTest.save(inProgressSubmissionReview))
+      await(underTest.save(approvedSubmissionReview))
       await(underTest.fetchByState(SubmissionReview.State.Approved)) mustBe List(approvedSubmissionReview)
     }
 
     "delete" in {
       await(repository.collection.find().toFuture()).length mustBe 0
-      await(underTest.create(submittedSubmissionReview))
+      await(underTest.save(submittedSubmissionReview))
       await(underTest.delete(submittedSubmissionReview.submissionId))
       await(repository.collection.find().toFuture()).length mustBe 0
     }
 
     "search" in {
       await(repository.collection.find().toFuture()).length mustBe 0
-      await(underTest.create(submittedSubmissionReview))
-      await(underTest.create(inProgressSubmissionReview))
-      await(underTest.create(approvedSubmissionReview))
+      await(underTest.save(submittedSubmissionReview))
+      await(underTest.save(inProgressSubmissionReview))
+      await(underTest.save(approvedSubmissionReview))
 
       val searchCriteria = SubmissionReviewSearch(List(Submitted, InProgress))
       val result         = await(underTest.search(searchCriteria))
@@ -104,9 +104,9 @@ class SubmissionReviewRepositoryISpec extends AnyWordSpec
 
     "search returns all" in {
       await(repository.collection.find().toFuture()).length mustBe 0
-      await(underTest.create(submittedSubmissionReview))
-      await(underTest.create(inProgressSubmissionReview))
-      await(underTest.create(approvedSubmissionReview))
+      await(underTest.save(submittedSubmissionReview))
+      await(underTest.save(inProgressSubmissionReview))
+      await(underTest.save(approvedSubmissionReview))
 
       val searchCriteria = SubmissionReviewSearch(List(Submitted, InProgress, Approved))
       val result         = await(underTest.search(searchCriteria))
@@ -117,8 +117,8 @@ class SubmissionReviewRepositoryISpec extends AnyWordSpec
 
     "search returns none" in {
       await(repository.collection.find().toFuture()).length mustBe 0
-      await(underTest.create(submittedSubmissionReview))
-      await(underTest.create(inProgressSubmissionReview))
+      await(underTest.save(submittedSubmissionReview))
+      await(underTest.save(inProgressSubmissionReview))
 
       val searchCriteria = SubmissionReviewSearch(List(Approved))
       val result         = await(underTest.search(searchCriteria))

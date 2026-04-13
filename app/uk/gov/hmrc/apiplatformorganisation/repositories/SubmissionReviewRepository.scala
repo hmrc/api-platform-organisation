@@ -53,7 +53,7 @@ class SubmissionReviewRepository @Inject() (mongo: MongoComponent, val metrics: 
       domainFormat = SubmissionsReviewRepository.MongoFormats.submissionReviewFormat,
       indexes = Seq(
         IndexModel(
-          Indexes.ascending("submissionId", "instanceIndex"),
+          Indexes.ascending("submissionId"),
           IndexOptions()
             .name("submissionIdAndInstanceIndex")
             .unique(true)
@@ -70,15 +70,14 @@ class SubmissionReviewRepository @Inject() (mongo: MongoComponent, val metrics: 
     ) with ApplicationLogger with MetricsTimer {
   override lazy val requiresTtlIndex: Boolean = false
 
-  private def filterBy(submissionId: SubmissionId, instanceIndex: Int) =
+  private def filterBy(submissionId: SubmissionId) =
     Filters.and(
-      Filters.equal("submissionId", Codecs.toBson(submissionId)),
-      Filters.equal("instanceIndex", instanceIndex)
+      Filters.equal("submissionId", Codecs.toBson(submissionId))
     )
 
-  def fetch(submissionId: SubmissionId, instanceIndex: Int): Future[Option[SubmissionReview]] = {
+  def fetch(submissionId: SubmissionId): Future[Option[SubmissionReview]] = {
     collection.find(
-      filter = filterBy(submissionId, instanceIndex)
+      filter = filterBy(submissionId)
     ).headOption()
   }
 
@@ -95,13 +94,17 @@ class SubmissionReviewRepository @Inject() (mongo: MongoComponent, val metrics: 
       .map(_.toList)
   }
 
-  def create(review: SubmissionReview): Future[SubmissionReview] = {
-    collection.insertOne(review).toFuture().map(_ => review)
-  }
+  def save(review: SubmissionReview): Future[SubmissionReview] = {
+    val query = equal("submissionId", Codecs.toBson(review.submissionId))
+    collection.find(query).headOption().flatMap {
+      case Some(_: SubmissionReview) =>
+        collection.replaceOne(
+          filter = query,
+          replacement = review
+        ).toFuture().map(_ => review)
 
-  def update(review: SubmissionReview): Future[SubmissionReview] = {
-    val filter = filterBy(review.submissionId, review.instanceIndex)
-    collection.findOneAndReplace(filter, review).toFuture().map(_ => review)
+      case None => collection.insertOne(review).toFuture().map(_ => review)
+    }
   }
 
   def delete(submissionId: SubmissionId): Future[Boolean] = {
