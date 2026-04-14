@@ -37,7 +37,6 @@ object SubmissionReviewData extends FixedClock {
 
   val one: SubmissionReview = SubmissionReview(
     SubmissionIdData.one,
-    0,
     OrganisationNameData.one,
     instant,
     "bob@example.com",
@@ -48,7 +47,6 @@ object SubmissionReviewData extends FixedClock {
 
   val two: SubmissionReview = SubmissionReview(
     SubmissionIdData.two,
-    0,
     OrganisationNameData.one,
     instant,
     "bill@example.com",
@@ -59,7 +57,6 @@ object SubmissionReviewData extends FixedClock {
 
   val three: SubmissionReview = SubmissionReview(
     SubmissionIdData.three,
-    0,
     OrganisationNameData.one,
     instant,
     "bill@example.com",
@@ -70,7 +67,6 @@ object SubmissionReviewData extends FixedClock {
 
   val four: SubmissionReview = SubmissionReview(
     SubmissionIdData.four,
-    0,
     OrganisationNameData.one,
     instant,
     "bill@example.com",

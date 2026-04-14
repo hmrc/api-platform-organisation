@@ -26,8 +26,8 @@ POST        /submission/:sid/decline                uk.gov.hmrc.apiplatformorgan
 GET         /company/:cnumber                       uk.gov.hmrc.apiplatformorganisation.controllers.CompanyController.fetchByCompanyNumber(cnumber: String)
 
 GET         /submission-reviews                     uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionReviewController.search()
-GET         /submission-review/:sid/:idx            uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionReviewController.fetch(sid: SubmissionId, idx: Int)
-PUT         /submission-review/:sid/:idx            uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionReviewController.update(sid: SubmissionId, idx: Int)
+GET         /submission-review/:sid                 uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionReviewController.fetch(sid: SubmissionId)
+PUT         /submission-review/:sid                 uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionReviewController.update(sid: SubmissionId)
 
 GET         /allow-lists                            uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationAllowListController.fetchAll()
 GET         /allow-list/:uid                        uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationAllowListController.fetch(uid: UserId)

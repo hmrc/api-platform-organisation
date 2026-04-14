@@ -47,20 +47,20 @@ class SubmissionReviewControllerSpec extends AnyWordSpec
   "fetch" should {
     "return 200" in new Setup {
       SubmissionReviewServiceMock.Fetch.thenReturn(Some(submittedSubmissionReview))
-      val fakeRequest = FakeRequest("GET", s"/submission-review/${submittedSubmissionReview.submissionId}/${submittedSubmissionReview.instanceIndex}").withHeaders(
+      val fakeRequest = FakeRequest("GET", s"/submission-review/${submittedSubmissionReview.submissionId}").withHeaders(
         "content-type" -> "application/json"
       )
-      val result      = underTest.fetch(submittedSubmissionReview.submissionId, submittedSubmissionReview.instanceIndex)(fakeRequest)
+      val result      = underTest.fetch(submittedSubmissionReview.submissionId)(fakeRequest)
       status(result) shouldBe Status.OK
       contentAsJson(result) shouldBe Json.toJson(submittedSubmissionReview)
     }
 
     "return 404 when not found" in new Setup {
       SubmissionReviewServiceMock.Fetch.thenReturn(None)
-      val fakeRequest = FakeRequest("GET", s"/submission-review/${submittedSubmissionReview.submissionId}/${submittedSubmissionReview.instanceIndex}").withHeaders(
+      val fakeRequest = FakeRequest("GET", s"/submission-review/${submittedSubmissionReview.submissionId}").withHeaders(
         "content-type" -> "application/json"
       )
-      val result      = underTest.fetch(submittedSubmissionReview.submissionId, submittedSubmissionReview.instanceIndex)(fakeRequest)
+      val result      = underTest.fetch(submittedSubmissionReview.submissionId)(fakeRequest)
       status(result) shouldBe Status.NOT_FOUND
     }
   }
@@ -94,7 +94,7 @@ class SubmissionReviewControllerSpec extends AnyWordSpec
   "update a submission review" should {
     implicit val writer: OWrites[SubmissionReviewController.UpdateSubmissionReviewRequest] = Json.writes[SubmissionReviewController.UpdateSubmissionReviewRequest]
     val fakeRequest                                                                        =
-      FakeRequest(PUT, s"/submission-review/${submittedSubmissionReview.submissionId}/${submittedSubmissionReview.instanceIndex}").withBody(Json.toJson(SubmissionReviewController.UpdateSubmissionReviewRequest(
+      FakeRequest(PUT, s"/submission-review/${submittedSubmissionReview.submissionId}").withBody(Json.toJson(SubmissionReviewController.UpdateSubmissionReviewRequest(
         "update@example.com",
         "update comment"
       )))
@@ -102,7 +102,7 @@ class SubmissionReviewControllerSpec extends AnyWordSpec
     "return an ok response" in new Setup {
       SubmissionReviewServiceMock.UpdateSubmissionReview.thenReturn(submittedSubmissionReview)
 
-      val result = underTest.update(submittedSubmissionReview.submissionId, submittedSubmissionReview.instanceIndex)(fakeRequest)
+      val result = underTest.update(submittedSubmissionReview.submissionId)(fakeRequest)
 
       status(result) shouldBe OK
 
@@ -116,7 +116,7 @@ class SubmissionReviewControllerSpec extends AnyWordSpec
     "return a bad request response" in new Setup {
       SubmissionReviewServiceMock.UpdateSubmissionReview.thenFails("Test Error")
 
-      val result = underTest.update(submittedSubmissionReview.submissionId, submittedSubmissionReview.instanceIndex)(fakeRequest)
+      val result = underTest.update(submittedSubmissionReview.submissionId)(fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }
