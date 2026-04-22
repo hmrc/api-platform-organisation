@@ -46,33 +46,33 @@ class SubmissionReviewService @Inject() (
   }
 
   def createOrUpdate(submissionId: SubmissionId, requestedBy: String, organisationName: OrganisationName): Future[SubmissionReview] = {
-    val newEvent            = SubmissionReview.Event(
-      "Submitted",
-      requestedBy,
-      instant,
-      None
-    )
-    val newSubmissionReview = SubmissionReview(
+    val submittedEvent                                                                                             = SubmissionReview.Event("Submitted", requestedBy, instant, None)
+    val reSubmittedEvent                                                                                           = SubmissionReview.Event("Re-submitted", requestedBy, instant, None)
+    val newSubmissionReview                                                                                        = SubmissionReview(
       submissionId,
       organisationName,
       instant,
       requestedBy,
       instant,
       SubmissionReview.State.Submitted,
-      List.empty
+      List(submittedEvent)
     )
+    def updateExistingSubmisssionReview(maybeSubmissionReview: Option[SubmissionReview]): Option[SubmissionReview] = {
+      maybeSubmissionReview match {
+        case Some(submissionReview) => Some(submissionReview.copy(
+            state = SubmissionReview.State.ReSubmitted,
+            events = reSubmittedEvent :: submissionReview.events,
+            organisationName = organisationName,
+            lastUpdate = instant
+          ))
+        case _                      => None
+      }
+    }
 
     for {
       maybeSubmissionReview                   <- submissionReviewRepository.fetch(submissionId)
-      submissionReview                         = maybeSubmissionReview.getOrElse(newSubmissionReview)
-      currentEvents                            = submissionReview.events
-      updatedSubmissionReview                  = submissionReview.copy(
-                                                   state = SubmissionReview.State.Submitted,
-                                                   events = newEvent :: currentEvents,
-                                                   organisationName = organisationName,
-                                                   lastUpdate = instant
-                                                 )
-      savedSubmissionReview: SubmissionReview <- submissionReviewRepository.save(updatedSubmissionReview)
+      submissionReview                         = updateExistingSubmisssionReview(maybeSubmissionReview).getOrElse(newSubmissionReview)
+      savedSubmissionReview: SubmissionReview <- submissionReviewRepository.save(submissionReview)
     } yield savedSubmissionReview
 
   }

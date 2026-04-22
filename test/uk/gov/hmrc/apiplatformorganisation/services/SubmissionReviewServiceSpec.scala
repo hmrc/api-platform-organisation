@@ -75,9 +75,9 @@ class SubmissionReviewServiceSpec extends AsyncHmrcSpec
         result shouldBe submittedSubmissionReview
 
         val createdSubmissionReview = SubmissionReviewRepositoryMock.Update.verifyCalledWith()
-        createdSubmissionReview.state shouldBe SubmissionReview.State.Submitted
+        createdSubmissionReview.state shouldBe SubmissionReview.State.ReSubmitted
         createdSubmissionReview.events.head.name shouldBe "requestedBy@example.com"
-        createdSubmissionReview.events.head.description shouldBe "Submitted"
+        createdSubmissionReview.events.head.description shouldBe "Re-submitted"
       }
     }
 

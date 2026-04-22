@@ -28,7 +28,7 @@ import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionReview
 import uk.gov.hmrc.apiplatformorganisation.SubmissionReviewFixtures
-import uk.gov.hmrc.apiplatformorganisation.models.{Approved, InProgress, SubmissionReviewSearch, Submitted}
+import uk.gov.hmrc.apiplatformorganisation.models.{Approved, InProgress, ReSubmitted, SubmissionReviewSearch, Submitted}
 
 class SubmissionReviewRepositoryISpec extends AnyWordSpec
     with Matchers
@@ -93,13 +93,14 @@ class SubmissionReviewRepositoryISpec extends AnyWordSpec
       await(repository.collection.find().toFuture()).length mustBe 0
       await(underTest.save(submittedSubmissionReview))
       await(underTest.save(inProgressSubmissionReview))
+      await(underTest.save(reSubmittedSubmissionReview))
       await(underTest.save(approvedSubmissionReview))
 
-      val searchCriteria = SubmissionReviewSearch(List(Submitted, InProgress))
+      val searchCriteria = SubmissionReviewSearch(List(Submitted, InProgress, ReSubmitted))
       val result         = await(underTest.search(searchCriteria))
 
-      result.size mustBe 2
-      result must contain only (submittedSubmissionReview, inProgressSubmissionReview)
+      result.size mustBe 3
+      result must contain only (submittedSubmissionReview, inProgressSubmissionReview, reSubmittedSubmissionReview)
     }
 
     "search returns all" in {

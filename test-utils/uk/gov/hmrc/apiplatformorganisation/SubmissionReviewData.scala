@@ -24,6 +24,7 @@ object SubmissionIdData {
   val two: SubmissionId   = SubmissionId.random
   val three: SubmissionId = SubmissionId.random
   val four: SubmissionId  = SubmissionId.random
+  val five: SubmissionId  = SubmissionId.random
 }
 
 object SubmissionReviewEventData extends FixedClock {
@@ -31,6 +32,7 @@ object SubmissionReviewEventData extends FixedClock {
   val two: SubmissionReview.Event   = SubmissionReview.Event("Comment", "sam@sdst.com", instant, Some("Comment"))
   val three: SubmissionReview.Event = SubmissionReview.Event("Approved", "sam@sdst.com", instant, Some("Approval comment"))
   val four: SubmissionReview.Event  = SubmissionReview.Event("Declined", "sam@sdst.com", instant, Some("Decline comment"))
+  val five: SubmissionReview.Event  = SubmissionReview.Event("Re-Submitted", "bob@example.com", instant, None)
 }
 
 object SubmissionReviewData extends FixedClock {
@@ -74,11 +76,23 @@ object SubmissionReviewData extends FixedClock {
     SubmissionReview.State.Declined,
     List(SubmissionReviewEventData.one, SubmissionReviewEventData.two, SubmissionReviewEventData.four)
   )
+
+  val five: SubmissionReview = SubmissionReview(
+    SubmissionIdData.five,
+    OrganisationNameData.one,
+    instant,
+    "bob@example.com",
+    instant,
+    SubmissionReview.State.Submitted,
+    List(SubmissionReviewEventData.one, SubmissionReviewEventData.four, SubmissionReviewEventData.five)
+  )
+
 }
 
 trait SubmissionReviewFixtures {
-  val submittedSubmissionReview: SubmissionReview  = SubmissionReviewData.one
-  val inProgressSubmissionReview: SubmissionReview = SubmissionReviewData.two
-  val approvedSubmissionReview: SubmissionReview   = SubmissionReviewData.three
-  val declinedSubmissionReview: SubmissionReview   = SubmissionReviewData.four
+  val submittedSubmissionReview: SubmissionReview   = SubmissionReviewData.one
+  val inProgressSubmissionReview: SubmissionReview  = SubmissionReviewData.two
+  val approvedSubmissionReview: SubmissionReview    = SubmissionReviewData.three
+  val declinedSubmissionReview: SubmissionReview    = SubmissionReviewData.four
+  val reSubmittedSubmissionReview: SubmissionReview = SubmissionReviewData.five
 }
