@@ -129,10 +129,11 @@ class SubmissionReviewRepository @Inject() (mongo: MongoComponent, val metrics: 
 
     def getFilterState(filter: SubmissionReviewStatusFilter): SubmissionReview.State = {
       filter match {
-        case Submitted  => SubmissionReview.State.Submitted
-        case InProgress => SubmissionReview.State.InProgress
-        case Approved   => SubmissionReview.State.Approved
-        case Declined   => SubmissionReview.State.Declined
+        case Submitted   => SubmissionReview.State.Submitted
+        case InProgress  => SubmissionReview.State.InProgress
+        case Approved    => SubmissionReview.State.Approved
+        case Declined    => SubmissionReview.State.Declined
+        case ReSubmitted => SubmissionReview.State.ReSubmitted
       }
     }
 

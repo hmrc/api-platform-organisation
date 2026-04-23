@@ -48,17 +48,19 @@ case object Submitted                     extends SubmissionReviewStatusFilter
 case object InProgress                    extends SubmissionReviewStatusFilter
 case object Approved                      extends SubmissionReviewStatusFilter
 case object Declined                      extends SubmissionReviewStatusFilter
+case object ReSubmitted                   extends SubmissionReviewStatusFilter
 
 case object SubmissionReviewStatusFilter {
 
   def apply(values: Seq[String]): Seq[Option[SubmissionReviewStatusFilter]] = {
     values.map(value =>
       value match {
-        case "SUBMITTED"   => Some(Submitted)
-        case "IN_PROGRESS" => Some(InProgress)
-        case "APPROVED"    => Some(Approved)
-        case "DECLINED"    => Some(Declined)
-        case _             => None
+        case "SUBMITTED"    => Some(Submitted)
+        case "IN_PROGRESS"  => Some(InProgress)
+        case "APPROVED"     => Some(Approved)
+        case "DECLINED"     => Some(Declined)
+        case "RE_SUBMITTED" => Some(ReSubmitted)
+        case _              => None
       }
     )
   }
