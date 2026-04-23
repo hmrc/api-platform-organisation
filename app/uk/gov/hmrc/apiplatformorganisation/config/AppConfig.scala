@@ -24,8 +24,10 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 @Singleton
 class AppConfig @Inject() (config: Configuration) extends ServicesConfig(config) {
 
-  val appName: String                = config.get[String]("appName")
-  val companiesHouseKey: String      = config.get[String]("companies-house.api-key")
-  val companiesHouseUri: String      = config.get[String]("companies-house.uri")
-  val thirdPartyDeveloperUrl: String = baseUrl("third-party-developer")
+  val appName: String                     = config.get[String]("appName")
+  val authToken: String                   = config.get[String]("internal-auth.token")
+  val companiesHouseKey: String           = config.get[String]("companies-house.api-key")
+  val companiesHouseUri: String           = config.get[String]("companies-house.uri")
+  val thirdPartyDeveloperUrl: String      = baseUrl("third-party-developer")
+  val organisationsMatchingApiUrl: String = baseUrl("organisations-matching-api")
 }
