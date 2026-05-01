@@ -53,19 +53,19 @@ trait SubmissionsServiceMockModule extends MockitoSugar with ArgumentMatchersSug
     object Submit {
 
       def thenReturn(submission: Submission) =
-        when(aMock.submit(*[SubmissionId], *)).thenReturn(successful(Right(submission)))
+        when(aMock.submit(*[SubmissionId], *)(*)).thenReturn(successful(Right(submission)))
 
       def thenFails(error: String) =
-        when(aMock.submit(*[SubmissionId], *)).thenReturn(successful(Left(error)))
+        when(aMock.submit(*[SubmissionId], *)(*)).thenReturn(successful(Left(error)))
     }
 
     object Approve {
 
       def thenReturn(submission: Submission) =
-        when(aMock.approve(*[SubmissionId], *, *)).thenReturn(successful(Right(submission)))
+        when(aMock.approve(*[SubmissionId], *, *)(*)).thenReturn(successful(Right(submission)))
 
       def thenFails(error: String) =
-        when(aMock.approve(*[SubmissionId], *, *)).thenReturn(successful(Left(error)))
+        when(aMock.approve(*[SubmissionId], *, *)(*)).thenReturn(successful(Left(error)))
     }
 
     object Decline {

@@ -22,6 +22,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import cats.data.NonEmptyList
 
+import uk.gov.hmrc.http.HeaderCarrier
+
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.services.{ClockNow, EitherTHelper}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
@@ -34,6 +36,7 @@ class SubmissionsService @Inject() (
     submissionsDAO: SubmissionsDAO,
     submissionReviewService: SubmissionReviewService,
     organisationService: OrganisationService,
+    auditService: AuditService,
     val clock: Clock
   )(implicit val ec: ExecutionContext
   ) extends EitherTHelper[String] with ClockNow {
@@ -72,7 +75,7 @@ class SubmissionsService @Inject() (
       .value
   }
 
-  def submit(submissionId: SubmissionId, requestedBy: String): Future[Either[String, Submission]] = {
+  def submit(submissionId: SubmissionId, requestedBy: String)(implicit hc: HeaderCarrier): Future[Either[String, Submission]] = {
     import SubmissionDataExtracter._
     (
       for {
@@ -82,12 +85,13 @@ class SubmissionsService @Inject() (
         submittedSubmission = Submission.submit(instant, requestedBy)(submission)
         savedSubmission    <- liftF(submissionsDAO.update(submittedSubmission))
         _                  <- liftF(submissionReviewService.createOrUpdate(savedSubmission.id, requestedBy, organisationName))
+        _                  <- liftF(auditService.auditSubmitOrganisation(savedSubmission))
       } yield savedSubmission
     )
       .value
   }
 
-  def approve(submissionId: SubmissionId, approvedBy: String, comment: Option[String]): Future[Either[String, Submission]] = {
+  def approve(submissionId: SubmissionId, approvedBy: String, comment: Option[String])(implicit hc: HeaderCarrier): Future[Either[String, Submission]] = {
     import SubmissionDataExtracter._
     (
       for {
@@ -99,6 +103,7 @@ class SubmissionsService @Inject() (
         approvedSubmission = Submission.grant(instant, approvedBy, comment, None)(submission)
         savedSubmission   <- liftF(submissionsDAO.update(approvedSubmission.copy(organisationId = Some(organisation.id))))
         _                 <- liftF(submissionReviewService.approve(savedSubmission.id, approvedBy, comment))
+        _                 <- liftF(auditService.auditApproveOrganisationSubmission(savedSubmission))
       } yield savedSubmission
     )
       .value
