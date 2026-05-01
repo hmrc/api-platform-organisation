@@ -81,4 +81,17 @@ class AuditServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
       }
     }
   }
+
+  "AuditHelper" when {
+    "getSubmittedBy" in new Setup {
+      AuditHelper.getSubmittedBy(submittedSubmission) shouldBe Map("submittedBy" -> "bob@example.com")
+      AuditHelper.getSubmittedBy(aSubmission) shouldBe Map.empty
+    }
+
+    "getApprovedBy" in new Setup {
+      AuditHelper.getApprovedBy(grantedSubmission) shouldBe Map("approvedBy" -> gatekeeperUserName)
+      AuditHelper.getApprovedBy(grantedWithWarningsSubmission) shouldBe Map("approvedBy" -> gatekeeperUserName)
+      AuditHelper.getApprovedBy(aSubmission) shouldBe Map.empty
+    }
+  }
 }
