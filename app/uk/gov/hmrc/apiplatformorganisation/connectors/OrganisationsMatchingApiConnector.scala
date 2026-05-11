@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.apiplatformorganisation.connectors
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -33,7 +34,7 @@ class OrganisationsMatchingApiConnector @Inject() (http: HttpClientV2, config: A
   lazy val serviceBaseUrl: String = config.organisationsMatchingApiUrl
 
   def matchOrganisationSa(request: SaMatchingRequest, hc: HeaderCarrier): Future[JsValue] = {
-    implicit val headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)))
+    implicit val headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)), extraHeaders = Seq("CorrelationId" -> UUID.randomUUID().toString))
 
     http.post(url"$serviceBaseUrl/self-assessment")
       .withBody(Json.toJson(request))
