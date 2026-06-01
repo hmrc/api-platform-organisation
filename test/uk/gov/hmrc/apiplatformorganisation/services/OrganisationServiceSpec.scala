@@ -68,21 +68,27 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
 
     val underTest = new OrganisationService(OrganisationRepositoryMock.aMock, EmailConnectorMock.aMock, ThirdPartyDeveloperConnectorMock.aMock, clock)
 
-    val adminUserId                    = UserId.random
-    val responsibleIndividualUserId    = UserId.random
-    val verifiedUserId                 = UserId.random
-    val unverifiedUserId               = UserId.random
-    val unregisteredUserId             = UserId.random
-    val email                          = LaxEmailAddress("existing@example.com")
-    val adminEmail                     = LaxEmailAddress("admin.user@example.com")
-    val responsibleIndividualEmail     = LaxEmailAddress("responsible-individual.user@example.com")
-    val verifiedEmail                  = LaxEmailAddress("verified.user@example.com")
-    val unverifiedEmail                = LaxEmailAddress("unverified.user@example.com")
-    val unregisteredEmail              = LaxEmailAddress("unregistered.user@example.com")
+    val adminUserId                                 = UserId.random
+    val unverifiedAdminUserId                       = UserId.random
+    val responsibleIndividualUserId                 = UserId.random
+    val unverifiedResponsibleIndividualUserId       = UserId.random
+    val verifiedUserId                              = UserId.random
+    val unverifiedUserId                            = UserId.random
+    val unregisteredUserId                          = UserId.random
+    val email                                       = LaxEmailAddress("existing@example.com")
+    val adminEmail                                  = LaxEmailAddress("admin.user@example.com")
+    val unverifiedAdminEmail                        = LaxEmailAddress("unverified-admin.user@example.com")
+    val responsibleIndividualEmail                  = LaxEmailAddress("responsible-individual.user@example.com")
+    val unverifiedResponsibleIndividualEmail        = LaxEmailAddress("unverified-responsible-individual.user@example.com")
+    val verifiedEmail                               = LaxEmailAddress("verified.user@example.com")
+    val unverifiedEmail                             = LaxEmailAddress("unverified.user@example.com")
+    val unregisteredEmail                           = LaxEmailAddress("unregistered.user@example.com")
 
     val manyMembers        = standardStoredOrg.collaborators ++ Set(
                                Collaborators.Administrator(adminUserId),
+                               Collaborators.Administrator(unverifiedAdminUserId),
                                Collaborators.ResponsibleIndividual(responsibleIndividualUserId),
+                               Collaborators.ResponsibleIndividual(unverifiedResponsibleIndividualUserId),
                                Collaborators.Member(verifiedUserId),
                                Collaborators.Member(unverifiedUserId),
                                Collaborators.Member(unregisteredUserId)
@@ -159,7 +165,9 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
           List(
             RegisteredOrUnregisteredUser(MemberData.one.userId, email, true, true),
             RegisteredOrUnregisteredUser(adminUserId, adminEmail, true, true),
-            RegisteredOrUnregisteredUser(responsibleIndividualUserId, responsibleIndividualEmail, true, true)
+            RegisteredOrUnregisteredUser(unverifiedAdminUserId, unverifiedAdminEmail, true, false),
+            RegisteredOrUnregisteredUser(responsibleIndividualUserId, responsibleIndividualEmail, true, true),
+            RegisteredOrUnregisteredUser(unverifiedResponsibleIndividualUserId, unverifiedResponsibleIndividualEmail, true, false)
           )
         )
 
@@ -167,7 +175,7 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
         ThirdPartyDeveloperConnectorMock.GetOrCreateUserId.succeeds(newUserId)
         ThirdPartyDeveloperConnectorMock.GetRegisteredOrUnregisteredUsers.succeeds(List(newUserId), newUserResponse)
         ThirdPartyDeveloperConnectorMock.GetRegisteredOrUnregisteredUsers.succeeds(
-          orgWithManyMembers.collaborators.filter(c => c.isAdministrator || c.isResponsibleIndividual).map(_.userId).toList,
+          Set(MemberData.one.userId, adminUserId, unverifiedAdminUserId, responsibleIndividualUserId, unverifiedResponsibleIndividualUserId).toList,
           existingUsersResponse
         )
         OrganisationRepositoryMock.AddCollaborator.willReturn(orgWithManyMembers)
@@ -193,7 +201,9 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
           List(
             RegisteredOrUnregisteredUser(MemberData.one.userId, email, true, true),
             RegisteredOrUnregisteredUser(adminUserId, adminEmail, true, true),
-            RegisteredOrUnregisteredUser(responsibleIndividualUserId, responsibleIndividualEmail, true, true)
+            RegisteredOrUnregisteredUser(unverifiedAdminUserId, unverifiedAdminEmail, true, false),
+            RegisteredOrUnregisteredUser(responsibleIndividualUserId, responsibleIndividualEmail, true, true),
+            RegisteredOrUnregisteredUser(unverifiedResponsibleIndividualUserId, unverifiedResponsibleIndividualEmail, true, false)
           )
         )
 
@@ -201,7 +211,7 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
         ThirdPartyDeveloperConnectorMock.GetOrCreateUserId.succeeds(newUserId)
         ThirdPartyDeveloperConnectorMock.GetRegisteredOrUnregisteredUsers.succeeds(List(newUserId), newUserResponse)
         ThirdPartyDeveloperConnectorMock.GetRegisteredOrUnregisteredUsers.succeeds(
-          orgWithManyMembers.collaborators.filter(c => c.isAdministrator || c.isResponsibleIndividual).map(_.userId).toList,
+          Set(MemberData.one.userId, adminUserId, unverifiedAdminUserId, responsibleIndividualUserId, unverifiedResponsibleIndividualUserId).toList,
           existingUsersResponse
         )
         OrganisationRepositoryMock.AddCollaborator.willReturn(orgWithManyMembers)
@@ -242,14 +252,16 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
           List(
             RegisteredOrUnregisteredUser(MemberData.one.userId, email, true, true),
             RegisteredOrUnregisteredUser(adminUserId, adminEmail, true, true),
-            RegisteredOrUnregisteredUser(responsibleIndividualUserId, responsibleIndividualEmail, true, true)
+            RegisteredOrUnregisteredUser(unverifiedAdminUserId, unverifiedAdminEmail, true, false),
+            RegisteredOrUnregisteredUser(responsibleIndividualUserId, responsibleIndividualEmail, true, true),
+            RegisteredOrUnregisteredUser(unverifiedResponsibleIndividualUserId, unverifiedResponsibleIndividualEmail, true, false)
           )
         )
 
         OrganisationRepositoryMock.Fetch.willReturn(orgWithManyMembers)
         OrganisationRepositoryMock.RemoveCollaborator.willReturn(orgWithManyMembers)
         ThirdPartyDeveloperConnectorMock.GetRegisteredOrUnregisteredUsers.succeeds(
-          orgWithManyMembers.collaborators.filter(c => c.isAdministrator || c.isResponsibleIndividual).map(_.userId).toList,
+          Set(MemberData.one.userId, adminUserId, unverifiedAdminUserId, responsibleIndividualUserId, unverifiedResponsibleIndividualUserId).toList,
           existingUsersResponse
         )
         EmailConnectorMock.SendMemberRemovedConfirmation.succeeds()
