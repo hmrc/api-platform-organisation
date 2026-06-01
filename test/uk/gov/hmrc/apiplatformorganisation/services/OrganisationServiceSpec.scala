@@ -68,18 +68,21 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
 
     val underTest = new OrganisationService(OrganisationRepositoryMock.aMock, EmailConnectorMock.aMock, ThirdPartyDeveloperConnectorMock.aMock, clock)
 
-    val adminUserId        = UserId.random
-    val verifiedUserId     = UserId.random
-    val unverifiedUserId   = UserId.random
-    val unregisteredUserId = UserId.random
-    val email              = LaxEmailAddress("existing@example.com")
-    val adminEmail         = LaxEmailAddress("admin.user@example.com")
-    val verifiedEmail      = LaxEmailAddress("verified.user@example.com")
-    val unverifiedEmail    = LaxEmailAddress("unverified.user@example.com")
-    val unregisteredEmail  = LaxEmailAddress("unregistered.user@example.com")
+    val adminUserId                    = UserId.random
+    val responsibleIndividualUserId    = UserId.random
+    val verifiedUserId                 = UserId.random
+    val unverifiedUserId               = UserId.random
+    val unregisteredUserId             = UserId.random
+    val email                          = LaxEmailAddress("existing@example.com")
+    val adminEmail                     = LaxEmailAddress("admin.user@example.com")
+    val responsibleIndividualEmail     = LaxEmailAddress("responsible-individual.user@example.com")
+    val verifiedEmail                  = LaxEmailAddress("verified.user@example.com")
+    val unverifiedEmail                = LaxEmailAddress("unverified.user@example.com")
+    val unregisteredEmail              = LaxEmailAddress("unregistered.user@example.com")
 
     val manyMembers        = standardStoredOrg.collaborators ++ Set(
                                Collaborators.Administrator(adminUserId),
+                               Collaborators.ResponsibleIndividual(responsibleIndividualUserId),
                                Collaborators.Member(verifiedUserId),
                                Collaborators.Member(unverifiedUserId),
                                Collaborators.Member(unregisteredUserId)
@@ -155,7 +158,8 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
         val existingUsersResponse = GetRegisteredOrUnregisteredUsersResponse(
           List(
             RegisteredOrUnregisteredUser(MemberData.one.userId, email, true, true),
-            RegisteredOrUnregisteredUser(adminUserId, adminEmail, true, true)
+            RegisteredOrUnregisteredUser(adminUserId, adminEmail, true, true),
+            RegisteredOrUnregisteredUser(responsibleIndividualUserId, responsibleIndividualEmail, true, true)
           )
         )
 
@@ -174,7 +178,7 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
 
         result.value shouldBe StoredOrganisation.asOrganisation(orgWithManyMembers)
         EmailConnectorMock.SendRegisteredMemberAddedConfirmation.verifyCalledWith(orgWithManyMembers.name, Set(newUserEmail))
-        EmailConnectorMock.SendMemberAddedNotification.verifyCalledWith(orgWithManyMembers.name, newUserEmail, "Member", Set(email, adminEmail))
+        EmailConnectorMock.SendMemberAddedNotification.verifyCalledWith(orgWithManyMembers.name, newUserEmail, "Member", Set(email, adminEmail, responsibleIndividualEmail))
       }
 
       "add unregistered member" in new Setup {
@@ -188,7 +192,8 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
         val existingUsersResponse = GetRegisteredOrUnregisteredUsersResponse(
           List(
             RegisteredOrUnregisteredUser(MemberData.one.userId, email, true, true),
-            RegisteredOrUnregisteredUser(adminUserId, adminEmail, true, true)
+            RegisteredOrUnregisteredUser(adminUserId, adminEmail, true, true),
+            RegisteredOrUnregisteredUser(responsibleIndividualUserId, responsibleIndividualEmail, true, true)
           )
         )
 
@@ -207,7 +212,7 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
 
         result.value shouldBe StoredOrganisation.asOrganisation(orgWithManyMembers)
         EmailConnectorMock.SendUnregisteredMemberAddedConfirmation.verifyCalledWith(orgWithManyMembers.name, Set(newUserEmail))
-        EmailConnectorMock.SendMemberAddedNotification.verifyCalledWith(orgWithManyMembers.name, newUserEmail, "Member", Set(email, adminEmail))
+        EmailConnectorMock.SendMemberAddedNotification.verifyCalledWith(orgWithManyMembers.name, newUserEmail, "Member", Set(email, adminEmail, responsibleIndividualEmail))
       }
 
       "add member fails if already present" in new Setup {
@@ -236,7 +241,8 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
         val existingUsersResponse = GetRegisteredOrUnregisteredUsersResponse(
           List(
             RegisteredOrUnregisteredUser(MemberData.one.userId, email, true, true),
-            RegisteredOrUnregisteredUser(adminUserId, adminEmail, true, true)
+            RegisteredOrUnregisteredUser(adminUserId, adminEmail, true, true),
+            RegisteredOrUnregisteredUser(responsibleIndividualUserId, responsibleIndividualEmail, true, true)
           )
         )
 
@@ -253,7 +259,7 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
 
         result.value shouldBe StoredOrganisation.asOrganisation(orgWithManyMembers)
         EmailConnectorMock.SendMemberRemovedConfirmation.verifyCalledWith(orgWithManyMembers.name, Set(oldUserEmail))
-        EmailConnectorMock.SendMemberRemovedNotification.verifyCalledWith(orgWithManyMembers.name, oldUserEmail, "Member", Set(email, adminEmail))
+        EmailConnectorMock.SendMemberRemovedNotification.verifyCalledWith(orgWithManyMembers.name, oldUserEmail, "Member", Set(email, adminEmail, responsibleIndividualEmail))
       }
 
       "remove member fails if not present" in new Setup {
