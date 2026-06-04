@@ -40,7 +40,6 @@ object UserIdData {
 
 object MemberData {
   val one: Collaborator   = Collaborators.ResponsibleIndividual(UserIdData.one)
-  val admin: Collaborator = Collaborators.Administrator(UserId.random)
 }
 
 object CreateOrganisationRequestData {

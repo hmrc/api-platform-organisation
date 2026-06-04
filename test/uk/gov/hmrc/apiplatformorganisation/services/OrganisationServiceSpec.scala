@@ -75,6 +75,7 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
     val verifiedUserId                              = UserId.random
     val unverifiedUserId                            = UserId.random
     val unregisteredUserId                          = UserId.random
+
     val email                                       = LaxEmailAddress("existing@example.com")
     val adminEmail                                  = LaxEmailAddress("admin.user@example.com")
     val unverifiedAdminEmail                        = LaxEmailAddress("unverified-admin.user@example.com")
@@ -175,7 +176,7 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
         ThirdPartyDeveloperConnectorMock.GetOrCreateUserId.succeeds(newUserId)
         ThirdPartyDeveloperConnectorMock.GetRegisteredOrUnregisteredUsers.succeeds(List(newUserId), newUserResponse)
         ThirdPartyDeveloperConnectorMock.GetRegisteredOrUnregisteredUsers.succeeds(
-          Set(MemberData.one.userId, adminUserId, unverifiedAdminUserId, responsibleIndividualUserId, unverifiedResponsibleIndividualUserId).toList,
+          orgWithManyMembers.collaborators.filter(c => c.isAdministrator || c.isResponsibleIndividual).map(_.userId).toList,
           existingUsersResponse
         )
         OrganisationRepositoryMock.AddCollaborator.willReturn(orgWithManyMembers)
@@ -211,7 +212,7 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
         ThirdPartyDeveloperConnectorMock.GetOrCreateUserId.succeeds(newUserId)
         ThirdPartyDeveloperConnectorMock.GetRegisteredOrUnregisteredUsers.succeeds(List(newUserId), newUserResponse)
         ThirdPartyDeveloperConnectorMock.GetRegisteredOrUnregisteredUsers.succeeds(
-          Set(MemberData.one.userId, adminUserId, unverifiedAdminUserId, responsibleIndividualUserId, unverifiedResponsibleIndividualUserId).toList,
+          orgWithManyMembers.collaborators.filter(c => c.isAdministrator || c.isResponsibleIndividual).map(_.userId).toList,
           existingUsersResponse
         )
         OrganisationRepositoryMock.AddCollaborator.willReturn(orgWithManyMembers)
@@ -261,7 +262,7 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
         OrganisationRepositoryMock.Fetch.willReturn(orgWithManyMembers)
         OrganisationRepositoryMock.RemoveCollaborator.willReturn(orgWithManyMembers)
         ThirdPartyDeveloperConnectorMock.GetRegisteredOrUnregisteredUsers.succeeds(
-          Set(MemberData.one.userId, adminUserId, unverifiedAdminUserId, responsibleIndividualUserId, unverifiedResponsibleIndividualUserId).toList,
+          orgWithManyMembers.collaborators.filter(c => c.isAdministrator || c.isResponsibleIndividual).map(_.userId).toList,
           existingUsersResponse
         )
         EmailConnectorMock.SendMemberRemovedConfirmation.succeeds()
