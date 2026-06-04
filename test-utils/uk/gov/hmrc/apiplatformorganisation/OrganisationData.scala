@@ -39,7 +39,7 @@ object UserIdData {
 }
 
 object MemberData {
-  val one: Collaborator   = Collaborators.ResponsibleIndividual(UserIdData.one)
+  val one: Collaborator = Collaborators.ResponsibleIndividual(UserIdData.one)
 }
 
 object CreateOrganisationRequestData {
