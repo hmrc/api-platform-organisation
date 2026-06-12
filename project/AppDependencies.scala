@@ -11,8 +11,7 @@ object AppDependencies {
     "uk.gov.hmrc"       %% "bootstrap-backend-play-30"        % bootstrapVersion,
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-30"               % hmrcMongoVersion,
     "uk.gov.hmrc"       %% "api-platform-organisation-domain" % orgDomainVersion,
-    "uk.gov.hmrc"       %% "api-platform-tpd-domain"          % tpdDomainVersion,
-    "commons-validator"  % "commons-validator"                % "1.7"
+    "uk.gov.hmrc"       %% "api-platform-tpd-domain"          % tpdDomainVersion
   )
 
   val test = Seq(
