@@ -28,7 +28,8 @@ lazy val microservice = Project("api-platform-organisation", file("."))
       "-Wconf:msg=Implicit parameters should be provided with a `using` clause:s"
     ),
     routesImport ++= Seq(
-      "uk.gov.hmrc.apiplatformorganisation.controllers.binders.PathBinders.given",
+      "uk.gov.hmrc.apiplatformorganisation.models.RoutesModel._",
+      "uk.gov.hmrc.apiplatformorganisation.models.RoutesModel.RouteConversions.given",
       "java.util.UUID",
       "uk.gov.hmrc.apiplatform.modules.common.domain.models._",
       "uk.gov.hmrc.apiplatform.modules.organisations.domain.models._",
