@@ -21,13 +21,13 @@ import scala.concurrent.ExecutionContext
 import org.apache.pekko.stream.Materializer
 import org.apache.pekko.stream.testkit.NoMaterializer
 
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.SubmissionsTestData
 import uk.gov.hmrc.apiplatformorganisation.mocks.SubmissionsServiceMockModule
 import uk.gov.hmrc.apiplatformorganisation.mocks.services.OrganisationServiceMockModule
-import uk.gov.hmrc.apiplatformorganisation.util._
+import uk.gov.hmrc.apiplatformorganisation.util.*
 
 class TestOnlyControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
   implicit val mat: Materializer    = NoMaterializer

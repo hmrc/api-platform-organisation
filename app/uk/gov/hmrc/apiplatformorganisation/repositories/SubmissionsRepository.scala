@@ -23,12 +23,12 @@ import com.google.inject.{Inject, Singleton}
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.{IndexModel, IndexOptions}
 
-import play.api.libs.json._
+import play.api.libs.json.*
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
 
 object SubmissionsRepository {
 
@@ -58,7 +58,7 @@ object SubmissionsRepository {
 
     implicit val dateFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 
-    import Submission.Status._
+    import Submission.Status.*
 
     implicit val RejectedStatusFormat: OFormat[Declined]                                         = Json.format[Declined]
     implicit val AcceptedStatusFormat: OFormat[Granted]                                          = Json.format[Granted]
@@ -82,8 +82,8 @@ object SubmissionsRepository {
       .and[Created]("created")
       .format
 
-    import GroupOfQuestionnaires._
-    import Question._
+    import GroupOfQuestionnaires.*
+    import Question.*
 
     implicit val submissionInstanceFormat: OFormat[Submission.Instance] = Json.format[Submission.Instance]
     implicit val submissionFormat: OFormat[Submission]                  = Json.format[Submission]

@@ -20,7 +20,7 @@ import java.time.Instant
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-import org.mongodb.scala.model.Filters._
+import org.mongodb.scala.model.Filters.*
 import org.mongodb.scala.model.{IndexModel, IndexOptions, Indexes}
 
 import play.api.libs.json.{Format, Json, OFormat}

@@ -25,9 +25,9 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationName}
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services.{ValidationError, ValidationErrors}
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils._
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.*
 import uk.gov.hmrc.apiplatformorganisation.mocks.services.{OrganisationServiceMockModule, SubmissionReviewServiceMockModule}
 import uk.gov.hmrc.apiplatformorganisation.mocks.{AuditServiceMockModule, SubmissionsDAOMockModule}
 import uk.gov.hmrc.apiplatformorganisation.repositories.QuestionnaireDAO

@@ -1,6 +1,6 @@
 # microservice specific routes
 
-POST        /organisation/create                    uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationController.create
+POST        /organisation/create                    uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationController.create()
 GET         /organisation/:oid                      uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationController.fetch(oid: OrganisationIdRt)
 GET         /organisation/user/:uid                 uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationController.fetchByUserId(uid: UserIdRt)
 POST        /organisations                          uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationController.searchOrganisations

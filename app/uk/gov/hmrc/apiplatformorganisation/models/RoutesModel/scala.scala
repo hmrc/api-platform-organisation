@@ -8,5 +8,5 @@ final case class OrganisationIdRt(value: UUID) extends AnyVal {
 }
 
 case class UserIdRt(value: ju.UUID) extends AnyVal {
-  override def toString(): String = value.toString
+  override def toString: String = value.toString
 }

@@ -23,7 +23,7 @@ import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
 import uk.gov.hmrc.apiplatformorganisation.connectors.EmailConnector
-import uk.gov.hmrc.apiplatformorganisation.models._
+import uk.gov.hmrc.apiplatformorganisation.models.*
 
 trait EmailConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
 

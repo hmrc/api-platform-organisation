@@ -24,7 +24,7 @@ import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.libs.ws.{WSClient, WSResponse}
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.test.WsTestClient
 import uk.gov.hmrc.http.test.WireMockSupport
 import uk.gov.hmrc.utils.ConfigBuilder

@@ -20,11 +20,13 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 import play.api.libs.json.{Json, OWrites, Reads}
+import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import play.api.mvc.{ControllerComponents, Results}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission.given
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services.ValidationErrors
 import uk.gov.hmrc.apiplatformorganisation.services.SubmissionsService
 
@@ -55,8 +57,8 @@ class SubmissionsController @Inject() (
     cc: ControllerComponents
   )(implicit val ec: ExecutionContext
   ) extends BackendController(cc) {
-  import SubmissionsController._
-  import Submission._
+  import SubmissionsController.*
+  import Submission.*
 
   def createSubmissionFor(userId: UserId) = Action.async(parse.json) { implicit request =>
     val failed = (msg: String) => BadRequest(Json.toJson(ErrorMessage(msg)))

@@ -18,7 +18,7 @@ package uk.gov.hmrc.apiplatformorganisation.models
 
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.Json.JsValueWrapper
-import play.api.libs.json._
+import play.api.libs.json.*
 
 case class RegisteredOfficeAddress(
     addressLineOne: Option[String] = None,
@@ -34,7 +34,7 @@ case class RegisteredOfficeAddress(
 
 object RegisteredOfficeAddress {
 
-  implicit val reads: Reads[RegisteredOfficeAddress] = (
+  given reads: Reads[RegisteredOfficeAddress] = (
     (__ \ "address_line_1").readNullable[String] and
       (__ \ "address_line_2").readNullable[String] and
       (__ \ "care_of").readNullable[String] and
@@ -48,25 +48,25 @@ object RegisteredOfficeAddress {
     RegisteredOfficeAddress(addressLineOne, addressLineTwo, careOf, country, locality, poBox, postalCode, premises, region)
   )
 
-  implicit val writes: OWrites[RegisteredOfficeAddress] = Json.writes[RegisteredOfficeAddress]
+  given writes: OWrites[RegisteredOfficeAddress] = Json.writes[RegisteredOfficeAddress]
 
-  implicit val format = OFormat[RegisteredOfficeAddress](reads, writes)
+  given format: OFormat[RegisteredOfficeAddress] = OFormat[RegisteredOfficeAddress](reads, writes)
 }
 
 case class CompaniesHouseCompanyProfile(companyName: String, registeredOfficeAddress: Option[RegisteredOfficeAddress])
 
 object CompaniesHouseCompanyProfile {
 
-  implicit val reads: Reads[CompaniesHouseCompanyProfile] = (
+  given reads: Reads[CompaniesHouseCompanyProfile] = (
     (__ \ "company_name").read[String] and
       (__ \ "registered_office_address").readNullable[RegisteredOfficeAddress]
   )((companyName, registeredOfficeAddress) =>
     CompaniesHouseCompanyProfile(companyName, registeredOfficeAddress)
   )
 
-  implicit val writes: OWrites[CompaniesHouseCompanyProfile] = Json.writes[CompaniesHouseCompanyProfile]
+  given writes: OWrites[CompaniesHouseCompanyProfile] = Json.writes[CompaniesHouseCompanyProfile]
 
-  implicit val format = OFormat[CompaniesHouseCompanyProfile](reads, writes)
+  given format: OFormat[CompaniesHouseCompanyProfile] = OFormat[CompaniesHouseCompanyProfile](reads, writes)
 }
 
 object ErrorCode extends Enumeration {

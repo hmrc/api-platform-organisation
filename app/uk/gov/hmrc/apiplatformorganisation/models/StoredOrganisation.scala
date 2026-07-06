@@ -18,7 +18,7 @@ package uk.gov.hmrc.apiplatformorganisation.models
 
 import java.time.Instant
 
-import play.api.libs.json._
+import play.api.libs.json.*
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}

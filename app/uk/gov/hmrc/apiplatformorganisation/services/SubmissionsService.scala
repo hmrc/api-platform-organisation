@@ -26,9 +26,9 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.services.{ClockNow, EitherTHelper}
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services._
-import uk.gov.hmrc.apiplatformorganisation.repositories._
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services.*
+import uk.gov.hmrc.apiplatformorganisation.repositories.*
 
 @Singleton
 class SubmissionsService @Inject() (
@@ -76,7 +76,7 @@ class SubmissionsService @Inject() (
   }
 
   def submit(submissionId: SubmissionId, requestedBy: String)(implicit hc: HeaderCarrier): Future[Either[String, Submission]] = {
-    import SubmissionDataExtracter._
+    import SubmissionDataExtracter.*
     (
       for {
         submission         <- fromOptionF(submissionsDAO.fetch(submissionId), "No such submission")
@@ -92,7 +92,7 @@ class SubmissionsService @Inject() (
   }
 
   def approve(submissionId: SubmissionId, approvedBy: String, comment: Option[String])(implicit hc: HeaderCarrier): Future[Either[String, Submission]] = {
-    import SubmissionDataExtracter._
+    import SubmissionDataExtracter.*
     (
       for {
         submission        <- fromOptionF(submissionsDAO.fetch(submissionId), "No such submission")

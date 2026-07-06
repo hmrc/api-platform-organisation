@@ -17,7 +17,7 @@
 package uk.gov.hmrc.apiplatformorganisation.services
 
 import uk.gov.hmrc.apiplatform.modules.common.utils.HmrcSpec
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.SubmissionsTestData
 
 class QuestionsAndAnswersToMapSpec extends HmrcSpec {

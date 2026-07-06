@@ -41,7 +41,7 @@ class OrganisationAllowListController @Inject() (
   )(implicit val ec: ExecutionContext
   ) extends BackendController(cc) with ApplicationLogger {
 
-  import OrganisationAllowListController._
+  import OrganisationAllowListController.*
 
   def create(userId: UserId): Action[AddOrganisationAllowListRequest] = Action.async(parse.json[AddOrganisationAllowListRequest]) { implicit request =>
     val failed = (msg: String) => BadRequest(Json.toJson(ErrorMessage(msg)))

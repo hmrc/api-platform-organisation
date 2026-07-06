@@ -22,16 +22,16 @@ import org.apache.pekko.stream.Materializer
 import org.apache.pekko.stream.testkit.NoMaterializer
 
 import play.api.libs.json.{JsError, JsSuccess, Json, OWrites, Reads}
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, MarkedSubmission, Question, Submission}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.SubmissionsTestData
 import uk.gov.hmrc.apiplatformorganisation.mocks.SubmissionsServiceMockModule
-import uk.gov.hmrc.apiplatformorganisation.util._
+import uk.gov.hmrc.apiplatformorganisation.util.*
 
 class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
-  import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission._
+  import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission.*
   implicit val mat: Materializer = NoMaterializer
 
   implicit val readsExtendedSubmission: Reads[Submission] = Json.reads[Submission]

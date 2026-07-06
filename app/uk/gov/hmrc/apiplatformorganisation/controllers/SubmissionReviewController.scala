@@ -26,7 +26,7 @@ import play.api.mvc.{ControllerComponents, Result, Results}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, SubmissionReview}
-import uk.gov.hmrc.apiplatformorganisation.models.ErrorCode._
+import uk.gov.hmrc.apiplatformorganisation.models.ErrorCode.*
 import uk.gov.hmrc.apiplatformorganisation.models.{JsErrorResponse, SubmissionReviewSearch}
 import uk.gov.hmrc.apiplatformorganisation.services.SubmissionReviewService
 import uk.gov.hmrc.apiplatformorganisation.utils.ApplicationLogger
@@ -45,7 +45,7 @@ class SubmissionReviewController @Inject() (
     cc: ControllerComponents
   )(implicit val ec: ExecutionContext
   ) extends BackendController(cc) with ApplicationLogger {
-  import SubmissionReviewController._
+  import SubmissionReviewController.*
 
   def fetch(submissionId: SubmissionId) = Action.async { request =>
     lazy val failed = NotFound(Results.EmptyContent())
