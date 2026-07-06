@@ -19,24 +19,25 @@ package uk.gov.hmrc.apiplatformorganisation.models
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionId
 
-import java.util as ju
 import java.util.UUID
 import scala.language.postfixOps
 
-final case class OrganisationIdRt(value: UUID) extends AnyVal {
-  override def toString: String = value.toString
-}
+object RouteModels {
+  case class SimpleOrganisationId(value: UUID) extends AnyVal {
+    override def toString: String = value.toString
+  }
 
-case class UserIdRt(value: ju.UUID) extends AnyVal {
-  override def toString: String = value.toString
-}
+  case class SimpleUserId(value: UUID) extends AnyVal {
+    override def toString: String = value.toString
+  }
 
-case class SubmissionIdRt(value: ju.UUID) extends AnyVal {
-  override def toString: String = value.toString
-}
+  case class SimpleSubmissionId(value: UUID) extends AnyVal {
+    override def toString: String = value.toString
+  }
 
-object RouteConversions {
-  given Conversion[UserIdRt, UserId] = uRt => UserId(uRt.value)
-  given Conversion[OrganisationIdRt, OrganisationId] = oRt => OrganisationId(oRt.value)
-  given Conversion[SubmissionIdRt, SubmissionId] = sRt => SubmissionId(sRt.value)
+  given Conversion[SimpleUserId, UserId] = uRt => UserId(uRt.value)
+
+  given Conversion[SimpleOrganisationId, OrganisationId] = oRt => OrganisationId(oRt.value)
+
+  given Conversion[SimpleSubmissionId, SubmissionId] = sRt => SubmissionId(sRt.value)
 }
