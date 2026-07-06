@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.apiplatformorganisation.models.RoutesModel
+package uk.gov.hmrc.apiplatformorganisation.models
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionId
 
-import java.util.UUID
 import java.util as ju
+import java.util.UUID
 import scala.language.postfixOps
 
 final case class OrganisationIdRt(value: UUID) extends AnyVal {
