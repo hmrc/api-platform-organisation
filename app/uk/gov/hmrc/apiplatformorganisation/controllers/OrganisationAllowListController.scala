@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 import play.api.libs.json.{Json, OWrites}
-import play.api.mvc.{Action, ControllerComponents, Results}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Results}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
@@ -51,7 +51,7 @@ class OrganisationAllowListController @Inject() (
     organisationAllowListService.create(userId, request.body.requestedBy, request.body.organisationName).map(_.fold(failed, success))
   }
 
-  def delete(userId: UserId) = Action.async { request =>
+  def delete(userId: UserId): Action[AnyContent] = Action.async { _ =>
     val failed = (msg: String) => BadRequest(Json.toJson(ErrorMessage(msg)))
 
     val success = (a: Boolean) => Ok(Json.toJson(a))
@@ -59,7 +59,7 @@ class OrganisationAllowListController @Inject() (
     organisationAllowListService.delete(userId).map(_.fold(failed, success))
   }
 
-  def fetch(userId: UserId) = Action.async { request =>
+  def fetch(userId: UserId): Action[AnyContent] = Action.async { _ =>
     lazy val failed = NotFound(Results.EmptyContent())
 
     val success = (sr: OrganisationAllowList) => Ok(Json.toJson(sr))
@@ -67,7 +67,7 @@ class OrganisationAllowListController @Inject() (
     organisationAllowListService.fetch(userId).map(_.fold(failed)(success))
   }
 
-  def fetchAll() = Action.async { request =>
+  def fetchAll(): Action[AnyContent] = Action.async { _ =>
     organisationAllowListService.fetchAll().map(allowLists => Ok(Json.toJson(allowLists)))
   }
 }

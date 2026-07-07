@@ -89,10 +89,10 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
       "store a submission for the user" in new Setup {
         SubmissionsDAOMock.Save.thenReturn()
 
-        val result = await(underTest.create(userId, "bob@example.com"))
+        val result: Either[String, Submission] = await(underTest.create(userId, "bob@example.com"))
 
         inside(result.value) {
-          case s @ Submission(_, _, _, startedBy, groupings, testQuestionIdsOfInterest, instances, _) =>
+          case s @ Submission(_, _, _, startedBy, _, _, instances, _) =>
             startedBy shouldBe userId
             instances.head.answersToQuestions.size shouldBe 0
         }
@@ -110,7 +110,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         SubmissionReviewServiceMock.CreateSubmissionReview.thenReturn(submittedSubmissionReview)
         AuditServiceMock.AuditSubmitOrganisation.thenReturn()
 
-        val result = await(underTest.submit(submissionId, "bob@example.com"))
+        val result: Either[String, Submission] = await(underTest.submit(submissionId, "bob@example.com"))
 
         result.value.status shouldBe Submission.Status.Submitted(instant, "bob@example.com")
       }
@@ -118,7 +118,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
       "fail to submit a submission that hasn't been answered completely" in new Setup {
         SubmissionsDAOMock.Fetch.thenReturn(aSubmission)
 
-        val result = await(underTest.submit(submissionId, "bob@example.com"))
+        val result: Either[String, Submission] = await(underTest.submit(submissionId, "bob@example.com"))
 
         result.isLeft shouldBe true
         result.left.value shouldBe "Submission not completely answered"
@@ -137,7 +137,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         SubmissionReviewServiceMock.ApproveSubmissionReview.thenReturn(approvedSubmissionReview)
         AuditServiceMock.AuditApproveOrganisationSubmission.thenReturn()
 
-        val result = await(underTest.approve(submissionId, "bob@example.com", Some("comment")))
+        val result: Either[String, Submission] = await(underTest.approve(submissionId, "bob@example.com", Some("comment")))
 
         result.value.status shouldBe Submission.Status.Granted(instant, "bob@example.com", Some("comment"), None)
 

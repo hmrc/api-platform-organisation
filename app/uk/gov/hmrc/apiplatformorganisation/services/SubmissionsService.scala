@@ -64,12 +64,12 @@ class SubmissionsService @Inject() (
     val emptyContext: Map[String, String] = Map.empty
     (
       for {
-        groups           <- liftF(questionnaireDAO.fetchActiveGroupsOfQuestionnaires())
-        allQuestionnaires = groups.flatMap(_.links)
-        submissionId      = SubmissionId.random
-        newInstance       = Submission.Instance(0, emptyAnswers, NonEmptyList.of(Submission.Status.Created(instant, requestedBy)))
-        submission        = Submission(submissionId, None, instant, startedBy, groups, QuestionnaireDAO.questionIdsOfInterest, NonEmptyList.of(newInstance), emptyContext)
-        savedSubmission  <- liftF(submissionsDAO.save(submission))
+        groups          <- liftF(questionnaireDAO.fetchActiveGroupsOfQuestionnaires())
+        _                = groups.flatMap(_.links)
+        submissionId     = SubmissionId.random
+        newInstance      = Submission.Instance(0, emptyAnswers, NonEmptyList.of(Submission.Status.Created(instant, requestedBy)))
+        submission       = Submission(submissionId, None, instant, startedBy, groups, QuestionnaireDAO.questionIdsOfInterest, NonEmptyList.of(newInstance), emptyContext)
+        savedSubmission <- liftF(submissionsDAO.save(submission))
       } yield savedSubmission
     )
       .value

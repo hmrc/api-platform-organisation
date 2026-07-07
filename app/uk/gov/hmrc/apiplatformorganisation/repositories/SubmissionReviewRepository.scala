@@ -123,7 +123,7 @@ class SubmissionReviewRepository @Inject() (mongo: MongoComponent, val metrics: 
         Document()
       } else {
         val bsonStates = states.map(s => Codecs.toBson(s))
-        in("state", bsonStates: _*)
+        in("state", bsonStates*)
       }
     }
 
@@ -138,7 +138,7 @@ class SubmissionReviewRepository @Inject() (mongo: MongoComponent, val metrics: 
     }
 
     val statusFilters = filters.collect { case sf: SubmissionReviewStatusFilter => sf }
-    statusMatch(statusFilters.map(sf => getFilterState(sf)): _*)
+    statusMatch(statusFilters.map(sf => getFilterState(sf))*)
   }
 
   private def runAggregationQuery(statusFilters: Bson) = {

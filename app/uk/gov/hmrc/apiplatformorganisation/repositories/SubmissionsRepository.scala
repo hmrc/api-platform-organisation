@@ -83,9 +83,8 @@ object SubmissionsRepository {
       .and[Created]("created")
       .format
 
-    import GroupOfQuestionnaires.*
-    import Question.*
     import NonEmptyListFormatters.given
+    import Question.*
 
     implicit val submissionInstanceFormat: OFormat[Submission.Instance] = Json.format[Submission.Instance]
     implicit val submissionFormat: OFormat[Submission]                  = Json.format[Submission]

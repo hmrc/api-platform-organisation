@@ -21,8 +21,8 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future.successful
 import scala.util.{Failure, Success, Try}
 
-import play.api.libs.json.{Json, OWrites, Reads}
-import play.api.mvc.{ControllerComponents, Result, Results}
+import play.api.libs.json.{JsValue, Json, OWrites, Reads}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Result, Results}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, SubmissionReview}
@@ -47,7 +47,7 @@ class SubmissionReviewController @Inject() (
   ) extends BackendController(cc) with ApplicationLogger {
   import SubmissionReviewController.*
 
-  def fetch(submissionId: SubmissionId) = Action.async { request =>
+  def fetch(submissionId: SubmissionId): Action[AnyContent] = Action.async { _ =>
     lazy val failed = NotFound(Results.EmptyContent())
 
     val success = (sr: SubmissionReview) => Ok(Json.toJson(sr))
@@ -55,7 +55,7 @@ class SubmissionReviewController @Inject() (
     submissionReviewService.fetch(submissionId).map(_.fold(failed)(success))
   }
 
-  def update(submissionId: SubmissionId) = Action.async(parse.json) { implicit request =>
+  def update(submissionId: SubmissionId): Action[JsValue] = Action.async(parse.json) { implicit request =>
     val failed = (msg: String) => BadRequest(Json.toJson(ErrorMessage(msg)))
 
     val success = (s: SubmissionReview) => Ok(Json.toJson(s))
@@ -65,7 +65,7 @@ class SubmissionReviewController @Inject() (
     }
   }
 
-  def search() = Action.async { request =>
+  def search(): Action[AnyContent] = Action.async { request =>
     Try(SubmissionReviewSearch.fromQueryString(request.queryString)) match {
       case Success(search) => submissionReviewService.search(search).map(s => Ok(Json.toJson(s))) recover recovery
       case Failure(e)      => successful(BadRequest(JsErrorResponse(BAD_QUERY_PARAMETER, e.getMessage)))

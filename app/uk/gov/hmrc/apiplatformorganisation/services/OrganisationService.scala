@@ -100,7 +100,7 @@ class OrganisationService @Inject() (
 
   private def isCollaboratorOnApp(collaborators: Set[Collaborator], userId: UserId): Boolean = {
     collaborators.find(collaborator => collaborator.userId == userId) match {
-      case Some(c) => true
+      case Some(_) => true
       case _       => false
     }
   }

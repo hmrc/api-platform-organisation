@@ -51,7 +51,7 @@ class AuditService @Inject() (
       auditSource = "api-platform-organisation",
       auditType = action.auditType,
       tags = hc.toAuditTags(action.name, "-") ++ HeaderCarrierHelper.headersToUserContext(hc),
-      detail = hc.toAuditDetails(data.toSeq: _*)
+      detail = hc.toAuditDetails(data.toSeq*)
     ))
 }
 
