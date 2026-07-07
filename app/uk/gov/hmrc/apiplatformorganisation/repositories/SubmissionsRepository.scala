@@ -28,6 +28,7 @@ import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.services.NonEmptyListFormatters
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
 
 object SubmissionsRepository {
@@ -84,6 +85,7 @@ object SubmissionsRepository {
 
     import GroupOfQuestionnaires.*
     import Question.*
+    import NonEmptyListFormatters.given
 
     implicit val submissionInstanceFormat: OFormat[Submission.Instance] = Json.format[Submission.Instance]
     implicit val submissionFormat: OFormat[Submission]                  = Json.format[Submission]

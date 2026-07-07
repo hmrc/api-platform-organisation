@@ -25,7 +25,7 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, SessionId => _, StringContextOps, _}
+import uk.gov.hmrc.http.{HeaderCarrier, SessionId as _, StringContextOps, *}
 
 import uk.gov.hmrc.apiplatformorganisation.config.AppConfig
 import uk.gov.hmrc.apiplatformorganisation.models.SaMatchingRequest

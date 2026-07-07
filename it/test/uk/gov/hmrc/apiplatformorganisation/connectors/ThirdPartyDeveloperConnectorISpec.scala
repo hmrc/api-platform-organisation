@@ -49,6 +49,7 @@ class ThirdPartyDeveloperConnectorISpec extends AsyncHmrcSpec
 
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
+    import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress.StringSyntax.toLaxEmail
 
     val userEmail: LaxEmailAddress = "thirdpartydeveloper@example.com".toLaxEmail
     val userId: UserId             = idOf(userEmail)

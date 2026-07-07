@@ -32,9 +32,10 @@ import uk.gov.hmrc.apiplatformorganisation.util.*
 
 class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
   import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission.*
+  import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission.given
   implicit val mat: Materializer = NoMaterializer
 
-  implicit val readsExtendedSubmission: Reads[Submission] = Json.reads[Submission]
+//  implicit val readsExtendedSubmission: Reads[Submission] = Json.reads[Submission]
 
   trait Setup extends SubmissionsServiceMockModule {
     val underTest = new SubmissionsController(SubmissionsServiceMock.aMock, Helpers.stubControllerComponents())

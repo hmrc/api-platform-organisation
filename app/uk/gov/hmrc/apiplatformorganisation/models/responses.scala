@@ -17,8 +17,8 @@
 package uk.gov.hmrc.apiplatformorganisation.models
 
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json.*
+import play.api.libs.json.Json.JsValueWrapper
 
 case class RegisteredOfficeAddress(
     addressLineOne: Option[String] = None,

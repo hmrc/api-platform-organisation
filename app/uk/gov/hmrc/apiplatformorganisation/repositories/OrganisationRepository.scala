@@ -20,10 +20,10 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 import org.bson.conversions.Bson
+import org.mongodb.scala.model.*
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.Sorts.descending
-import org.mongodb.scala.model.*
 
 import play.api.libs.json.Json
 import uk.gov.hmrc.mongo.MongoComponent

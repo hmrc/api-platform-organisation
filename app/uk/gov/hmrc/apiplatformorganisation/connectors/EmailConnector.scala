@@ -19,11 +19,13 @@ package uk.gov.hmrc.apiplatformorganisation.connectors
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
+
 import play.api.libs.json.{Json, OFormat}
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import play.mvc.Http.Status.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
+
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
 import uk.gov.hmrc.apiplatformorganisation.models.HasSucceeded

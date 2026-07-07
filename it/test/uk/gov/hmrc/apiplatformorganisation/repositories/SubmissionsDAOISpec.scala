@@ -20,6 +20,7 @@ import java.time.Clock
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import com.mongodb.MongoException
+import org.mongodb.scala.ObservableFuture
 import org.scalatest.BeforeAndAfterEach
 
 import play.api.inject.bind
@@ -73,7 +74,7 @@ class SubmissionsDAOISpec
       await(
         submissionsRepository.collection
           .countDocuments()
-          .toFuture()
+          .head()
           .map(x => x.toInt)
       ) mustBe 1
     }

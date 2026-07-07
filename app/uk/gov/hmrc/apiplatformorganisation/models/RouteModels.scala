@@ -16,13 +16,14 @@
 
 package uk.gov.hmrc.apiplatformorganisation.models
 
-import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionId
-
 import java.util.UUID
 import scala.language.postfixOps
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionId
+
 object RouteModels {
+
   case class SimpleOrganisationId(value: UUID) extends AnyVal {
     override def toString: String = value.toString
   }
