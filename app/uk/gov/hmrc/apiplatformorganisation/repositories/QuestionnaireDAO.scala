@@ -80,10 +80,12 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo("Select Yes if your name is correct").some
       )
 
-      val questionRIName = Question.TextQuestion(
+      val questionRIName = Question.NameQuestion(
         Question.Id("f04afc8a-08e6-4a90-b6f3-3d6ffed6a373"),
         Wording("What is your name?"),
-        statement = None,
+        statement = Statement(
+          StatementText("Please note that your user profile on the Developer Hub will be permanently changed to this value.")
+        ).some,
         label = Question.Label("First and last name").some,
         errorInfo = ErrorInfo("Enter a first and last name", "First and last name cannot be blank").some
       )
