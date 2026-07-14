@@ -24,7 +24,7 @@ import uk.gov.hmrc.apiplatform.modules.common.services.{ClockNow, EitherTHelper}
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, SubmissionReview}
 import uk.gov.hmrc.apiplatformorganisation.models.SubmissionReviewSearch
-import uk.gov.hmrc.apiplatformorganisation.repositories._
+import uk.gov.hmrc.apiplatformorganisation.repositories.*
 
 @Singleton
 class SubmissionReviewService @Inject() (

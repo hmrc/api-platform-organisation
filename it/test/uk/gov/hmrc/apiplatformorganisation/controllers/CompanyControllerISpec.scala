@@ -18,13 +18,14 @@ package uk.gov.hmrc.apiplatformorganisation.controllers
 
 import scala.concurrent.Future
 
-import org.scalatest.matchers.must.Matchers.convertToAnyMustWrapper
+import org.scalatest.matchers.must.Matchers.*
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
+import play.api.libs.ws.WSBodyReadables.readableAsString
 import play.api.libs.ws.{WSClient, WSResponse}
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.test.WsTestClient
 import uk.gov.hmrc.http.test.WireMockSupport
 import uk.gov.hmrc.utils.ConfigBuilder
@@ -60,7 +61,7 @@ class CompanyControllerISpec extends AsyncHmrcSpec with WireMockSupport with Con
       val response = await(callGetEndpoint(companyNumber))
 
       response.status mustBe OK
-      response.body mustBe Json.toJson(companiesHouseCompanyProfile).toString()
+      response.body mustBe Json.toJson(companiesHouseCompanyProfile).toString
     }
   }
 }

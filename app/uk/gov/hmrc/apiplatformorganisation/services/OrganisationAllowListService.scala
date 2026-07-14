@@ -24,7 +24,7 @@ import uk.gov.hmrc.apiplatform.modules.common.domain.models.UserId
 import uk.gov.hmrc.apiplatform.modules.common.services.{ClockNow, EitherTHelper}
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.OrganisationAllowList
-import uk.gov.hmrc.apiplatformorganisation.repositories._
+import uk.gov.hmrc.apiplatformorganisation.repositories.*
 
 @Singleton
 class OrganisationAllowListService @Inject() (

@@ -17,7 +17,7 @@
 package uk.gov.hmrc.apiplatformorganisation.services
 
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationName}
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
 
 object SubmissionDataExtracter {
 

@@ -21,7 +21,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
 import play.api.libs.json.{Json, OFormat}
-import play.mvc.Http.Status._
+import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
+import play.mvc.Http.Status.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 
@@ -49,7 +50,7 @@ object EmailConnector {
 
 @Singleton
 class EmailConnector @Inject() (httpClient: HttpClientV2, config: EmailConnector.Config)(implicit val ec: ExecutionContext) extends ApplicationLogger {
-  import EmailConnector._
+  import EmailConnector.*
 
   val serviceUrl = config.baseUrl
 
@@ -127,7 +128,7 @@ class EmailConnector @Inject() (httpClient: HttpClientV2, config: EmailConnector
     }
 
     def makeCall() = {
-      import uk.gov.hmrc.http.HttpReads.Implicits._
+      import uk.gov.hmrc.http.HttpReads.Implicits.*
 
       httpClient
         .post(url"$url")

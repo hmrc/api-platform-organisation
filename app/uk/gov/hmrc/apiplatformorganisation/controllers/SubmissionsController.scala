@@ -19,12 +19,13 @@ package uk.gov.hmrc.apiplatformorganisation.controllers
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
-import play.api.libs.json.{Json, OWrites, Reads}
-import play.api.mvc.{ControllerComponents, Results}
+import play.api.libs.json.{JsValue, Json, OWrites, Reads}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Results}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission.given
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services.ValidationErrors
 import uk.gov.hmrc.apiplatformorganisation.services.SubmissionsService
 
@@ -55,10 +56,9 @@ class SubmissionsController @Inject() (
     cc: ControllerComponents
   )(implicit val ec: ExecutionContext
   ) extends BackendController(cc) {
-  import SubmissionsController._
-  import Submission._
+  import SubmissionsController.*
 
-  def createSubmissionFor(userId: UserId) = Action.async(parse.json) { implicit request =>
+  def createSubmissionFor(userId: UserId): Action[JsValue] = Action.async(parse.json) { implicit request =>
     val failed = (msg: String) => BadRequest(Json.toJson(ErrorMessage(msg)))
 
     val success = (s: Submission) => Ok(Json.toJson(s))
@@ -68,7 +68,7 @@ class SubmissionsController @Inject() (
     }
   }
 
-  def submitSubmission(submissionId: SubmissionId) = Action.async(parse.json) { implicit request =>
+  def submitSubmission(submissionId: SubmissionId): Action[JsValue] = Action.async(parse.json) { implicit request =>
     val failed = (msg: String) => BadRequest(Json.toJson(ErrorMessage(msg)))
 
     val success = (s: Submission) => Ok(Json.toJson(s))
@@ -78,7 +78,7 @@ class SubmissionsController @Inject() (
     }
   }
 
-  def approveSubmission(submissionId: SubmissionId) = Action.async(parse.json) { implicit request =>
+  def approveSubmission(submissionId: SubmissionId): Action[JsValue] = Action.async(parse.json) { implicit request =>
     val failed = (msg: String) => BadRequest(Json.toJson(ErrorMessage(msg)))
 
     val success = (s: Submission) => Ok(Json.toJson(s))
@@ -88,7 +88,7 @@ class SubmissionsController @Inject() (
     }
   }
 
-  def declineSubmission(submissionId: SubmissionId) = Action.async(parse.json) { implicit request =>
+  def declineSubmission(submissionId: SubmissionId): Action[JsValue] = Action.async(parse.json) { implicit request =>
     val failed = (msg: String) => BadRequest(Json.toJson(ErrorMessage(msg)))
 
     val success = (s: Submission) => Ok(Json.toJson(s))
@@ -98,7 +98,7 @@ class SubmissionsController @Inject() (
     }
   }
 
-  def fetchSubmission(submissionId: SubmissionId) = Action.async { _ =>
+  def fetchSubmission(submissionId: SubmissionId): Action[AnyContent] = Action.async { _ =>
     lazy val failed = NotFound(Results.EmptyContent())
 
     val success = (s: ExtendedSubmission) => Ok(Json.toJson(s))
@@ -106,7 +106,7 @@ class SubmissionsController @Inject() (
     service.fetch(submissionId).map(_.fold(failed)(success))
   }
 
-  def fetchLatestByOrganisationId(organisationId: OrganisationId) = Action.async { _ =>
+  def fetchLatestByOrganisationId(organisationId: OrganisationId): Action[AnyContent] = Action.async { _ =>
     lazy val failed = NotFound(Results.EmptyContent())
 
     val success = (s: Submission) => Ok(Json.toJson(s))
@@ -114,7 +114,7 @@ class SubmissionsController @Inject() (
     service.fetchLatestByOrganisationId(organisationId).map(_.fold(failed)(success))
   }
 
-  def fetchLatestByUserId(userId: UserId) = Action.async { _ =>
+  def fetchLatestByUserId(userId: UserId): Action[AnyContent] = Action.async { _ =>
     lazy val failed = NotFound(Results.EmptyContent())
 
     val success = (s: Submission) => Ok(Json.toJson(s))
@@ -122,7 +122,7 @@ class SubmissionsController @Inject() (
     service.fetchLatestByUserId(userId).map(_.fold(failed)(success))
   }
 
-  def fetchLatestExtendedByOrganisationId(organisationId: OrganisationId) = Action.async { _ =>
+  def fetchLatestExtendedByOrganisationId(organisationId: OrganisationId): Action[AnyContent] = Action.async { _ =>
     lazy val failed = NotFound(Results.EmptyContent())
 
     val success = (s: ExtendedSubmission) => Ok(Json.toJson(s))
@@ -130,7 +130,7 @@ class SubmissionsController @Inject() (
     service.fetchLatestExtendedByOrganisationId(organisationId).map(_.fold(failed)(success))
   }
 
-  def fetchLatestExtendedByUserId(userId: UserId) = Action.async { _ =>
+  def fetchLatestExtendedByUserId(userId: UserId): Action[AnyContent] = Action.async { _ =>
     lazy val failed = NotFound(Results.EmptyContent())
 
     val success = (s: ExtendedSubmission) => Ok(Json.toJson(s))
@@ -138,7 +138,7 @@ class SubmissionsController @Inject() (
     service.fetchLatestExtendedByUserId(userId).map(_.fold(failed)(success))
   }
 
-  def fetchLatestMarkedSubmissionByOrganisationId(organisationId: OrganisationId) = Action.async { _ =>
+  def fetchLatestMarkedSubmissionByOrganisationId(organisationId: OrganisationId): Action[AnyContent] = Action.async { _ =>
     lazy val failed = (msg: String) => NotFound(Json.toJson(ErrorMessage(msg)))
 
     val success = (s: MarkedSubmission) => Ok(Json.toJson(s))
@@ -146,7 +146,7 @@ class SubmissionsController @Inject() (
     service.fetchLatestMarkedSubmissionByOrganisationId(organisationId).map(_.fold(failed, success))
   }
 
-  def fetchLatestMarkedSubmissionByUserId(userId: UserId) = Action.async { _ =>
+  def fetchLatestMarkedSubmissionByUserId(userId: UserId): Action[AnyContent] = Action.async { _ =>
     lazy val failed = (msg: String) => NotFound(Json.toJson(ErrorMessage(msg)))
 
     val success = (s: MarkedSubmission) => Ok(Json.toJson(s))
@@ -154,7 +154,7 @@ class SubmissionsController @Inject() (
     service.fetchLatestMarkedSubmissionByUserId(userId).map(_.fold(failed, success))
   }
 
-  def recordAnswers(submissionId: SubmissionId, questionId: Question.Id) = Action.async(parse.json) { implicit request =>
+  def recordAnswers(submissionId: SubmissionId, questionId: Question.Id): Action[JsValue] = Action.async(parse.json) { implicit request =>
     val failed = (msg: ValidationErrors) => BadRequest(Json.toJson(msg))
 
     val success = (s: ExtendedSubmission) => Ok(Json.toJson(s))

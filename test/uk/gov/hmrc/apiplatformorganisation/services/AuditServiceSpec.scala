@@ -27,7 +27,7 @@ import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.DataEvent
 
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils._
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.*
 import uk.gov.hmrc.apiplatformorganisation.util.AsyncHmrcSpec
 import uk.gov.hmrc.apiplatformorganisation.{OrganisationFixtures, SubmissionReviewFixtures}
 

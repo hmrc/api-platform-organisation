@@ -22,16 +22,16 @@ import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 
 import cats.data.NonEmptyList
-import cats.implicits._
+import cats.implicits.*
 
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
 import uk.gov.hmrc.apiplatformorganisation.repositories.QuestionnaireDAO.Questionnaires.{OrganisationDetails, ResponsibleIndividualDetails}
 
 @Singleton
 class QuestionnaireDAO @Inject() (implicit ec: ExecutionContext) {
   private val store: mutable.Map[Questionnaire.Id, Questionnaire] = mutable.Map()
 
-  import QuestionnaireDAO.Questionnaires._
+  import QuestionnaireDAO.Questionnaires.*
 
   allIndividualQuestionnaires.map(q => store.put(q.id, q))
 

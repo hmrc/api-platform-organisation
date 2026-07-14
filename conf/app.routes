@@ -1,37 +1,37 @@
 # microservice specific routes
 
-POST        /organisation/create                    uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationController.create
-GET         /organisation/:oid                      uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationController.fetch(oid: OrganisationId)
-GET         /organisation/user/:uid                 uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationController.fetchByUserId(uid: UserId)
+POST        /organisation/create                    uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationController.create()
+GET         /organisation/:oid                      uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationController.fetch(oid: SimpleOrganisationId)
+GET         /organisation/user/:uid                 uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationController.fetchByUserId(uid: SimpleUserId)
 POST        /organisations                          uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationController.searchOrganisations
-PUT         /organisation/:oid/member               uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationController.addCollaborator(oid: OrganisationId)
-DELETE      /organisation/:oid/member/:uid          uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationController.removeCollaborator(oid: OrganisationId, uid: UserId)
+PUT         /organisation/:oid/member               uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationController.addCollaborator(oid: SimpleOrganisationId)
+DELETE      /organisation/:oid/member/:uid          uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationController.removeCollaborator(oid: SimpleOrganisationId, uid: SimpleUserId)
 
-POST        /submission/user/:uid                   uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.createSubmissionFor(uid: UserId)
-GET         /submission/user/:uid                   uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchLatestByUserId(uid: UserId)
-GET         /submission/user/:uid/extended          uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchLatestExtendedByUserId(uid: UserId)
-GET         /submission/marked/user/:uid            uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchLatestMarkedSubmissionByUserId(uid: UserId)
+POST        /submission/user/:uid                   uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.createSubmissionFor(uid: SimpleUserId)
+GET         /submission/user/:uid                   uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchLatestByUserId(uid: SimpleUserId)
+GET         /submission/user/:uid/extended          uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchLatestExtendedByUserId(uid: SimpleUserId)
+GET         /submission/marked/user/:uid            uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchLatestMarkedSubmissionByUserId(uid: SimpleUserId)
 
-GET         /submission/organisation/:oid           uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchLatestByOrganisationId(oid: OrganisationId)
-GET         /submission/organisation/:oid/extended  uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchLatestExtendedByOrganisationId(oid: OrganisationId)
-GET         /submission/marked/organisation/:oid    uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchLatestMarkedSubmissionByOrganisationId(oid: OrganisationId)
+GET         /submission/organisation/:oid           uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchLatestByOrganisationId(oid: SimpleOrganisationId)
+GET         /submission/organisation/:oid/extended  uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchLatestExtendedByOrganisationId(oid: SimpleOrganisationId)
+GET         /submission/marked/organisation/:oid    uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchLatestMarkedSubmissionByOrganisationId(oid: SimpleOrganisationId)
 
-GET         /submission/:sid                        uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchSubmission(sid: SubmissionId)
-POST        /submission/:sid/question/:qid          uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.recordAnswers(sid: SubmissionId, qid: Question.Id)
+GET         /submission/:sid                        uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchSubmission(sid: SimpleSubmissionId)
+POST        /submission/:sid/question/:qid          uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.recordAnswers(sid: SimpleSubmissionId, qid: Question.Id)
 
-POST        /submission/:sid                        uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.submitSubmission(sid: SubmissionId)
-POST        /submission/:sid/approve                uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.approveSubmission(sid: SubmissionId)
-POST        /submission/:sid/decline                uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.declineSubmission(sid: SubmissionId)
+POST        /submission/:sid                        uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.submitSubmission(sid: SimpleSubmissionId)
+POST        /submission/:sid/approve                uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.approveSubmission(sid: SimpleSubmissionId)
+POST        /submission/:sid/decline                uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.declineSubmission(sid: SimpleSubmissionId)
 
 GET         /company/:cnumber                       uk.gov.hmrc.apiplatformorganisation.controllers.CompanyController.fetchByCompanyNumber(cnumber: String)
 
 POST        /matching/sa                            uk.gov.hmrc.apiplatformorganisation.controllers.MatchingController.matchBySa()
 
 GET         /submission-reviews                     uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionReviewController.search()
-GET         /submission-review/:sid                 uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionReviewController.fetch(sid: SubmissionId)
-PUT         /submission-review/:sid                 uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionReviewController.update(sid: SubmissionId)
+GET         /submission-review/:sid                 uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionReviewController.fetch(sid: SimpleSubmissionId)
+PUT         /submission-review/:sid                 uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionReviewController.update(sid: SimpleSubmissionId)
 
 GET         /allow-lists                            uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationAllowListController.fetchAll()
-GET         /allow-list/:uid                        uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationAllowListController.fetch(uid: UserId)
-POST        /allow-list/:uid                        uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationAllowListController.create(uid: UserId)
-DELETE      /allow-list/:uid                        uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationAllowListController.delete(uid: UserId)
+GET         /allow-list/:uid                        uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationAllowListController.fetch(uid: SimpleUserId)
+POST        /allow-list/:uid                        uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationAllowListController.create(uid: SimpleUserId)
+DELETE      /allow-list/:uid                        uk.gov.hmrc.apiplatformorganisation.controllers.OrganisationAllowListController.delete(uid: SimpleUserId)

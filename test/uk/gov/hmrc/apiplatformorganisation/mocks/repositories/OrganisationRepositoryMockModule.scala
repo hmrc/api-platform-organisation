@@ -21,7 +21,7 @@ import scala.concurrent.Future
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
-import uk.gov.hmrc.apiplatformorganisation.models._
+import uk.gov.hmrc.apiplatformorganisation.models.*
 import uk.gov.hmrc.apiplatformorganisation.repositories.OrganisationRepository
 
 trait OrganisationRepositoryMockModule extends MockitoSugar with ArgumentMatchersSugar {

@@ -26,9 +26,9 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.services.{ClockNow, EitherTHelper}
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services._
-import uk.gov.hmrc.apiplatformorganisation.repositories._
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services.*
+import uk.gov.hmrc.apiplatformorganisation.repositories.*
 
 @Singleton
 class SubmissionsService @Inject() (
@@ -64,19 +64,19 @@ class SubmissionsService @Inject() (
     val emptyContext: Map[String, String] = Map.empty
     (
       for {
-        groups           <- liftF(questionnaireDAO.fetchActiveGroupsOfQuestionnaires())
-        allQuestionnaires = groups.flatMap(_.links)
-        submissionId      = SubmissionId.random
-        newInstance       = Submission.Instance(0, emptyAnswers, NonEmptyList.of(Submission.Status.Created(instant, requestedBy)))
-        submission        = Submission(submissionId, None, instant, startedBy, groups, QuestionnaireDAO.questionIdsOfInterest, NonEmptyList.of(newInstance), emptyContext)
-        savedSubmission  <- liftF(submissionsDAO.save(submission))
+        groups          <- liftF(questionnaireDAO.fetchActiveGroupsOfQuestionnaires())
+        _                = groups.flatMap(_.links)
+        submissionId     = SubmissionId.random
+        newInstance      = Submission.Instance(0, emptyAnswers, NonEmptyList.of(Submission.Status.Created(instant, requestedBy)))
+        submission       = Submission(submissionId, None, instant, startedBy, groups, QuestionnaireDAO.questionIdsOfInterest, NonEmptyList.of(newInstance), emptyContext)
+        savedSubmission <- liftF(submissionsDAO.save(submission))
       } yield savedSubmission
     )
       .value
   }
 
   def submit(submissionId: SubmissionId, requestedBy: String)(implicit hc: HeaderCarrier): Future[Either[String, Submission]] = {
-    import SubmissionDataExtracter._
+    import SubmissionDataExtracter.*
     (
       for {
         submission         <- fromOptionF(submissionsDAO.fetch(submissionId), "No such submission")
@@ -92,7 +92,7 @@ class SubmissionsService @Inject() (
   }
 
   def approve(submissionId: SubmissionId, approvedBy: String, comment: Option[String])(implicit hc: HeaderCarrier): Future[Either[String, Submission]] = {
-    import SubmissionDataExtracter._
+    import SubmissionDataExtracter.*
     (
       for {
         submission        <- fromOptionF(submissionsDAO.fetch(submissionId), "No such submission")

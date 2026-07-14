@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.apiplatformorganisation.stubs
 
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
 
 import play.api.http.Status.{NOT_FOUND, OK, UNAUTHORIZED}
 

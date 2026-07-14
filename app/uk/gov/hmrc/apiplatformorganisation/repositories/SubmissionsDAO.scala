@@ -21,11 +21,12 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Sorts.descending
+import org.mongodb.scala.{ObservableFuture, SingleObservableFuture}
 
 import uk.gov.hmrc.mongo.play.json.Codecs
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
 
 @Singleton
 class SubmissionsDAO @Inject() (submissionsRepository: SubmissionsRepository)(implicit val ec: ExecutionContext) {

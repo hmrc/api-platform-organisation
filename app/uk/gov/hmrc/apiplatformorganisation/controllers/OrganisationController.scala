@@ -36,7 +36,7 @@ object OrganisationController {
 @Singleton()
 class OrganisationController @Inject() (cc: ControllerComponents, organisationService: OrganisationService)(implicit val ec: ExecutionContext)
     extends BackendController(cc) {
-  import OrganisationController._
+  import OrganisationController.*
 
   def create(): Action[CreateOrganisationRequest] = Action.async(parse.json[CreateOrganisationRequest]) { implicit request =>
     organisationService.create(request.body.organisationName, request.body.organisationType, request.body.requestedBy).map(org => Ok(Json.toJson(org)))
