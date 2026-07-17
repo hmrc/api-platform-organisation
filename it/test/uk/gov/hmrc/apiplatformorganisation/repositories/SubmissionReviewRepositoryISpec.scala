@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.apiplatformorganisation.repositories
 
+import org.mongodb.scala.ObservableFuture
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite

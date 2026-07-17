@@ -17,24 +17,24 @@
 package uk.gov.hmrc.apiplatformorganisation.controllers
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 import org.apache.pekko.stream.Materializer
 import org.apache.pekko.stream.testkit.NoMaterializer
 
-import play.api.libs.json.{JsError, JsSuccess, Json, OWrites, Reads}
-import play.api.test.Helpers._
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Json, OWrites}
+import play.api.mvc.Result
+import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, MarkedSubmission, Question, Submission}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.SubmissionsTestData
 import uk.gov.hmrc.apiplatformorganisation.mocks.SubmissionsServiceMockModule
-import uk.gov.hmrc.apiplatformorganisation.util._
+import uk.gov.hmrc.apiplatformorganisation.util.*
 
 class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
-  import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission._
+  import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission.given
   implicit val mat: Materializer = NoMaterializer
-
-  implicit val readsExtendedSubmission: Reads[Submission] = Json.reads[Submission]
 
   trait Setup extends SubmissionsServiceMockModule {
     val underTest = new SubmissionsController(SubmissionsServiceMock.aMock, Helpers.stubControllerComponents())
@@ -47,7 +47,7 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
     "return an ok response" in new Setup {
       SubmissionsServiceMock.Create.thenReturn(aSubmission)
 
-      val result = underTest.createSubmissionFor(userId)(fakeRequest)
+      val result: Future[Result] = underTest.createSubmissionFor(userId)(fakeRequest)
 
       status(result) shouldBe OK
 
@@ -61,7 +61,7 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
     "return a bad request response" in new Setup {
       SubmissionsServiceMock.Create.thenFails("Test Error")
 
-      val result = underTest.createSubmissionFor(userId)(fakeRequest)
+      val result: Future[Result] = underTest.createSubmissionFor(userId)(fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }
@@ -74,7 +74,7 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
     "return an ok response" in new Setup {
       SubmissionsServiceMock.Submit.thenReturn(aSubmission)
 
-      val result = underTest.submitSubmission(submissionId)(fakeRequest)
+      val result: Future[Result] = underTest.submitSubmission(submissionId)(fakeRequest)
 
       status(result) shouldBe OK
 
@@ -88,7 +88,7 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
     "return a bad request response" in new Setup {
       SubmissionsServiceMock.Submit.thenFails("Test Error")
 
-      val result = underTest.submitSubmission(submissionId)(fakeRequest)
+      val result: Future[Result] = underTest.submitSubmission(submissionId)(fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }
@@ -102,7 +102,7 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
     "return an ok response" in new Setup {
       SubmissionsServiceMock.Approve.thenReturn(aSubmission)
 
-      val result = underTest.approveSubmission(submissionId)(fakeRequest)
+      val result: Future[Result] = underTest.approveSubmission(submissionId)(fakeRequest)
 
       status(result) shouldBe OK
 
@@ -116,7 +116,7 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
     "return a bad request response" in new Setup {
       SubmissionsServiceMock.Approve.thenFails("Test Error")
 
-      val result = underTest.approveSubmission(submissionId)(fakeRequest)
+      val result: Future[Result] = underTest.approveSubmission(submissionId)(fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }
@@ -130,7 +130,7 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
     "return an ok response" in new Setup {
       SubmissionsServiceMock.Decline.thenReturn(aSubmission)
 
-      val result = underTest.declineSubmission(submissionId)(fakeRequest)
+      val result: Future[Result] = underTest.declineSubmission(submissionId)(fakeRequest)
 
       status(result) shouldBe OK
 
@@ -144,7 +144,7 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
     "return a bad request response" in new Setup {
       SubmissionsServiceMock.Decline.thenFails("Test Error")
 
-      val result = underTest.declineSubmission(submissionId)(fakeRequest)
+      val result: Future[Result] = underTest.declineSubmission(submissionId)(fakeRequest)
 
       status(result) shouldBe BAD_REQUEST
     }
@@ -154,7 +154,7 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
     "return ok response with submission when found" in new Setup {
       SubmissionsServiceMock.FetchLatestByOrganisationId.thenReturn(aSubmission)
 
-      val result = underTest.fetchLatestByOrganisationId(organisationId)(FakeRequest(GET, "/"))
+      val result: Future[Result] = underTest.fetchLatestByOrganisationId(organisationId)(FakeRequest(GET, "/"))
 
       status(result) shouldBe OK
       contentAsJson(result).validate[Submission] match {
@@ -166,7 +166,7 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
     "return not found when not found" in new Setup {
       SubmissionsServiceMock.FetchLatestByOrganisationId.thenReturnNone()
 
-      val result = underTest.fetchLatestByOrganisationId(organisationId)(FakeRequest(GET, "/"))
+      val result: Future[Result] = underTest.fetchLatestByOrganisationId(organisationId)(FakeRequest(GET, "/"))
 
       status(result) shouldBe NOT_FOUND
     }
@@ -176,7 +176,7 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
     "return ok response with submission when found" in new Setup {
       SubmissionsServiceMock.FetchLatestByUserId.thenReturn(aSubmission)
 
-      val result = underTest.fetchLatestByUserId(userId)(FakeRequest(GET, "/"))
+      val result: Future[Result] = underTest.fetchLatestByUserId(userId)(FakeRequest(GET, "/"))
 
       status(result) shouldBe OK
       contentAsJson(result).validate[Submission] match {
@@ -188,7 +188,7 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
     "return not found when not found" in new Setup {
       SubmissionsServiceMock.FetchLatestByUserId.thenReturnNone()
 
-      val result = underTest.fetchLatestByUserId(userId)(FakeRequest(GET, "/"))
+      val result: Future[Result] = underTest.fetchLatestByUserId(userId)(FakeRequest(GET, "/"))
 
       status(result) shouldBe NOT_FOUND
     }
@@ -198,19 +198,19 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
     "return ok response with submission when found" in new Setup {
       SubmissionsServiceMock.FetchLatestExtendedByOrganisationId.thenReturn(aSubmission.withNotStartedProgress())
 
-      val result = underTest.fetchLatestExtendedByOrganisationId(organisationId)(FakeRequest(GET, "/"))
+      val result: Future[Result] = underTest.fetchLatestExtendedByOrganisationId(organisationId)(FakeRequest(GET, "/"))
 
       status(result) shouldBe OK
       contentAsJson(result).validate[ExtendedSubmission] match {
-        case JsSuccess(extendedSubmission, _) => succeed
-        case JsError(e)                       => fail(s"Not parsed as a response $e")
+        case JsSuccess(_, _) => succeed
+        case JsError(e)      => fail(s"Not parsed as a response $e")
       }
     }
 
     "return not found when not found" in new Setup {
       SubmissionsServiceMock.FetchLatestExtendedByOrganisationId.thenReturnNone()
 
-      val result = underTest.fetchLatestExtendedByOrganisationId(organisationId)(FakeRequest(GET, "/"))
+      val result: Future[Result] = underTest.fetchLatestExtendedByOrganisationId(organisationId)(FakeRequest(GET, "/"))
 
       status(result) shouldBe NOT_FOUND
     }
@@ -220,19 +220,19 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
     "return ok response with submission when found" in new Setup {
       SubmissionsServiceMock.FetchLatestExtendedByUserId.thenReturn(aSubmission.withNotStartedProgress())
 
-      val result = underTest.fetchLatestExtendedByUserId(userId)(FakeRequest(GET, "/"))
+      val result: Future[Result] = underTest.fetchLatestExtendedByUserId(userId)(FakeRequest(GET, "/"))
 
       status(result) shouldBe OK
       contentAsJson(result).validate[ExtendedSubmission] match {
-        case JsSuccess(extendedSubmission, _) => succeed
-        case JsError(e)                       => fail(s"Not parsed as a response $e")
+        case JsSuccess(_, _) => succeed
+        case JsError(e)      => fail(s"Not parsed as a response $e")
       }
     }
 
     "return not found when not found" in new Setup {
       SubmissionsServiceMock.FetchLatestExtendedByUserId.thenReturnNone()
 
-      val result = underTest.fetchLatestExtendedByUserId(userId)(FakeRequest(GET, "/"))
+      val result: Future[Result] = underTest.fetchLatestExtendedByUserId(userId)(FakeRequest(GET, "/"))
 
       status(result) shouldBe NOT_FOUND
     }
@@ -242,19 +242,19 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
     "return ok response with submission when found" in new Setup {
       SubmissionsServiceMock.Fetch.thenReturn(aSubmission.withNotStartedProgress())
 
-      val result = underTest.fetchSubmission(submissionId)(FakeRequest(GET, "/"))
+      val result: Future[Result] = underTest.fetchSubmission(submissionId)(FakeRequest(GET, "/"))
 
       status(result) shouldBe OK
       contentAsJson(result).validate[ExtendedSubmission] match {
-        case JsSuccess(extendedSubmission, _) => succeed
-        case JsError(e)                       => fail(s"Not parsed as a response $e")
+        case JsSuccess(_, _) => succeed
+        case JsError(e)      => fail(s"Not parsed as a response $e")
       }
     }
 
     "return not found when not found" in new Setup {
       SubmissionsServiceMock.Fetch.thenReturnNone()
 
-      val result = underTest.fetchSubmission(submissionId)(FakeRequest(GET, "/"))
+      val result: Future[Result] = underTest.fetchSubmission(submissionId)(FakeRequest(GET, "/"))
 
       status(result) shouldBe NOT_FOUND
     }
@@ -265,19 +265,19 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
       val markedSubmission = MarkedSubmission(aSubmission, Map.empty)
       SubmissionsServiceMock.FetchLatestMarkedSubmissionByOrganisationId.thenReturn(markedSubmission)
 
-      val result = underTest.fetchLatestMarkedSubmissionByOrganisationId(organisationId)(FakeRequest(GET, "/"))
+      val result: Future[Result] = underTest.fetchLatestMarkedSubmissionByOrganisationId(organisationId)(FakeRequest(GET, "/"))
 
       status(result) shouldBe OK
       contentAsJson(result).validate[MarkedSubmission] match {
-        case JsSuccess(markedSubmission, _) => succeed
-        case JsError(e)                     => fail(s"Not parsed as a response $e")
+        case JsSuccess(_, _) => succeed
+        case JsError(e)      => fail(s"Not parsed as a response $e")
       }
     }
 
     "return not found when not found" in new Setup {
       SubmissionsServiceMock.FetchLatestMarkedSubmissionByOrganisationId.thenFails("nope")
 
-      val result = underTest.fetchLatestMarkedSubmissionByOrganisationId(organisationId)(FakeRequest(GET, "/"))
+      val result: Future[Result] = underTest.fetchLatestMarkedSubmissionByOrganisationId(organisationId)(FakeRequest(GET, "/"))
 
       status(result) shouldBe NOT_FOUND
     }
@@ -288,19 +288,19 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
       val markedSubmission = MarkedSubmission(aSubmission, Map.empty)
       SubmissionsServiceMock.FetchLatestMarkedSubmissionByUserId.thenReturn(markedSubmission)
 
-      val result = underTest.fetchLatestMarkedSubmissionByUserId(userId)(FakeRequest(GET, "/"))
+      val result: Future[Result] = underTest.fetchLatestMarkedSubmissionByUserId(userId)(FakeRequest(GET, "/"))
 
       status(result) shouldBe OK
       contentAsJson(result).validate[MarkedSubmission] match {
-        case JsSuccess(markedSubmission, _) => succeed
-        case JsError(e)                     => fail(s"Not parsed as a response $e")
+        case JsSuccess(_, _) => succeed
+        case JsError(e)      => fail(s"Not parsed as a response $e")
       }
     }
 
     "return not found when not found" in new Setup {
       SubmissionsServiceMock.FetchLatestMarkedSubmissionByUserId.thenFails("nope")
 
-      val result = underTest.fetchLatestMarkedSubmissionByUserId(userId)(FakeRequest(GET, "/"))
+      val result: Future[Result] = underTest.fetchLatestMarkedSubmissionByUserId(userId)(FakeRequest(GET, "/"))
 
       status(result) shouldBe NOT_FOUND
     }
@@ -312,9 +312,9 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
 
       SubmissionsServiceMock.RecordAnswers.thenReturn(ExtendedSubmission(answeringSubmission, answeringSubmission.withIncompleteProgress().questionnaireProgress))
 
-      val answerJsonBody = Json.toJson(SubmissionsController.RecordAnswersRequest(Map(Question.answerKey -> Seq("Yes"))))
+      val answerJsonBody: JsValue = Json.toJson(SubmissionsController.RecordAnswersRequest(Map(Question.answerKey -> Seq("Yes"))))
 
-      val result = underTest.recordAnswers(submissionId, questionId)(FakeRequest(PUT, "/").withBody(answerJsonBody))
+      val result: Future[Result] = underTest.recordAnswers(submissionId, questionId)(FakeRequest(PUT, "/").withBody(answerJsonBody))
 
       status(result) shouldBe OK
     }
@@ -324,8 +324,8 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
 
       SubmissionsServiceMock.RecordAnswers.thenFails("bang")
 
-      val answerJsonBody = Json.toJson(SubmissionsController.RecordAnswersRequest(Map(Question.answerKey -> Seq("Yes"))))
-      val result         = underTest.recordAnswers(submissionId, questionId)(FakeRequest(PUT, "/").withBody(answerJsonBody))
+      val answerJsonBody: JsValue = Json.toJson(SubmissionsController.RecordAnswersRequest(Map(Question.answerKey -> Seq("Yes"))))
+      val result: Future[Result]  = underTest.recordAnswers(submissionId, questionId)(FakeRequest(PUT, "/").withBody(answerJsonBody))
 
       status(result) shouldBe BAD_REQUEST
     }

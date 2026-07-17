@@ -25,7 +25,7 @@ import org.scalatest.wordspec.AnyWordSpec
 
 import play.api.http.Status
 import play.api.libs.json.{JsError, JsSuccess, Json, OWrites}
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.SubmissionReview

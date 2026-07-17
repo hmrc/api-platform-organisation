@@ -22,8 +22,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import org.mongodb.scala.bson.Document
 import org.mongodb.scala.bson.conversions.Bson
-import org.mongodb.scala.model.Aggregates._
-import org.mongodb.scala.model.Filters._
+import org.mongodb.scala.model.Aggregates.*
+import org.mongodb.scala.model.Filters.*
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes}
 
 import play.api.libs.json.{Format, Json, OFormat}
@@ -33,7 +33,7 @@ import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{SubmissionId, SubmissionReview}
-import uk.gov.hmrc.apiplatformorganisation.models._
+import uk.gov.hmrc.apiplatformorganisation.models.*
 import uk.gov.hmrc.apiplatformorganisation.utils.{ApplicationLogger, MetricsTimer}
 
 object SubmissionsReviewRepository {
@@ -123,7 +123,7 @@ class SubmissionReviewRepository @Inject() (mongo: MongoComponent, val metrics: 
         Document()
       } else {
         val bsonStates = states.map(s => Codecs.toBson(s))
-        in("state", bsonStates: _*)
+        in("state", bsonStates*)
       }
     }
 
@@ -138,7 +138,7 @@ class SubmissionReviewRepository @Inject() (mongo: MongoComponent, val metrics: 
     }
 
     val statusFilters = filters.collect { case sf: SubmissionReviewStatusFilter => sf }
-    statusMatch(statusFilters.map(sf => getFilterState(sf)): _*)
+    statusMatch(statusFilters.map(sf => getFilterState(sf))*)
   }
 
   private def runAggregationQuery(statusFilters: Bson) = {

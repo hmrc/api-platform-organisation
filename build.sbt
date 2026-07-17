@@ -3,7 +3,7 @@ import uk.gov.hmrc.DefaultBuildSettings
 Global / bloopAggregateSourceDependencies := true
 Global / bloopExportJarClassifiers := Some(Set("sources"))
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.18"
+ThisBuild / scalaVersion := "3.7.4"
 ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
 ThisBuild / semanticdbEnabled := true
 ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
@@ -20,8 +20,17 @@ lazy val microservice = Project("api-platform-organisation", file("."))
     retrieveManaged := true,
     // https://www.scala-lang.org/2021/01/12/configuring-and-suppressing-warnings.html
     // suppress warnings in generated routes files
-    scalacOptions += "-Wconf:src=routes/.*:s",
+    scalacOptions ++= Seq(
+      "-Wconf:msg=Implicit parameters should be provided with a `using` clause:s", // TODO - remove once Play is really Scala 3
+      "-Wconf:msg=unused import&src=html/.*:s"
+    ),
+    Test / scalacOptions ++= Seq(
+      "-Wconf:msg=Implicit parameters should be provided with a `using` clause:s"
+    ),
     routesImport ++= Seq(
+      "uk.gov.hmrc.apiplatformorganisation.models.RouteModels._",
+      "uk.gov.hmrc.apiplatformorganisation.models.RouteModels.given",
+      "java.util.UUID",
       "uk.gov.hmrc.apiplatform.modules.common.domain.models._",
       "uk.gov.hmrc.apiplatform.modules.organisations.domain.models._",
       "uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models._"
