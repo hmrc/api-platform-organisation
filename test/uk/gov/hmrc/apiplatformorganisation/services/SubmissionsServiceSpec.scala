@@ -28,6 +28,7 @@ import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services.{ValidationError, ValidationErrors}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.*
+import uk.gov.hmrc.apiplatformorganisation.connectors.CompaniesHouseConnector
 import uk.gov.hmrc.apiplatformorganisation.mocks.services.{OrganisationServiceMockModule, SubmissionReviewServiceMockModule}
 import uk.gov.hmrc.apiplatformorganisation.mocks.{AuditServiceMockModule, SubmissionsDAOMockModule}
 import uk.gov.hmrc.apiplatformorganisation.repositories.QuestionnaireDAO
@@ -80,8 +81,18 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
     )
       .hasCompletelyAnsweredWith(completedAnswers)
 
+    val mockCompaniesHouseConnector = mock[CompaniesHouseConnector]
+
     val underTest =
-      new SubmissionsService(new QuestionnaireDAO(), SubmissionsDAOMock.aMock, SubmissionReviewServiceMock.aMock, OrganisationServiceMock.aMock, AuditServiceMock.aMock, clock)
+      new SubmissionsService(
+        new QuestionnaireDAO(),
+        SubmissionsDAOMock.aMock,
+        SubmissionReviewServiceMock.aMock,
+        OrganisationServiceMock.aMock,
+        AuditServiceMock.aMock,
+        mockCompaniesHouseConnector,
+        clock
+      )
   }
 
   "SubmissionsService" when {
