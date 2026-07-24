@@ -71,21 +71,12 @@ object QuestionnaireDAO {
 
     object ResponsibleIndividualDetails {
 
-      val questionRIConfirmName = Question.YesNoQuestion(
-        Question.Id("a8f3a6b4-cff0-4bb5-b38f-fd224b4715d5"),
-        Wording("Is this your name?"),
-        statement = Some(Statement(StatementText("{userName}"))),
-        yesMarking = Mark.Pass,
-        noMarking = Mark.Pass,
-        errorInfo = ErrorInfo("Select Yes if your name is correct").some,
-        summary = Some("Is {userName} your name?")
-      )
-
       val questionRIName = Question.NameQuestion(
         Question.Id("f04afc8a-08e6-4a90-b6f3-3d6ffed6a373"),
-        Wording("What is your name?"),
+        Wording("Is this your name?"),
         statement = Statement(
-          StatementText("Please note that your user profile on the Developer Hub will be permanently changed to this value.")
+          StatementText("Please update your name below."),
+          StatementText("Note that your user profile on the Developer Hub will be permanently changed to this value.")
         ).some,
         label = Question.Label("First and last name").some,
         errorInfo = ErrorInfo("Enter a first and last name", "First and last name cannot be blank").some,
@@ -114,8 +105,7 @@ object QuestionnaireDAO {
         id = Questionnaire.Id("be15b318-524a-4d10-89a5-4bfa52ed49c2"),
         label = Questionnaire.Label("About you"),
         questions = NonEmptyList.of(
-          QuestionItem(questionRIConfirmName),
-          QuestionItem(questionRIName, AskWhen.AskWhenAnswer(questionRIConfirmName, "No")),
+          QuestionItem(questionRIName),
           QuestionItem(questionRIJobTitle),
           QuestionItem(questionRIPhone)
         )
