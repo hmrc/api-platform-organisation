@@ -20,7 +20,7 @@ import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application, Mode}
-import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.utils.{ConfigBuilder, WireMockSupport}
 
 import uk.gov.hmrc.apiplatformorganisation.models.CompaniesHouseCompanyProfile
@@ -53,24 +53,23 @@ class CompaniesHouseConnectorISpec
       "return CompaniesHouseCompanyProfile when Companies House returns 200 and company information in response body" in new Setup {
         GetCompanyByNumber.stubSuccess(companyNumber)
 
-        val result: CompaniesHouseCompanyProfile = await(objInTest.getCompanyByNumber(companyNumber))
-        result shouldBe companiesHouseCompanyProfile
+        val result: Option[CompaniesHouseCompanyProfile] = await(objInTest.getCompanyByNumber(companyNumber))
+        result shouldBe Some(companiesHouseCompanyProfile)
       }
-    }
 
-    "throw UpstreamErrorResponse when Companies House returns 401 unauthorized" in new Setup {
-      GetCompanyByNumber.stubUnauthorised(companyNumber)
+      "return None when Companies House returns 404 not found" in new Setup {
+        GetCompanyByNumber.stubNotFound(companyNumber)
 
-      intercept[UpstreamErrorResponse] {
-        await(objInTest.getCompanyByNumber(companyNumber))
+        val result: Option[CompaniesHouseCompanyProfile] = await(objInTest.getCompanyByNumber(companyNumber))
+        result shouldBe None
       }
-    }
 
-    "throw NotFoundException when Companies House returns 404 not found" in new Setup {
-      GetCompanyByNumber.stubNotFound(companyNumber)
+      "throw UpstreamErrorResponse when Companies House returns 401 unauthorized" in new Setup {
+        GetCompanyByNumber.stubUnauthorised(companyNumber)
 
-      intercept[NotFoundException] {
-        await(objInTest.getCompanyByNumber(companyNumber))
+        intercept[UpstreamErrorResponse] {
+          await(objInTest.getCompanyByNumber(companyNumber))
+        }
       }
     }
   }

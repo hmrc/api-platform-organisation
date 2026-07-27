@@ -103,7 +103,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         val result: Either[String, Submission] = await(underTest.create(userId, "bob@example.com"))
 
         inside(result.value) {
-          case s @ Submission(_, _, _, startedBy, _, _, instances, _) =>
+          case _ @Submission(_, _, _, startedBy, _, _, instances, _) =>
             startedBy shouldBe userId
             instances.head.answersToQuestions.size shouldBe 0
         }

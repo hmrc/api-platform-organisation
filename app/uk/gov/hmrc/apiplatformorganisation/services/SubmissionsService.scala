@@ -195,7 +195,10 @@ class SubmissionsService @Inject() (
   private def processCompanyDetails(companyNumber: String, extSubmission: ExtendedSubmission)(implicit hc: HeaderCarrier): Future[Either[ValidationErrors, Submission]] = {
     (
       for {
-        companyProfile <- etValidation.fromOptionF(companiesHouseConnector.getCompanyByNumber(companyNumber), ValidationErrors(ValidationError(message = s"The company number ${companyNumber} was not found")))
+        companyProfile <- etValidation.fromOptionF(
+                            companiesHouseConnector.getCompanyByNumber(companyNumber),
+                            ValidationErrors(ValidationError(message = s"The company number ${companyNumber} was not found"))
+                          )
         companyDetails  = getCompanyDetails(companyNumber, companyProfile)
         additionalData  = AdditionalData(Some(companyDetails))
         submission      = Submission.updateLatestAdditionalDataTo(Some(additionalData))(extSubmission.submission)
