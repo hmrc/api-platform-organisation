@@ -176,29 +176,31 @@ class SubmissionsService @Inject() (
       for {
         initialSubmission <- etValidation.fromOptionF(submissionsDAO.fetch(submissionId), ValidationErrors(ValidationError(message = "No such submission")))
         extSubmission     <- etValidation.fromEither(AnswerQuestion.recordAnswer(initialSubmission, questionId, rawAnswers))
-        submission        <- etValidation.liftF(processQuestion(extSubmission, questionId))
+        submission        <- etValidation.fromEitherF(processQuestion(extSubmission, questionId))
         savedSubmission   <- etValidation.liftF(submissionsDAO.update(submission))
       } yield extSubmission.copy(submission = savedSubmission)
     )
       .value
   }
 
-  private def processQuestion(extSubmission: ExtendedSubmission, questionId: Question.Id)(implicit hc: HeaderCarrier): Future[Submission] = {
+  private def processQuestion(extSubmission: ExtendedSubmission, questionId: Question.Id)(implicit hc: HeaderCarrier): Future[Either[ValidationErrors, Submission]] = {
     val maybeQuestion = extSubmission.submission.findQuestion(questionId)
     val maybeAnswer   = extSubmission.submission.latestInstance.answersToQuestions.get(questionId)
     (maybeQuestion, maybeAnswer) match {
       case (Some(_: CompanyNumberQuestion), Some(a: CompanyNumberAnswer)) => processCompanyDetails(a.value, extSubmission)
-      case _                                                              => Future.successful(extSubmission.submission)
+      case _                                                              => Future.successful(Right(extSubmission.submission))
     }
   }
 
-  private def processCompanyDetails(companyNumber: String, extSubmission: ExtendedSubmission)(implicit hc: HeaderCarrier): Future[Submission] = {
-    for {
-      companyProfile <- companiesHouseConnector.getCompanyByNumber(companyNumber)
-      companyDetails  = getCompanyDetails(companyNumber, companyProfile)
-      additionalData  = AdditionalData(Some(companyDetails))
-      submission      = Submission.updateLatestAdditionalDataTo(Some(additionalData))(extSubmission.submission)
-    } yield submission
+  private def processCompanyDetails(companyNumber: String, extSubmission: ExtendedSubmission)(implicit hc: HeaderCarrier): Future[Either[ValidationErrors, Submission]] = {
+    (
+      for {
+        companyProfile <- etValidation.fromOptionF(companiesHouseConnector.getCompanyByNumber(companyNumber), ValidationErrors(ValidationError(message = s"The company number ${companyNumber} was not found")))
+        companyDetails  = getCompanyDetails(companyNumber, companyProfile)
+        additionalData  = AdditionalData(Some(companyDetails))
+        submission      = Submission.updateLatestAdditionalDataTo(Some(additionalData))(extSubmission.submission)
+      } yield submission
+    ).value
   }
 
   private def getCompanyDetails(companyNumber: String, company: CompaniesHouseCompanyProfile): CompanyDetails = {
