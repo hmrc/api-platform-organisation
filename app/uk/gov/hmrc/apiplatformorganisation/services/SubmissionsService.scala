@@ -221,7 +221,7 @@ class SubmissionsService @Inject() (
           addr.premises,
           addr.region
         )
-      case _          => CompanyDetails(companyNumber, company.companyName, None, None, None, None, None, None, None, None, None)
+      case _          => CompanyDetails(companyNumber, company.companyName)
     }
   }
 

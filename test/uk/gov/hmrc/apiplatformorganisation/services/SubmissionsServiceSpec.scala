@@ -17,6 +17,7 @@
 package uk.gov.hmrc.apiplatformorganisation.services
 
 import scala.concurrent.ExecutionContext
+import scala.concurrent.Future.successful
 
 import cats.data.NonEmptyList
 import org.scalatest.Inside
@@ -31,6 +32,7 @@ import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.*
 import uk.gov.hmrc.apiplatformorganisation.connectors.CompaniesHouseConnector
 import uk.gov.hmrc.apiplatformorganisation.mocks.services.{OrganisationServiceMockModule, SubmissionReviewServiceMockModule}
 import uk.gov.hmrc.apiplatformorganisation.mocks.{AuditServiceMockModule, SubmissionsDAOMockModule}
+import uk.gov.hmrc.apiplatformorganisation.models.CompaniesHouseCompanyProfile
 import uk.gov.hmrc.apiplatformorganisation.repositories.QuestionnaireDAO
 import uk.gov.hmrc.apiplatformorganisation.util.AsyncHmrcSpec
 import uk.gov.hmrc.apiplatformorganisation.{OrganisationFixtures, SubmissionReviewFixtures}
@@ -345,6 +347,22 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
 
         val out = result.value
         out.submission.latestInstance.answersToQuestions.get(optionalQuestionId).value shouldBe ActualAnswer.NoAnswer
+        SubmissionsDAOMock.Update.verifyCalled()
+      }
+
+      "records new answers and process question for company number question" in new Setup {
+        val partiallyAnsweredSubmission = buildPartiallyAnsweredSubmission()
+        val companyNumberQuestionId     = partiallyAnsweredSubmission.getQuestionOfInterest("organisationNumberId").get
+
+        SubmissionsDAOMock.Fetch.thenReturn(partiallyAnsweredSubmission)
+        SubmissionsDAOMock.Update.thenReturn()
+        val companyProfile = CompaniesHouseCompanyProfile("12345678", "Company name", "active", None)
+        when(mockCompaniesHouseConnector.getCompanyByNumber(*)(*)).thenReturn(successful(Some(companyProfile)))
+
+        val result = await(underTest.recordAnswers(partiallyAnsweredSubmission.id, companyNumberQuestionId, Map(Question.answerKey -> Seq("12345678"))))
+
+        val out = result.value
+        out.submission.latestInstance.answersToQuestions.get(companyNumberQuestionId).value shouldBe ActualAnswer.CompanyNumberAnswer("12345678")
         SubmissionsDAOMock.Update.verifyCalled()
       }
 

@@ -30,6 +30,6 @@ trait TestData {
     postalCode = Some("IM2 1AA")
   )
 
-  val companiesHouseCompanyProfile = CompaniesHouseCompanyProfile("TEST LIMITED", Some(registeredOfficeAddress))
+  val companiesHouseCompanyProfile = CompaniesHouseCompanyProfile(companyNumber, "TEST LIMITED", "registered", Some(registeredOfficeAddress))
 
 }
