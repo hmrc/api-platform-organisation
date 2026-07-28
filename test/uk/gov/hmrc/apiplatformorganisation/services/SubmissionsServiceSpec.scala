@@ -366,6 +366,31 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         SubmissionsDAOMock.Update.verifyCalled()
       }
 
+      "returns validation error when company not found for company number question" in new Setup {
+        val partiallyAnsweredSubmission = buildPartiallyAnsweredSubmission()
+        val companyNumberQuestionId     = partiallyAnsweredSubmission.getQuestionOfInterest("organisationNumberId").get
+
+        SubmissionsDAOMock.Fetch.thenReturn(partiallyAnsweredSubmission)
+        when(mockCompaniesHouseConnector.getCompanyByNumber(*)(*)).thenReturn(successful(None))
+
+        val result = await(underTest.recordAnswers(partiallyAnsweredSubmission.id, companyNumberQuestionId, Map(Question.answerKey -> Seq("12345678"))))
+
+        result.left.value shouldBe ValidationErrors(ValidationError(message = "The company number 12345678 was not found"))
+      }
+
+      "returns validation error when company is not active for company number question" in new Setup {
+        val partiallyAnsweredSubmission = buildPartiallyAnsweredSubmission()
+        val companyNumberQuestionId     = partiallyAnsweredSubmission.getQuestionOfInterest("organisationNumberId").get
+
+        SubmissionsDAOMock.Fetch.thenReturn(partiallyAnsweredSubmission)
+        val companyProfile = CompaniesHouseCompanyProfile("12345678", "Company name", "closed", None)
+        when(mockCompaniesHouseConnector.getCompanyByNumber(*)(*)).thenReturn(successful(Some(companyProfile)))
+
+        val result = await(underTest.recordAnswers(partiallyAnsweredSubmission.id, companyNumberQuestionId, Map(Question.answerKey -> Seq("12345678"))))
+
+        result.left.value shouldBe ValidationErrors(ValidationError(message = "The company is not active, only companies that are trading can be set up on the Developer Hub"))
+      }
+
       "fail when given an invalid question" in new Setup {
         SubmissionsDAOMock.Fetch.thenReturn(aSubmission)
         SubmissionsDAOMock.Update.thenReturn()

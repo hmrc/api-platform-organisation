@@ -199,11 +199,25 @@ class SubmissionsService @Inject() (
                             companiesHouseConnector.getCompanyByNumber(companyNumber),
                             ValidationErrors(ValidationError(message = s"The company number ${companyNumber} was not found"))
                           )
+        _              <- etValidation.cond(
+                            checkCompanyIsActive(companyProfile),
+                            (),
+                            ValidationErrors(ValidationError(message = "The company is not active, only companies that are trading can be set up on the Developer Hub"))
+                          )
         companyDetails  = getCompanyDetails(companyNumber, companyProfile)
         additionalData  = AdditionalData(Some(companyDetails))
         submission      = Submission.updateLatestAdditionalDataTo(Some(additionalData))(extSubmission.submission)
       } yield submission
     ).value
+  }
+
+  private def checkCompanyIsActive(companyProfile: CompaniesHouseCompanyProfile) = {
+    companyProfile.companyStatus.trim().toLowerCase() match {
+      case "active"     => true
+      case "open"       => true
+      case "registered" => true
+      case _            => false
+    }
   }
 
   private def getCompanyDetails(companyNumber: String, company: CompaniesHouseCompanyProfile): CompanyDetails = {
