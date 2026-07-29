@@ -71,23 +71,16 @@ object QuestionnaireDAO {
 
     object ResponsibleIndividualDetails {
 
-      val questionRIConfirmName = Question.YesNoQuestion(
-        Question.Id("a8f3a6b4-cff0-4bb5-b38f-fd224b4715d5"),
-        Wording("Is this your name?"),
-        statement = Some(Statement(StatementText("{userName}"))),
-        yesMarking = Mark.Pass,
-        noMarking = Mark.Pass,
-        errorInfo = ErrorInfo("Select Yes if your name is correct").some
-      )
-
       val questionRIName = Question.NameQuestion(
         Question.Id("f04afc8a-08e6-4a90-b6f3-3d6ffed6a373"),
-        Wording("What is your name?"),
+        Wording("Is this your name?"),
         statement = Statement(
-          StatementText("Please note that your user profile on the Developer Hub will be permanently changed to this value.")
+          StatementText("Please update your name below."),
+          StatementText("Note that your user profile on the Developer Hub will be permanently changed to this value.")
         ).some,
         label = Question.Label("First and last name").some,
-        errorInfo = ErrorInfo("Enter a first and last name", "First and last name cannot be blank").some
+        errorInfo = ErrorInfo("Enter a first and last name", "First and last name cannot be blank").some,
+        summary = Some("Name")
       )
 
       val questionRIJobTitle = Question.TextQuestion(
@@ -95,7 +88,8 @@ object QuestionnaireDAO {
         Wording("What’s your job title?"),
         statement = None,
         label = Question.Label("Job title").some,
-        errorInfo = ErrorInfo("Enter a job title", "Job title cannot be blank").some
+        errorInfo = ErrorInfo("Enter a job title", "Job title cannot be blank").some,
+        summary = Some("Job title")
       )
 
       val questionRIPhone = Question.TextQuestion(
@@ -103,15 +97,15 @@ object QuestionnaireDAO {
         Wording("What’s your phone number?"),
         statement = None,
         hintText = StatementText("For international numbers include the country code.").some,
-        errorInfo = ErrorInfo("Enter a telephone number", "Telephone number cannot be blank").some
+        errorInfo = ErrorInfo("Enter a telephone number", "Telephone number cannot be blank").some,
+        summary = Some("Phone number")
       )
 
       val questionnaire = Questionnaire(
         id = Questionnaire.Id("be15b318-524a-4d10-89a5-4bfa52ed49c2"),
         label = Questionnaire.Label("About you"),
         questions = NonEmptyList.of(
-          QuestionItem(questionRIConfirmName),
-          QuestionItem(questionRIName, AskWhen.AskWhenAnswer(questionRIConfirmName, "No")),
+          QuestionItem(questionRIName),
           QuestionItem(questionRIJobTitle),
           QuestionItem(questionRIPhone)
         )
@@ -133,7 +127,8 @@ object QuestionnaireDAO {
           (PossibleAnswer(scottishLimitedPartnership)  -> Mark.Pass),
           (PossibleAnswer(noneOfTheAbove)              -> Mark.Fail)
         ),
-        errorInfo = ErrorInfo("Select your business type").some
+        errorInfo = ErrorInfo("Select your business type").some,
+        summary = Some("Business type")
       )
 
       // UK limited company
@@ -153,7 +148,8 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo(
           "Your company number must have 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total",
           "Enter your company registration number, like 01234567"
-        ).some
+        ).some,
+        summary = Some("Company registration number")
       )
 
       val questionLtdOrgName = Question.TextQuestion(
@@ -161,14 +157,16 @@ object QuestionnaireDAO {
         Wording("What is the company name?"),
         statement = None,
         validation = TextValidation.OrganisationName.some,
-        errorInfo = ErrorInfo("Your company name cannot be blank", "Enter your company name").some
+        errorInfo = ErrorInfo("Your company name cannot be blank", "Enter your company name").some,
+        summary = Some("Registered company name")
       )
 
       val questionLtdOrgAddress = Question.AddressQuestion(
         Question.Id("e1dbf1a3-e28b-1c83-a739-86f1319ca8cc"),
         Wording("Enter the company’s registered address"),
         statement = None,
-        errorInfo = ErrorInfo("Your company address line one and postcode cannot be blank", "Enter your company address").some
+        errorInfo = ErrorInfo("Your company address line one and postcode cannot be blank", "Enter your company address").some,
+        summary = Some("Registered address")
       )
 
       val questionLtdOrgUTR = Question.TextQuestion(
@@ -179,7 +177,8 @@ object QuestionnaireDAO {
           StatementLink("Ask for a copy of your Corporation Tax UTR (opens in new tab)", "https://www.gov.uk/find-lost-utr-number")
         ).some,
         hintText = StatementText("Your UTR can be 10 or 13 digits long.").some,
-        errorInfo = ErrorInfo("Your  Unique Taxpayer Reference cannot be blank", "Enter your Unique Taxpayer Reference, like 1234567890").some
+        errorInfo = ErrorInfo("Your  Unique Taxpayer Reference cannot be blank", "Enter your Unique Taxpayer Reference, like 1234567890").some,
+        summary = Some("Corporation tax UTR")
       )
 
       val questionLtdOrgWebsite = Question.TextQuestion(
@@ -189,7 +188,8 @@ object QuestionnaireDAO {
         hintText = StatementText("Website URL").some,
         absence = ("My company doesn't have a website", Mark.Fail).some,
         validation = TextValidation.Url.some,
-        errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some
+        errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some,
+        summary = Some("Website URL")
       )
 
       // Limited liability partnership
@@ -209,7 +209,8 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo(
           "Your company number must have 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total",
           "Enter your company registration number, like 01234567"
-        ).some
+        ).some,
+        summary = Some("Company registration number")
       )
 
       val questionLlpOrgName = Question.TextQuestion(
@@ -217,14 +218,16 @@ object QuestionnaireDAO {
         Wording("What is the partnership name?"),
         statement = None,
         validation = TextValidation.OrganisationName.some,
-        errorInfo = ErrorInfo("Your partnership name cannot be blank", "Enter your partnership name").some
+        errorInfo = ErrorInfo("Your partnership name cannot be blank", "Enter your partnership name").some,
+        summary = Some("Registered company name")
       )
 
       val questionLlpOrgAddress = Question.AddressQuestion(
         Question.Id("cac2fd7a-954f-4e91-a248-0b23fe4b0245"),
         Wording("Enter the registered address of the partnership"),
         statement = None,
-        errorInfo = ErrorInfo("Your partnership address cannot be blank", "Enter your partnership address").some
+        errorInfo = ErrorInfo("Your partnership address cannot be blank", "Enter your partnership address").some,
+        summary = Some("Registered address")
       )
 
       val questionLlpOrgUTR = Question.TextQuestion(
@@ -235,7 +238,8 @@ object QuestionnaireDAO {
           StatementLink("Get more help to find your UTR (opens in new tab)", "https://www.gov.uk/find-lost-utr-number")
         ).some,
         hintText = StatementText("Your UTR can be 10 or 13 digits long.").some,
-        errorInfo = ErrorInfo("Your  Unique Taxpayer Reference cannot be blank", "Enter your Unique Taxpayer Reference, like 1234567890").some
+        errorInfo = ErrorInfo("Your  Unique Taxpayer Reference cannot be blank", "Enter your Unique Taxpayer Reference, like 1234567890").some,
+        summary = Some("Corporation tax UTR")
       )
 
       val questionLlpOrgWebsite = Question.TextQuestion(
@@ -245,7 +249,8 @@ object QuestionnaireDAO {
         hintText = StatementText("Website URL").some,
         absence = ("My partnership doesn't have a website", Mark.Fail).some,
         validation = TextValidation.Url.some,
-        errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some
+        errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some,
+        summary = Some("Website URL")
       )
 
       // Limited partnership
@@ -265,7 +270,8 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo(
           "Your company number must have 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total",
           "Enter your company registration number, like 01234567"
-        ).some
+        ).some,
+        summary = Some("Company registration number")
       )
 
       val questionLpOrgName = Question.TextQuestion(
@@ -273,14 +279,16 @@ object QuestionnaireDAO {
         Wording("What is the partnership name?"),
         statement = None,
         validation = TextValidation.OrganisationName.some,
-        errorInfo = ErrorInfo("Your partnership name cannot be blank", "Enter your partnership name").some
+        errorInfo = ErrorInfo("Your partnership name cannot be blank", "Enter your partnership name").some,
+        summary = Some("Registered company name")
       )
 
       val questionLpOrgAddress = Question.AddressQuestion(
         Question.Id("5094e40c-aebe-4381-9af6-c7b42d0163cb"),
         Wording("Enter the registered address for the partnership"),
         statement = None,
-        errorInfo = ErrorInfo("Your partnership address cannot be blank", "Enter your partnership address").some
+        errorInfo = ErrorInfo("Your partnership address cannot be blank", "Enter your partnership address").some,
+        summary = Some("Registered address")
       )
 
       val questionLpOrgUTR = Question.TextQuestion(
@@ -291,7 +299,8 @@ object QuestionnaireDAO {
           StatementLink("Get more help to find your UTR (opens in new tab)", "https://www.gov.uk/find-lost-utr-number")
         ).some,
         hintText = StatementText("Your UTR can be 10 or 13 digits long.").some,
-        errorInfo = ErrorInfo("Your  Unique Taxpayer Reference cannot be blank", "Enter your Unique Taxpayer Reference, like 1234567890").some
+        errorInfo = ErrorInfo("Your  Unique Taxpayer Reference cannot be blank", "Enter your Unique Taxpayer Reference, like 1234567890").some,
+        summary = Some("Corporation tax UTR")
       )
 
       val questionLpOrgWebsite = Question.TextQuestion(
@@ -301,7 +310,8 @@ object QuestionnaireDAO {
         hintText = StatementText("Website URL").some,
         absence = ("My partnership doesn't have a website", Mark.Fail).some,
         validation = TextValidation.Url.some,
-        errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some
+        errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some,
+        summary = Some("Website URL")
       )
 
       // Scottish limited partnership
@@ -321,7 +331,8 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo(
           "Your company number must have 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total",
           "Enter your company registration number, like 01234567"
-        ).some
+        ).some,
+        summary = Some("Company registration number")
       )
 
       val questionSlpOrgName = Question.TextQuestion(
@@ -329,14 +340,16 @@ object QuestionnaireDAO {
         Wording("What is the partnership name?"),
         statement = None,
         validation = TextValidation.OrganisationName.some,
-        errorInfo = ErrorInfo("Your partnership name cannot be blank", "Enter your partnership name").some
+        errorInfo = ErrorInfo("Your partnership name cannot be blank", "Enter your partnership name").some,
+        summary = Some("Registered company name")
       )
 
       val questionSlpOrgAddress = Question.AddressQuestion(
         Question.Id("e4419ecd-b79a-4a04-aa1b-8d3bcfecd286"),
         Wording("Enter the registered address for the partnership"),
         statement = None,
-        errorInfo = ErrorInfo("Your partnership address cannot be blank", "Enter your partnership address").some
+        errorInfo = ErrorInfo("Your partnership address cannot be blank", "Enter your partnership address").some,
+        summary = Some("Registered address")
       )
 
       val questionSlpOrgUTR = Question.TextQuestion(
@@ -347,7 +360,8 @@ object QuestionnaireDAO {
           StatementLink("Get more help to find your UTR (opens in new tab)", "https://www.gov.uk/find-lost-utr-number")
         ).some,
         hintText = StatementText("Your UTR can be 10 or 13 digits long.").some,
-        errorInfo = ErrorInfo("Your  Unique Taxpayer Reference cannot be blank", "Enter your Unique Taxpayer Reference, like 1234567890").some
+        errorInfo = ErrorInfo("Your  Unique Taxpayer Reference cannot be blank", "Enter your Unique Taxpayer Reference, like 1234567890").some,
+        summary = Some("Corporation tax UTR")
       )
 
       val questionSlpOrgWebsite = Question.TextQuestion(
@@ -357,7 +371,8 @@ object QuestionnaireDAO {
         hintText = StatementText("Website URL").some,
         absence = ("My partnership doesn't have a website", Mark.Fail).some,
         validation = TextValidation.Url.some,
-        errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some
+        errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some,
+        summary = Some("Website URL")
       )
 
       // None of the above
