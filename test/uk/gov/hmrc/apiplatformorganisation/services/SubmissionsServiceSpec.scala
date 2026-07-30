@@ -26,6 +26,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationName}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission.{AdditionalData, CompanyDetails}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services.{ValidationError, ValidationErrors}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.*
 import uk.gov.hmrc.apiplatformorganisation.mocks.services.{OrganisationServiceMockModule, SubmissionReviewServiceMockModule}
@@ -101,11 +102,13 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
 
     "submit submission" should {
       "submit a submission" in new Setup {
-        val samplePassAnsweredSubmission = aSubmission.copy(id = completedSubmissionId)
+        val additionalData               = AdditionalData(Some(CompanyDetails("12345678", "Company name")))
+        val samplePassAnsweredSubmission = Submission.updateLatestAdditionalDataTo(Some(additionalData))(aSubmission.copy(id = completedSubmissionId)
           .hasCompletelyAnsweredWith(samplePassAnswersToQuestions)
           .withCompletedProgress()
+          .submission)
 
-        SubmissionsDAOMock.Fetch.thenReturn(samplePassAnsweredSubmission.submission)
+        SubmissionsDAOMock.Fetch.thenReturn(samplePassAnsweredSubmission)
         SubmissionsDAOMock.Update.thenReturn()
         SubmissionReviewServiceMock.CreateSubmissionReview.thenReturn(submittedSubmissionReview)
         AuditServiceMock.AuditSubmitOrganisation.thenReturn()
@@ -127,11 +130,13 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
 
     "approve submission" should {
       "approve a submission" in new Setup {
-        val samplePassSubmittedSubmission = aSubmission.copy(id = completedSubmissionId)
+        val additionalData                = AdditionalData(Some(CompanyDetails("12345678", "Company name")))
+        val samplePassSubmittedSubmission = Submission.updateLatestAdditionalDataTo(Some(additionalData))(aSubmission.copy(id = completedSubmissionId)
           .hasCompletelyAnsweredWith(samplePassAnswersToQuestions)
           .withSubmittedProgress()
+          .submission)
 
-        SubmissionsDAOMock.Fetch.thenReturn(samplePassSubmittedSubmission.submission)
+        SubmissionsDAOMock.Fetch.thenReturn(samplePassSubmittedSubmission)
         OrganisationServiceMock.CreateOrganisation.thenReturn(standardOrg)
         SubmissionsDAOMock.Update.thenReturn()
         SubmissionReviewServiceMock.ApproveSubmissionReview.thenReturn(approvedSubmissionReview)
@@ -142,9 +147,9 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         result.value.status shouldBe Submission.Status.Granted(instant, "bob@example.com", Some("comment"), None)
 
         OrganisationServiceMock.CreateOrganisation.verifyCalledWith(
-          OrganisationName("Bobs Burgers"),
+          OrganisationName("Company name"),
           Organisation.OrganisationType.UkLimitedCompany,
-          samplePassSubmittedSubmission.submission.startedBy
+          samplePassSubmittedSubmission.startedBy
         )
         val updatedSubmission: Submission = SubmissionsDAOMock.Update.verifyCalledWith()
         updatedSubmission.organisationId shouldBe Some(standardOrg.id)

@@ -133,7 +133,7 @@ object QuestionnaireDAO {
 
       // UK limited company
 
-      val questionLtdCompanyNumber = Question.TextQuestion(
+      val questionLtdCompanyNumber = Question.CompanyNumberQuestion(
         Question.Id("4e148791-1a07-4f28-8fe4-ba3e18cdc118"),
         Wording("What’s the company registration number (CRN)?"),
         statement = Statement(
@@ -145,7 +145,6 @@ object QuestionnaireDAO {
         ).some,
         hintText =
           StatementText("It has 8 characters, for example 01234567 or AC012345.").some,
-        validation = TextValidation.OrganisationNumber.some,
         errorInfo = ErrorInfo(
           "Your company number must have 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total",
           "Enter your company registration number, like 01234567"
@@ -153,20 +152,23 @@ object QuestionnaireDAO {
         summary = Some("Company registration number")
       )
 
-      val questionLtdOrgName = Question.TextQuestion(
+      val questionLtdOrgName = Question.ConfirmCompanyNameQuestion(
         Question.Id("a2dbf1a7-e31b-4c89-a755-21f0652ca9cc"),
-        Wording("What is the company name?"),
+        Wording("Is this your company?"),
         statement = None,
-        validation = TextValidation.OrganisationName.some,
-        errorInfo = ErrorInfo("Your company name cannot be blank", "Enter your company name").some,
+        yesMarking = Mark.Pass,
+        noMarking = Mark.Pass,
+        errorInfo = ErrorInfo("Select Yes if the company name is correct").some,
         summary = Some("Registered company name")
       )
 
-      val questionLtdOrgAddress = Question.AddressQuestion(
+      val questionLtdOrgAddress = Question.ConfirmCompanyAddressQuestion(
         Question.Id("e1dbf1a3-e28b-1c83-a739-86f1319ca8cc"),
-        Wording("Enter the company’s registered address"),
+        Wording("Is this the correct registered address for your company?"),
         statement = None,
-        errorInfo = ErrorInfo("Your company address line one and postcode cannot be blank", "Enter your company address").some,
+        yesMarking = Mark.Pass,
+        noMarking = Mark.Pass,
+        errorInfo = ErrorInfo("Select Yes if the company address is correct").some,
         summary = Some("Registered address")
       )
 
