@@ -197,7 +197,7 @@ object QuestionnaireDAO {
 
       // Limited liability partnership
 
-      val questionLlpCompanyNumber = Question.TextQuestion(
+      val questionLlpCompanyNumber = Question.CompanyNumberQuestion(
         Question.Id("55df946c-769a-4fb3-a28e-6066b89cc104"),
         Wording("What’s the company registration number (CRN)?"),
         statement = Statement(
@@ -209,7 +209,6 @@ object QuestionnaireDAO {
         ).some,
         hintText =
           StatementText("It has 8 characters, for example 01234567 or AC012345.").some,
-        validation = TextValidation.OrganisationNumber.some,
         errorInfo = ErrorInfo(
           "Your company number must have 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total",
           "Enter your company registration number, like 01234567"
@@ -259,7 +258,7 @@ object QuestionnaireDAO {
 
       // Limited partnership
 
-      val questionLpCompanyNumber = Question.TextQuestion(
+      val questionLpCompanyNumber = Question.CompanyNumberQuestion(
         Question.Id("725ced0b-6a33-4436-99b6-177366d600a5"),
         Wording("What’s the company registration number (CRN)?"),
         statement = Statement(
@@ -271,7 +270,6 @@ object QuestionnaireDAO {
         ).some,
         hintText =
           StatementText("It has 8 characters, for example 01234567 or AC012345.").some,
-        validation = TextValidation.OrganisationNumber.some,
         errorInfo = ErrorInfo(
           "Your company number must have 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total",
           "Enter your company registration number, like 01234567"
@@ -321,7 +319,7 @@ object QuestionnaireDAO {
 
       // Scottish limited partnership
 
-      val questionSlpCompanyNumber = Question.TextQuestion(
+      val questionSlpCompanyNumber = Question.CompanyNumberQuestion(
         Question.Id("550f26f6-54ee-48b1-9798-0b7c780faf86"),
         Wording("What’s the company registration number (CRN)?"),
         statement = Statement(
@@ -333,7 +331,6 @@ object QuestionnaireDAO {
         ).some,
         hintText =
           StatementText("It has 8 characters, for example 01234567 or AC012345.").some,
-        validation = TextValidation.OrganisationNumber.some,
         errorInfo = ErrorInfo(
           "Your company number must have 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total",
           "Enter your company registration number, like 01234567"
