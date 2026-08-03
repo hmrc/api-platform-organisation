@@ -27,7 +27,12 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.services.{ClockNow, EitherTHelper}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.ActualAnswer.CompanyNumberAnswer
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Question.CompanyNumberQuestion
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission.{AdditionalData, CompanyDetails}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services.*
+import uk.gov.hmrc.apiplatformorganisation.connectors.CompaniesHouseConnector
+import uk.gov.hmrc.apiplatformorganisation.models.CompaniesHouseCompanyProfile
 import uk.gov.hmrc.apiplatformorganisation.repositories.*
 
 @Singleton
@@ -37,6 +42,7 @@ class SubmissionsService @Inject() (
     submissionReviewService: SubmissionReviewService,
     organisationService: OrganisationService,
     auditService: AuditService,
+    companiesHouseConnector: CompaniesHouseConnector,
     val clock: Clock
   )(implicit val ec: ExecutionContext
   ) extends EitherTHelper[String] with ClockNow {
@@ -164,15 +170,73 @@ class SubmissionsService @Inject() (
       .value
   }
 
-  def recordAnswers(submissionId: SubmissionId, questionId: Question.Id, rawAnswers: Map[String, Seq[String]]): Future[Either[ValidationErrors, ExtendedSubmission]] = {
+  def recordAnswers(submissionId: SubmissionId, questionId: Question.Id, rawAnswers: Map[String, Seq[String]])(implicit hc: HeaderCarrier)
+      : Future[Either[ValidationErrors, ExtendedSubmission]] = {
     (
       for {
         initialSubmission <- etValidation.fromOptionF(submissionsDAO.fetch(submissionId), ValidationErrors(ValidationError(message = "No such submission")))
         extSubmission     <- etValidation.fromEither(AnswerQuestion.recordAnswer(initialSubmission, questionId, rawAnswers))
-        savedSubmission   <- etValidation.liftF(submissionsDAO.update(extSubmission.submission))
+        submission        <- etValidation.fromEitherF(processQuestion(extSubmission, questionId))
+        savedSubmission   <- etValidation.liftF(submissionsDAO.update(submission))
       } yield extSubmission.copy(submission = savedSubmission)
     )
       .value
+  }
+
+  private def processQuestion(extSubmission: ExtendedSubmission, questionId: Question.Id)(implicit hc: HeaderCarrier): Future[Either[ValidationErrors, Submission]] = {
+    val maybeQuestion = extSubmission.submission.findQuestion(questionId)
+    val maybeAnswer   = extSubmission.submission.latestInstance.answersToQuestions.get(questionId)
+    (maybeQuestion, maybeAnswer) match {
+      case (Some(_: CompanyNumberQuestion), Some(a: CompanyNumberAnswer)) => processCompanyDetails(a.value, extSubmission)
+      case _                                                              => Future.successful(Right(extSubmission.submission))
+    }
+  }
+
+  private def processCompanyDetails(companyNumber: String, extSubmission: ExtendedSubmission)(implicit hc: HeaderCarrier): Future[Either[ValidationErrors, Submission]] = {
+    (
+      for {
+        companyProfile <- etValidation.fromOptionF(
+                            companiesHouseConnector.getCompanyByNumber(companyNumber),
+                            ValidationErrors(ValidationError(message = s"The company number ${companyNumber} was not found"))
+                          )
+        _              <- etValidation.cond(
+                            checkCompanyIsActive(companyProfile),
+                            (),
+                            ValidationErrors(ValidationError(message = "The company is not active, only companies that are trading can be set up on the Developer Hub"))
+                          )
+        companyDetails  = getCompanyDetails(companyNumber, companyProfile)
+        additionalData  = AdditionalData(Some(companyDetails))
+        submission      = Submission.updateLatestAdditionalDataTo(Some(additionalData))(extSubmission.submission)
+      } yield submission
+    ).value
+  }
+
+  private def checkCompanyIsActive(companyProfile: CompaniesHouseCompanyProfile) = {
+    companyProfile.companyStatus.trim().toLowerCase() match {
+      case "active"     => true
+      case "open"       => true
+      case "registered" => true
+      case _            => false
+    }
+  }
+
+  private def getCompanyDetails(companyNumber: String, company: CompaniesHouseCompanyProfile): CompanyDetails = {
+    company.registeredOfficeAddress match {
+      case Some(addr) => CompanyDetails(
+          companyNumber,
+          company.companyName,
+          addr.addressLineOne,
+          addr.addressLineTwo,
+          addr.careOf,
+          addr.country,
+          addr.locality,
+          addr.poBox,
+          addr.postalCode,
+          addr.premises,
+          addr.region
+        )
+      case _          => CompanyDetails(companyNumber, company.companyName)
+    }
   }
 
   def delete(submissionId: SubmissionId): Future[Boolean] = {

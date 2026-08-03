@@ -53,15 +53,17 @@ object RegisteredOfficeAddress {
   given format: OFormat[RegisteredOfficeAddress] = OFormat[RegisteredOfficeAddress](reads, writes)
 }
 
-case class CompaniesHouseCompanyProfile(companyName: String, registeredOfficeAddress: Option[RegisteredOfficeAddress])
+case class CompaniesHouseCompanyProfile(companyNumber: String, companyName: String, companyStatus: String, registeredOfficeAddress: Option[RegisteredOfficeAddress])
 
 object CompaniesHouseCompanyProfile {
 
   given reads: Reads[CompaniesHouseCompanyProfile] = (
-    (__ \ "company_name").read[String] and
+    (__ \ "company_number").read[String] and
+      (__ \ "company_name").read[String] and
+      (__ \ "company_status").read[String] and
       (__ \ "registered_office_address").readNullable[RegisteredOfficeAddress]
-  )((companyName, registeredOfficeAddress) =>
-    CompaniesHouseCompanyProfile(companyName, registeredOfficeAddress)
+  )((companyNumber, companyName, companyStatus, registeredOfficeAddress) =>
+    CompaniesHouseCompanyProfile(companyNumber, companyName, companyStatus, registeredOfficeAddress)
   )
 
   given writes: OWrites[CompaniesHouseCompanyProfile] = Json.writes[CompaniesHouseCompanyProfile]

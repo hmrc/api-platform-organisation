@@ -17,6 +17,7 @@
 package uk.gov.hmrc.apiplatformorganisation.services
 
 import scala.concurrent.ExecutionContext
+import scala.concurrent.Future.successful
 
 import cats.data.NonEmptyList
 import org.scalatest.Inside
@@ -28,8 +29,10 @@ import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services.{ValidationError, ValidationErrors}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.*
+import uk.gov.hmrc.apiplatformorganisation.connectors.CompaniesHouseConnector
 import uk.gov.hmrc.apiplatformorganisation.mocks.services.{OrganisationServiceMockModule, SubmissionReviewServiceMockModule}
 import uk.gov.hmrc.apiplatformorganisation.mocks.{AuditServiceMockModule, SubmissionsDAOMockModule}
+import uk.gov.hmrc.apiplatformorganisation.models.CompaniesHouseCompanyProfile
 import uk.gov.hmrc.apiplatformorganisation.repositories.QuestionnaireDAO
 import uk.gov.hmrc.apiplatformorganisation.util.AsyncHmrcSpec
 import uk.gov.hmrc.apiplatformorganisation.{OrganisationFixtures, SubmissionReviewFixtures}
@@ -80,8 +83,18 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
     )
       .hasCompletelyAnsweredWith(completedAnswers)
 
+    val mockCompaniesHouseConnector = mock[CompaniesHouseConnector]
+
     val underTest =
-      new SubmissionsService(new QuestionnaireDAO(), SubmissionsDAOMock.aMock, SubmissionReviewServiceMock.aMock, OrganisationServiceMock.aMock, AuditServiceMock.aMock, clock)
+      new SubmissionsService(
+        new QuestionnaireDAO(),
+        SubmissionsDAOMock.aMock,
+        SubmissionReviewServiceMock.aMock,
+        OrganisationServiceMock.aMock,
+        AuditServiceMock.aMock,
+        mockCompaniesHouseConnector,
+        clock
+      )
   }
 
   "SubmissionsService" when {
@@ -92,7 +105,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         val result: Either[String, Submission] = await(underTest.create(userId, "bob@example.com"))
 
         inside(result.value) {
-          case s @ Submission(_, _, _, startedBy, _, _, instances, _) =>
+          case _ @Submission(_, _, _, startedBy, _, _, instances, _) =>
             startedBy shouldBe userId
             instances.head.answersToQuestions.size shouldBe 0
         }
@@ -335,6 +348,47 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         val out = result.value
         out.submission.latestInstance.answersToQuestions.get(optionalQuestionId).value shouldBe ActualAnswer.NoAnswer
         SubmissionsDAOMock.Update.verifyCalled()
+      }
+
+      "records new answers and process question for company number question" in new Setup {
+        val partiallyAnsweredSubmission = buildPartiallyAnsweredSubmission()
+        val companyNumberQuestionId     = partiallyAnsweredSubmission.getQuestionOfInterest("organisationNumberId").get
+
+        SubmissionsDAOMock.Fetch.thenReturn(partiallyAnsweredSubmission)
+        SubmissionsDAOMock.Update.thenReturn()
+        val companyProfile = CompaniesHouseCompanyProfile("12345678", "Company name", "active", None)
+        when(mockCompaniesHouseConnector.getCompanyByNumber(*)(*)).thenReturn(successful(Some(companyProfile)))
+
+        val result = await(underTest.recordAnswers(partiallyAnsweredSubmission.id, companyNumberQuestionId, Map(Question.answerKey -> Seq("12345678"))))
+
+        val out = result.value
+        out.submission.latestInstance.answersToQuestions.get(companyNumberQuestionId).value shouldBe ActualAnswer.CompanyNumberAnswer("12345678")
+        SubmissionsDAOMock.Update.verifyCalled()
+      }
+
+      "returns validation error when company not found for company number question" in new Setup {
+        val partiallyAnsweredSubmission = buildPartiallyAnsweredSubmission()
+        val companyNumberQuestionId     = partiallyAnsweredSubmission.getQuestionOfInterest("organisationNumberId").get
+
+        SubmissionsDAOMock.Fetch.thenReturn(partiallyAnsweredSubmission)
+        when(mockCompaniesHouseConnector.getCompanyByNumber(*)(*)).thenReturn(successful(None))
+
+        val result = await(underTest.recordAnswers(partiallyAnsweredSubmission.id, companyNumberQuestionId, Map(Question.answerKey -> Seq("12345678"))))
+
+        result.left.value shouldBe ValidationErrors(ValidationError(message = "The company number 12345678 was not found"))
+      }
+
+      "returns validation error when company is not active for company number question" in new Setup {
+        val partiallyAnsweredSubmission = buildPartiallyAnsweredSubmission()
+        val companyNumberQuestionId     = partiallyAnsweredSubmission.getQuestionOfInterest("organisationNumberId").get
+
+        SubmissionsDAOMock.Fetch.thenReturn(partiallyAnsweredSubmission)
+        val companyProfile = CompaniesHouseCompanyProfile("12345678", "Company name", "closed", None)
+        when(mockCompaniesHouseConnector.getCompanyByNumber(*)(*)).thenReturn(successful(Some(companyProfile)))
+
+        val result = await(underTest.recordAnswers(partiallyAnsweredSubmission.id, companyNumberQuestionId, Map(Question.answerKey -> Seq("12345678"))))
+
+        result.left.value shouldBe ValidationErrors(ValidationError(message = "The company is not active, only companies that are trading can be set up on the Developer Hub"))
       }
 
       "fail when given an invalid question" in new Setup {

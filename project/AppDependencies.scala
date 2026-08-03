@@ -3,8 +3,8 @@ import sbt.*
 object AppDependencies {
 
   private val bootstrapVersion = "10.7.0"
-  private val hmrcMongoVersion = "2.12.0"
-  private val orgDomainVersion = "1.3.0"
+  private val hmrcMongoVersion = "2.13.0"
+  private val orgDomainVersion = "1.4.0"
   private val tpdDomainVersion = "1.0.0"
 
   val compile = Seq(
