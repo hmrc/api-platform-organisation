@@ -23,8 +23,6 @@ POST        /submission/:sid                        uk.gov.hmrc.apiplatformorgan
 POST        /submission/:sid/approve                uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.approveSubmission(sid: SimpleSubmissionId)
 POST        /submission/:sid/decline                uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.declineSubmission(sid: SimpleSubmissionId)
 
-GET         /company/:cnumber                       uk.gov.hmrc.apiplatformorganisation.controllers.CompanyController.fetchByCompanyNumber(cnumber: String)
-
 POST        /matching/sa                            uk.gov.hmrc.apiplatformorganisation.controllers.MatchingController.matchBySa()
 
 GET         /submission-reviews                     uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionReviewController.search()

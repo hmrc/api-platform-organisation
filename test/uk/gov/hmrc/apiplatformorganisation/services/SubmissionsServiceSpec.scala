@@ -361,6 +361,24 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
 
         SubmissionsDAOMock.Fetch.thenReturn(partiallyAnsweredSubmission)
         SubmissionsDAOMock.Update.thenReturn()
+        val registeredOfficeAddress =
+          uk.gov.hmrc.apiplatformorganisation.models.RegisteredOfficeAddress(Some("1 High Street"), None, None, None, Some("London"), None, Some("NW1 2ZZ"))
+        val companyProfile          = CompaniesHouseCompanyProfile("12345678", "Company name", "active", Some(registeredOfficeAddress))
+        when(mockCompaniesHouseConnector.getCompanyByNumber(*)(*)).thenReturn(successful(Some(companyProfile)))
+
+        val result = await(underTest.recordAnswers(partiallyAnsweredSubmission.id, companyNumberQuestionId, Map(Question.answerKey -> Seq("12345678"))))
+
+        val out = result.value
+        out.submission.latestInstance.answersToQuestions.get(companyNumberQuestionId).value shouldBe ActualAnswer.CompanyNumberAnswer("12345678")
+        SubmissionsDAOMock.Update.verifyCalled()
+      }
+
+      "records new answers and process question for company number question where company has no address" in new Setup {
+        val partiallyAnsweredSubmission = buildPartiallyAnsweredSubmission()
+        val companyNumberQuestionId     = partiallyAnsweredSubmission.getQuestionOfInterest("organisationNumberId").get
+
+        SubmissionsDAOMock.Fetch.thenReturn(partiallyAnsweredSubmission)
+        SubmissionsDAOMock.Update.thenReturn()
         val companyProfile = CompaniesHouseCompanyProfile("12345678", "Company name", "active", None)
         when(mockCompaniesHouseConnector.getCompanyByNumber(*)(*)).thenReturn(successful(Some(companyProfile)))
 
