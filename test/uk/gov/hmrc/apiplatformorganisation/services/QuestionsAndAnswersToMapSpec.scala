@@ -26,8 +26,8 @@ class QuestionsAndAnswersToMapSpec extends HmrcSpec {
 
     val answersToQuestionsWithMissingIds: Map[Question.Id, ActualAnswer] = Map(
       (Question.Id.random                           -> ActualAnswer.TextAnswer("bad question")),
-      (OrganisationDetails.questionCompanyNumber.id -> ActualAnswer.TextAnswer("question 1")),
-      (OrganisationDetails.questionLtdOrgName.id    -> ActualAnswer.TextAnswer("question 2"))
+      (OrganisationDetails.questionCompanyNumber.id -> ActualAnswer.CompanyNumberAnswer("12345678")),
+      (OrganisationDetails.questionLtdOrgUtr.id     -> ActualAnswer.TextAnswer("question 2"))
     )
     val submissionWithMissingQuestionIds                                 = Submission.updateLatestAnswersTo(answersToQuestionsWithMissingIds)(aSubmission)
   }
@@ -35,27 +35,27 @@ class QuestionsAndAnswersToMapSpec extends HmrcSpec {
   "QuestionsAndAnswersToMap" should {
     "return a map of questions to answers" in new Setup {
       val answers: Map[Question.Id, ActualAnswer] = Map(
-        (OrganisationDetails.questionCompanyNumber.id -> ActualAnswer.TextAnswer("question 1")),
-        (OrganisationDetails.questionLtdOrgName.id    -> ActualAnswer.TextAnswer("question 2"))
+        (OrganisationDetails.questionCompanyNumber.id -> ActualAnswer.CompanyNumberAnswer("12345678")),
+        (OrganisationDetails.questionLtdOrgUtr.id     -> ActualAnswer.TextAnswer("question 2"))
       )
 
       val map = QuestionsAndAnswersToMap(aSubmission.answeringWith(answers))
       map.size shouldBe 2
-      map should contain("whatIsTheCompanyRegistrationNumber?" -> "question 1")
-      map should contain("whatIsYourOrganisation’sName?" -> "question 2")
+      map should contain("whatIsTheCompanyRegistrationNumber?" -> "12345678")
+      map should contain("whatIsYourCorporationTaxUniqueTaxpayerReference(UTR)?" -> "question 2")
     }
 
     "return a map of questions to answers omitting missing question ids" in new Setup {
       val answers: Map[Question.Id, ActualAnswer] = Map(
         (Question.Id.random                           -> ActualAnswer.TextAnswer("bad question")),
-        (OrganisationDetails.questionCompanyNumber.id -> ActualAnswer.TextAnswer("question 1")),
-        (OrganisationDetails.questionLtdOrgName.id    -> ActualAnswer.TextAnswer("question 2"))
+        (OrganisationDetails.questionCompanyNumber.id -> ActualAnswer.CompanyNumberAnswer("12345678")),
+        (OrganisationDetails.questionLtdOrgUtr.id     -> ActualAnswer.TextAnswer("question 2"))
       )
 
       val map = QuestionsAndAnswersToMap(aSubmission.answeringWith(answers))
       map.size shouldBe 2
-      map should contain("whatIsTheCompanyRegistrationNumber?" -> "question 1")
-      map should contain("whatIsYourOrganisation’sName?" -> "question 2")
+      map should contain("whatIsTheCompanyRegistrationNumber?" -> "12345678")
+      map should contain("whatIsYourCorporationTaxUniqueTaxpayerReference(UTR)?" -> "question 2")
     }
 
     "toCamelCase" in new Setup {
