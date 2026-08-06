@@ -26,6 +26,9 @@ There is a convenience script to spin up the service locally
 ./run_local.sh
 ```
 
+Note that to run this you will need to set up an environment variable called 
+COMPANIES_HOUSE_KEY which contains the key for the Companies House API. 
+
 ## License
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").

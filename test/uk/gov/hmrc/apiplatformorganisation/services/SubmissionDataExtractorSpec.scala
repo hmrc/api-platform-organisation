@@ -19,6 +19,7 @@ package uk.gov.hmrc.apiplatformorganisation.services
 import uk.gov.hmrc.apiplatform.modules.common.utils.HmrcSpec
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission.{AdditionalData, CompanyDetails}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.SubmissionsTestData
 
 class SubmissionDataExtracterSpec extends HmrcSpec with SubmissionsTestData {
@@ -32,7 +33,8 @@ class SubmissionDataExtracterSpec extends HmrcSpec with SubmissionsTestData {
   }
 
   "getOrganisationName with name filled in for UK company" in {
-    val submissionWithOrgName = Submission.updateLatestAnswersTo(samplePassAnswersToQuestions)(aSubmission)
-    SubmissionDataExtracter.getOrganisationName(submissionWithOrgName) shouldBe Some(OrganisationName("Bobs Burgers"))
+    val additionalData        = AdditionalData(Some(CompanyDetails("12345678", "Company name")))
+    val submissionWithOrgName = Submission.updateLatestAdditionalDataTo(Some(additionalData))(aSubmission)
+    SubmissionDataExtracter.getOrganisationName(submissionWithOrgName) shouldBe Some(OrganisationName("Company name"))
   }
 }

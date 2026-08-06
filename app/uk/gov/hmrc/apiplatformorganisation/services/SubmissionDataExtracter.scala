@@ -25,8 +25,8 @@ object SubmissionDataExtracter {
     val orgName = submission.organisationName
 
     orgName match {
-      case "n/a" => None
-      case _     => Some(OrganisationName(orgName))
+      case Some(orgName) => Some(OrganisationName(orgName))
+      case None          => None
     }
   }
 
