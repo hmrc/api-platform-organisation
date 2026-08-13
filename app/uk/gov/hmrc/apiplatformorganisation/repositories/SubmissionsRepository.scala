@@ -39,67 +39,6 @@ object SubmissionsRepository {
   object MongoFormatter {
     import uk.gov.hmrc.play.json.Union
 
-    // implicit val keyReadsQuestionnaireId: KeyReads[Questionnaire.Id]   = KeyReads(key => JsSuccess(Questionnaire.Id(key)))
-    // implicit val keyWritesQuestionnaireId: KeyWrites[Questionnaire.Id] = KeyWrites(_.value)
-
-    // implicit val stateWrites: Writes[QuestionnaireState] = Writes {
-    //   case QuestionnaireState.NotStarted    => JsString("NotStarted")
-    //   case QuestionnaireState.InProgress    => JsString("InProgress")
-    //   case QuestionnaireState.NotApplicable => JsString("NotApplicable")
-    //   case QuestionnaireState.Completed     => JsString("Completed")
-    // }
-
-    // implicit val stateReads: Reads[QuestionnaireState] = Reads {
-    //   case JsString("NotStarted")    => JsSuccess(QuestionnaireState.NotStarted)
-    //   case JsString("InProgress")    => JsSuccess(QuestionnaireState.InProgress)
-    //   case JsString("NotApplicable") => JsSuccess(QuestionnaireState.NotApplicable)
-    //   case JsString("Completed")     => JsSuccess(QuestionnaireState.Completed)
-    //   case _                         => JsError("Failed to parse QuestionnaireState value")
-    // }
-
-    // implicit val questionnaireProgressFormat: OFormat[QuestionnaireProgress] = Json.format[QuestionnaireProgress]
-    // implicit val questionIdsOfInterestFormat: OFormat[QuestionIdsOfInterest] = Json.format[QuestionIdsOfInterest]
-
-    // implicit val dateFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
-
-    // import Submission.Status.*
-
-    // implicit val RejectedStatusFormat: OFormat[Declined]                                         = Json.format[Declined]
-    // implicit val AcceptedStatusFormat: OFormat[Granted]                                          = Json.format[Granted]
-    // implicit val AcceptedWithWarningsStatusFormat: OFormat[GrantedWithWarnings]                  = Json.format[GrantedWithWarnings]
-    // implicit val failedStatusFormat: OFormat[Failed]                                             = Json.format[Failed]
-    // implicit val warningsStatusFormat: OFormat[Warnings]                                         = Json.format[Warnings]
-    // implicit val pendingResponsibleIndividualStatusFormat: OFormat[PendingResponsibleIndividual] = Json.format[PendingResponsibleIndividual]
-    // implicit val SubmittedStatusFormat: OFormat[Submitted]                                       = Json.format[Submitted]
-    // implicit val answeringStatusFormat: OFormat[Answering]                                       = Json.format[Answering]
-    // implicit val CreatedStatusFormat: OFormat[Created]                                           = Json.format[Created]
-
-    // implicit val submissionStatus: OFormat[Submission.Status] = Union.from[Submission.Status]("Submission.StatusType")
-    //   .and[Declined]("declined")
-    //   .and[Granted]("granted")
-    //   .and[GrantedWithWarnings]("grantedWithWarnings")
-    //   .and[Failed]("failed")
-    //   .and[Warnings]("warnings")
-    //   .and[PendingResponsibleIndividual]("pendingResponsibleIndividual")
-    //   .and[Submitted]("submitted")
-    //   .and[Answering]("answering")
-    //   .and[Created]("created")
-    //   .format
-
-    // import NonEmptyListFormatters.given
-    // import Question.*
-    // import play.api.libs.functional.syntax._
-
-    // private val readsQuestionItem: Reads[QuestionItem] = (
-    //   (JsPath \ "question").read[Question] and
-    //     ((JsPath \ "askWhen").read[NonEmptyList[AskWhen]] or Reads.pure(NonEmptyList.of(AskWhen.AlwaysAsk)))
-    // )(QuestionItem.apply(_, _))
-
-    // given OFormat[QuestionItem] = OFormat(readsQuestionItem, Json.writes[QuestionItem])
-
-    // implicit val submissionInstanceFormat: OFormat[Submission.Instance] = Json.format[Submission.Instance]
-    // implicit val submissionFormat: OFormat[Submission]                  = Json.format[Submission]
-
     given Format[ObjectId] = MongoFormats.objectIdFormat
     given Format[Instant]  = MongoJavatimeFormats.instantFormat
 
