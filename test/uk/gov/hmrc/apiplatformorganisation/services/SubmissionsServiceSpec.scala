@@ -398,7 +398,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
 
         val result = await(underTest.recordAnswers(partiallyAnsweredSubmission.id, companyNumberQuestionId, Map(Question.answerKey -> Seq("12345678"))))
 
-        result.left.value shouldBe ValidationErrors(ValidationError(message = "The company number 12345678 was not found"))
+        result.left.value shouldBe ValidationErrors(ValidationError(key = ValidationError.companyNumberNotFoundKey, message = "The company number 12345678 was not found"))
       }
 
       "returns validation error when company is not active for company number question" in new Setup {
