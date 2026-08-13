@@ -251,40 +251,46 @@ object QuestionnaireDAO {
         questions = NonEmptyList.of(
           QuestionItem(questionOrgType),
           // UK limited company
-          QuestionItem(questionLtdCompanyNumber, AskWhen.AskWhenAnswer(questionOrgType, ukLimitedCompany)),
-          QuestionItem(questionLtdConfirmCompanyName, AskWhen.AskWhenAnswer(questionOrgType, ukLimitedCompany)),
+          QuestionItem(
+            questionLtdCompanyNumber,
+            AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany, limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership))
+          ),
+          QuestionItem(
+            questionLtdConfirmCompanyName,
+            AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany, limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership))
+          ),
           QuestionItem(
             questionLtdInvalidCompanyName,
             NonEmptyList.of(
-              AskWhen.AskWhenAnswer(questionOrgType, ukLimitedCompany),
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany, limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
               AskWhen.AskWhenAnswer(questionLtdConfirmCompanyName, "No")
             )
           ),
           QuestionItem(
             questionLtdConfirmCompanyAddress,
             NonEmptyList.of(
-              AskWhen.AskWhenAnswer(questionOrgType, ukLimitedCompany),
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany, limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
               AskWhen.AskWhenAnswer(questionLtdConfirmCompanyName, "Yes")
             )
           ),
           QuestionItem(
             questionLtdInvalidCompanyAddress,
             NonEmptyList.of(
-              AskWhen.AskWhenAnswer(questionOrgType, ukLimitedCompany),
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany, limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
               AskWhen.AskWhenAnswer(questionLtdConfirmCompanyAddress, "No")
             )
           ),
           QuestionItem(
             questionLtdOrgUTR,
             NonEmptyList.of(
-              AskWhen.AskWhenAnswer(questionOrgType, ukLimitedCompany),
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany, limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
               AskWhen.AskWhenAnswer(questionLtdConfirmCompanyAddress, "Yes")
             )
           ),
           QuestionItem(
             questionLtdOrgWebsite,
             NonEmptyList.of(
-              AskWhen.AskWhenAnswer(questionOrgType, ukLimitedCompany),
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany, limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
               AskWhen.AskWhenAnswer(questionLtdConfirmCompanyAddress, "Yes")
             )
           ),
