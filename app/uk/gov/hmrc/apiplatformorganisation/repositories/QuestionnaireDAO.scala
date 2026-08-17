@@ -49,6 +49,7 @@ object QuestionnaireDAO {
   final val limitedLiabilityPartnership = "Limited liability partnership"
   final val limitedPartnership          = "Limited partnership"
   final val scottishLimitedPartnership  = "Scottish limited partnership"
+  final val nonUkCompanyWithoutUkBranch = "Non-UK company without a branch or place of business in the UK"
   final val noneOfTheAbove              = "None of the above"
 
   final val notApplicableQuestionId = Question.Id("473aa8f0-32f3-40f8-8703-d4929be2b887")
@@ -56,9 +57,10 @@ object QuestionnaireDAO {
   // *** Note - change this if the questions change. ***
   val questionIdsOfInterest = QuestionIdsOfInterest(
     Map(
-      "organisationTypeId"          -> OrganisationDetails.questionOrgType.id,
-      "organisationNameLtdId"       -> OrganisationDetails.questionLtdConfirmCompanyName.id,
-      "responsibleIndividualNameId" -> ResponsibleIndividualDetails.questionRIName.id
+      "organisationTypeId"             -> OrganisationDetails.questionOrgType.id,
+      "organisationNameLtdId"          -> OrganisationDetails.questionLtdConfirmCompanyName.id,
+      "organisationNameNonUkWithoutId" -> OrganisationDetails.questionNonUkWithoutCompanyName.id,
+      "responsibleIndividualNameId"    -> ResponsibleIndividualDetails.questionRIName.id
     )
   )
 
@@ -122,6 +124,7 @@ object QuestionnaireDAO {
           (PossibleAnswer(limitedLiabilityPartnership) -> Mark.Pass),
           (PossibleAnswer(limitedPartnership)          -> Mark.Pass),
           (PossibleAnswer(scottishLimitedPartnership)  -> Mark.Pass),
+          (PossibleAnswer(nonUkCompanyWithoutUkBranch) -> Mark.Pass),
           (PossibleAnswer(noneOfTheAbove)              -> Mark.Fail)
         ),
         errorInfo = ErrorInfo("Select your business type").some,
@@ -214,7 +217,28 @@ object QuestionnaireDAO {
         summary = Some("Website URL")
       )
 
+      // Non-UK company without a branch or place of business in the UK
+
+      val questionNonUkWithoutCompanyName = Question.TextQuestion(
+        Question.Id("26cbc31c-4d32-41cb-8630-2cff89d0976a"),
+        Wording("What is the company name?"),
+        statement = None,
+        validation = TextValidation.OrganisationName.some,
+        errorInfo = ErrorInfo("Your company name cannot be blank", "Enter your company name").some
+      )
+
+      val questionNonUkWithoutWebsite = Question.TextQuestion(
+        Question.Id("917c788b-5bd3-45f5-a263-05940fe38c87"),
+        Wording("What is your website URL?"),
+        statement = None,
+        hintText = StatementText("Website URL").some,
+        absence = ("My partnership doesn't have a website", Mark.Fail).some,
+        validation = TextValidation.Url.some,
+        errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some
+      )
+
       // None of the above
+
       val questionNoneOfTheAbove = Question.AcknowledgementOnly(
         Question.Id("3f94c15f-00f2-4d60-a8f8-b24a6c5e99ae"),
         Wording("Your organisation type is not supported yet"),
@@ -227,13 +251,53 @@ object QuestionnaireDAO {
         questions = NonEmptyList.of(
           QuestionItem(questionOrgType),
           // UK limited company
-          QuestionItem(questionLtdCompanyNumber),
-          QuestionItem(questionLtdConfirmCompanyName),
-          QuestionItem(questionLtdInvalidCompanyName, AskWhen.AskWhenAnswer(questionLtdConfirmCompanyName, "No")),
-          QuestionItem(questionLtdConfirmCompanyAddress, AskWhen.AskWhenAnswer(questionLtdConfirmCompanyName, "Yes")),
-          QuestionItem(questionLtdInvalidCompanyAddress, AskWhen.AskWhenAnswer(questionLtdConfirmCompanyAddress, "No")),
-          QuestionItem(questionLtdOrgUTR, AskWhen.AskWhenAnswer(questionLtdConfirmCompanyAddress, "Yes")),
-          QuestionItem(questionLtdOrgWebsite, AskWhen.AskWhenAnswer(questionLtdConfirmCompanyAddress, "Yes")),
+          QuestionItem(
+            questionLtdCompanyNumber,
+            AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany, limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership))
+          ),
+          QuestionItem(
+            questionLtdConfirmCompanyName,
+            AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany, limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership))
+          ),
+          QuestionItem(
+            questionLtdInvalidCompanyName,
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany, limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
+              AskWhen.AskWhenAnswer(questionLtdConfirmCompanyName, "No")
+            )
+          ),
+          QuestionItem(
+            questionLtdConfirmCompanyAddress,
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany, limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
+              AskWhen.AskWhenAnswer(questionLtdConfirmCompanyName, "Yes")
+            )
+          ),
+          QuestionItem(
+            questionLtdInvalidCompanyAddress,
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany, limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
+              AskWhen.AskWhenAnswer(questionLtdConfirmCompanyAddress, "No")
+            )
+          ),
+          QuestionItem(
+            questionLtdOrgUTR,
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany, limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
+              AskWhen.AskWhenAnswer(questionLtdConfirmCompanyAddress, "Yes")
+            )
+          ),
+          QuestionItem(
+            questionLtdOrgWebsite,
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany, limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
+              AskWhen.AskWhenAnswer(questionLtdConfirmCompanyAddress, "Yes")
+            )
+          ),
+
+          // Non-UK company without a branch or place of business in the UK
+          QuestionItem(questionNonUkWithoutCompanyName, AskWhen.AskWhenAnswer(questionOrgType, nonUkCompanyWithoutUkBranch)),
+          QuestionItem(questionNonUkWithoutWebsite, AskWhen.AskWhenAnswer(questionOrgType, nonUkCompanyWithoutUkBranch)),
 
           // None of the above
           QuestionItem(questionNoneOfTheAbove, AskWhen.AskWhenAnswer(questionOrgType, noneOfTheAbove))
