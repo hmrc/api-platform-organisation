@@ -49,6 +49,7 @@ object QuestionnaireDAO {
   final val limitedLiabilityPartnership = "Limited liability partnership"
   final val limitedPartnership          = "Limited partnership"
   final val scottishLimitedPartnership  = "Scottish limited partnership"
+  final val nonUkWithoutPlaceOfBusinessInUk = "Non-UK company without a branch or place of business in the UK"
   final val noneOfTheAbove              = "None of the above"
 
   final val notApplicableQuestionId = Question.Id("473aa8f0-32f3-40f8-8703-d4929be2b887")
@@ -58,7 +59,8 @@ object QuestionnaireDAO {
     Map(
       "organisationTypeId"          -> OrganisationDetails.questionOrgType.id,
       "organisationNameLtdId"       -> OrganisationDetails.questionLtdConfirmCompanyName.id,
-      "responsibleIndividualNameId" -> ResponsibleIndividualDetails.questionRIName.id
+      "responsibleIndividualNameId" -> ResponsibleIndividualDetails.questionRIName.id,
+      "organisationNameNonUkWithoutId" -> OrganisationDetails.questionNonUkWithoutAttachment.id,
     )
   )
 
@@ -122,6 +124,7 @@ object QuestionnaireDAO {
           (PossibleAnswer(limitedLiabilityPartnership) -> Mark.Pass),
           (PossibleAnswer(limitedPartnership)          -> Mark.Pass),
           (PossibleAnswer(scottishLimitedPartnership)  -> Mark.Pass),
+          (PossibleAnswer(nonUkWithoutPlaceOfBusinessInUk)  -> Mark.Pass),
           (PossibleAnswer(noneOfTheAbove)              -> Mark.Fail)
         ),
         errorInfo = ErrorInfo("Select your business type").some,
@@ -214,6 +217,21 @@ object QuestionnaireDAO {
         summary = Some("Website URL")
       )
 
+      // Non-UK
+
+      val questionNonUkWithoutAttachment = Question.AttachmentQuestion(
+        Question.Id("019feccc-4457-7605-bd0e-037821ff0123"),
+        Wording("Upload the tax registration document for your company"),
+        statement = None,
+        hintText =
+          StatementText("You can upload your registration document as a scanned copy or photo of the original. The selected file must be smaller than 20MB.").some,
+        errorInfo = ErrorInfo(
+          "Upload your registration document as a scanned copy or photo of the original.",
+          "The selected file must be smaller than 20MB."
+        ).some,
+        summary = Some("Tax document")
+      )
+
       // None of the above
       val questionNoneOfTheAbove = Question.AcknowledgementOnly(
         Question.Id("3f94c15f-00f2-4d60-a8f8-b24a6c5e99ae"),
@@ -226,6 +244,9 @@ object QuestionnaireDAO {
         label = Questionnaire.Label("Your business"),
         questions = NonEmptyList.of(
           QuestionItem(questionOrgType),
+          // Non-UK company without a branch or place of business in the UK
+          QuestionItem(questionNonUkWithoutAttachment, AskWhen.AskWhenAnswer(questionOrgType, nonUkWithoutPlaceOfBusinessInUk)),
+
           // UK limited company
           QuestionItem(questionLtdCompanyNumber),
           QuestionItem(questionLtdConfirmCompanyName),
@@ -235,8 +256,8 @@ object QuestionnaireDAO {
           QuestionItem(questionLtdOrgUTR, AskWhen.AskWhenAnswer(questionLtdConfirmCompanyAddress, "Yes")),
           QuestionItem(questionLtdOrgWebsite, AskWhen.AskWhenAnswer(questionLtdConfirmCompanyAddress, "Yes")),
 
-          // None of the above
-          QuestionItem(questionNoneOfTheAbove, AskWhen.AskWhenAnswer(questionOrgType, noneOfTheAbove))
+            // None of the above
+            QuestionItem(questionNoneOfTheAbove, AskWhen.AskWhenAnswer(questionOrgType, noneOfTheAbove))
         )
       )
     }
