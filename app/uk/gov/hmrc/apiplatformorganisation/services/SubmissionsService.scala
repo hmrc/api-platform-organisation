@@ -197,7 +197,7 @@ class SubmissionsService @Inject() (
       for {
         companyProfile <- etValidation.fromOptionF(
                             companiesHouseConnector.getCompanyByNumber(companyNumber),
-                            ValidationErrors(ValidationError(message = s"The company number ${companyNumber} was not found"))
+                            ValidationErrors(ValidationError(key = ValidationError.companyNumberNotFoundKey, message = s"The company number ${companyNumber} was not found"))
                           )
         _              <- etValidation.cond(
                             checkCompanyIsActive(companyProfile),
