@@ -245,7 +245,7 @@ object QuestionnaireDAO {
           StatementText("You can upload your registration document as a scanned copy or photo of the original. The selected file must be smaller than 20MB.").some,
         errorInfo = ErrorInfo(
           "Upload your registration document as a scanned copy or photo of the original.",
-          "The selected file must be smaller than 20MB."
+          "The selected file must be smaller than 10MB."
         ).some,
         summary = Some("Tax document")
       )

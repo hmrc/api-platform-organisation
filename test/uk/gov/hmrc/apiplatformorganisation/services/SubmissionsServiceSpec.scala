@@ -22,6 +22,7 @@ import scala.concurrent.Future.successful
 import cats.data.NonEmptyList
 import org.scalatest.Inside
 
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
@@ -356,8 +357,12 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
       }
 
       "records new answers and process question for company number question" in new Setup {
-        val partiallyAnsweredSubmission = buildPartiallyAnsweredSubmission()
-        val companyNumberQuestionId     = partiallyAnsweredSubmission.getQuestionOfInterest("organisationNumberId").get
+        val baseSubmission              = buildPartiallyAnsweredSubmission()
+        val question2_Id                = baseSubmission.allQuestionnaires.head.questions.toList(1).question.id
+        val modifiedAnswers             = baseSubmission.latestInstance.answersToQuestions ++ Map(question2_Id -> ActualAnswer.SingleChoiceAnswer("ge"))
+        val partiallyAnsweredSubmission = Submission.updateLatestAnswersTo(modifiedAnswers)(baseSubmission)
+
+        val companyNumberQuestionId = partiallyAnsweredSubmission.getQuestionOfInterest("organisationNumberId").get
 
         SubmissionsDAOMock.Fetch.thenReturn(partiallyAnsweredSubmission)
         SubmissionsDAOMock.Update.thenReturn()
@@ -374,7 +379,10 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
       }
 
       "records new answers and process question for company number question where company has no address" in new Setup {
-        val partiallyAnsweredSubmission = buildPartiallyAnsweredSubmission()
+        val baseSubmission              = buildPartiallyAnsweredSubmission()
+        val question2_Id                = baseSubmission.allQuestionnaires.head.questions.toList(1).question.id
+        val modifiedAnswers             = baseSubmission.latestInstance.answersToQuestions ++ Map(question2_Id -> ActualAnswer.SingleChoiceAnswer("ge"))
+        val partiallyAnsweredSubmission = Submission.updateLatestAnswersTo(modifiedAnswers)(baseSubmission)
         val companyNumberQuestionId     = partiallyAnsweredSubmission.getQuestionOfInterest("organisationNumberId").get
 
         SubmissionsDAOMock.Fetch.thenReturn(partiallyAnsweredSubmission)
@@ -390,7 +398,10 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
       }
 
       "returns validation error when company not found for company number question" in new Setup {
-        val partiallyAnsweredSubmission = buildPartiallyAnsweredSubmission()
+        val baseSubmission              = buildPartiallyAnsweredSubmission()
+        val question2_Id                = baseSubmission.allQuestionnaires.head.questions.toList(1).question.id
+        val modifiedAnswers             = baseSubmission.latestInstance.answersToQuestions ++ Map(question2_Id -> ActualAnswer.SingleChoiceAnswer("ge"))
+        val partiallyAnsweredSubmission = Submission.updateLatestAnswersTo(modifiedAnswers)(baseSubmission)
         val companyNumberQuestionId     = partiallyAnsweredSubmission.getQuestionOfInterest("organisationNumberId").get
 
         SubmissionsDAOMock.Fetch.thenReturn(partiallyAnsweredSubmission)
@@ -402,7 +413,10 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
       }
 
       "returns validation error when company is not active for company number question" in new Setup {
-        val partiallyAnsweredSubmission = buildPartiallyAnsweredSubmission()
+        val baseSubmission              = buildPartiallyAnsweredSubmission()
+        val question2_Id                = baseSubmission.allQuestionnaires.head.questions.toList(1).question.id
+        val modifiedAnswers             = baseSubmission.latestInstance.answersToQuestions ++ Map(question2_Id -> ActualAnswer.SingleChoiceAnswer("ge"))
+        val partiallyAnsweredSubmission = Submission.updateLatestAnswersTo(modifiedAnswers)(baseSubmission)
         val companyNumberQuestionId     = partiallyAnsweredSubmission.getQuestionOfInterest("organisationNumberId").get
 
         SubmissionsDAOMock.Fetch.thenReturn(partiallyAnsweredSubmission)
