@@ -59,6 +59,7 @@ object QuestionnaireDAO {
   val questionIdsOfInterest = QuestionIdsOfInterest(
     Map(
       "organisationTypeId"             -> OrganisationDetails.questionOrgType.id,
+      "partnershipTypeId"              -> OrganisationDetails.questionPartnershipType.id,
       "organisationNameLtdId"          -> OrganisationDetails.questionLtdConfirmCompanyName.id,
       "organisationNameNonUkWithoutId" -> OrganisationDetails.questionNonUkWithoutCompanyName.id,
       "responsibleIndividualNameId"    -> ResponsibleIndividualDetails.questionRIName.id
@@ -398,15 +399,22 @@ object QuestionnaireDAO {
           QuestionItem(questionPartnershipType, AskWhen.AskWhenAnswer(questionOrgType, partnership)),
           QuestionItem(
             questionPartnershipCompanyNumber,
-            AskWhen.AskWhenAnswers(questionPartnershipType, NonEmptyList.of(limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership))
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswer(questionOrgType, partnership),
+              AskWhen.AskWhenAnswers(questionPartnershipType, NonEmptyList.of(limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership))
+            )
           ),
           QuestionItem(
             questionPartnershipConfirmCompanyName,
-            AskWhen.AskWhenAnswers(questionPartnershipType, NonEmptyList.of(limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership))
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswer(questionOrgType, partnership),
+              AskWhen.AskWhenAnswers(questionPartnershipType, NonEmptyList.of(limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership))
+            )
           ),
           QuestionItem(
             questionPartnershipInvalidCompanyName,
             NonEmptyList.of(
+              AskWhen.AskWhenAnswer(questionOrgType, partnership),
               AskWhen.AskWhenAnswers(questionPartnershipType, NonEmptyList.of(limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
               AskWhen.AskWhenAnswer(questionPartnershipConfirmCompanyName, "No")
             )
@@ -414,6 +422,7 @@ object QuestionnaireDAO {
           QuestionItem(
             questionPartnershipConfirmCompanyAddress,
             NonEmptyList.of(
+              AskWhen.AskWhenAnswer(questionOrgType, partnership),
               AskWhen.AskWhenAnswers(questionPartnershipType, NonEmptyList.of(limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
               AskWhen.AskWhenAnswer(questionPartnershipConfirmCompanyName, "Yes")
             )
@@ -421,6 +430,7 @@ object QuestionnaireDAO {
           QuestionItem(
             questionPartnershipInvalidCompanyAddress,
             NonEmptyList.of(
+              AskWhen.AskWhenAnswer(questionOrgType, partnership),
               AskWhen.AskWhenAnswers(questionPartnershipType, NonEmptyList.of(limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
               AskWhen.AskWhenAnswer(questionPartnershipConfirmCompanyAddress, "No")
             )
@@ -428,6 +438,7 @@ object QuestionnaireDAO {
           QuestionItem(
             questionPartnershipOrgUTR,
             NonEmptyList.of(
+              AskWhen.AskWhenAnswer(questionOrgType, partnership),
               AskWhen.AskWhenAnswers(questionPartnershipType, NonEmptyList.of(limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
               AskWhen.AskWhenAnswer(questionPartnershipConfirmCompanyAddress, "Yes")
             )
@@ -435,6 +446,7 @@ object QuestionnaireDAO {
           QuestionItem(
             questionPartnershipOrgWebsite,
             NonEmptyList.of(
+              AskWhen.AskWhenAnswer(questionOrgType, partnership),
               AskWhen.AskWhenAnswers(questionPartnershipType, NonEmptyList.of(limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
               AskWhen.AskWhenAnswer(questionPartnershipConfirmCompanyAddress, "Yes")
             )
