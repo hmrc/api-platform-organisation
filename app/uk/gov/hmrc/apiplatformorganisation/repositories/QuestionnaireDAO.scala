@@ -124,7 +124,7 @@ object QuestionnaireDAO {
           (PossibleAnswer(limitedLiabilityPartnership) -> Mark.Pass),
           (PossibleAnswer(limitedPartnership)          -> Mark.Pass),
           (PossibleAnswer(scottishLimitedPartnership)  -> Mark.Pass),
-          (PossibleAnswer(nonUkCompanyWithoutUkBranch) -> Mark.Pass),
+          (PossibleAnswer(nonUkCompanyWithoutUkBranch) -> Mark.Fail),
           (PossibleAnswer(noneOfTheAbove)              -> Mark.Fail)
         ),
         errorInfo = ErrorInfo("Select your business type").some,

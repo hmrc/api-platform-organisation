@@ -22,7 +22,6 @@ import scala.concurrent.Future.successful
 import cats.data.NonEmptyList
 import org.scalatest.Inside
 
-import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
