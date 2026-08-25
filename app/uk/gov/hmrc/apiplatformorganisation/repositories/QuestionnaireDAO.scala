@@ -46,6 +46,7 @@ object QuestionnaireDAO {
 
   // Organisation types
   final val ukLimitedCompany            = "UK limited company"
+  final val partnership                 = "Partnership"
   final val limitedLiabilityPartnership = "Limited liability partnership"
   final val limitedPartnership          = "Limited partnership"
   final val scottishLimitedPartnership  = "Scottish limited partnership"
@@ -58,6 +59,7 @@ object QuestionnaireDAO {
   val questionIdsOfInterest = QuestionIdsOfInterest(
     Map(
       "organisationTypeId"             -> OrganisationDetails.questionOrgType.id,
+      "partnershipTypeId"              -> OrganisationDetails.questionPartnershipType.id,
       "organisationNameLtdId"          -> OrganisationDetails.questionLtdConfirmCompanyName.id,
       "organisationNameNonUkWithoutId" -> OrganisationDetails.questionNonUkWithoutCompanyName.id,
       "responsibleIndividualNameId"    -> ResponsibleIndividualDetails.questionRIName.id
@@ -121,9 +123,7 @@ object QuestionnaireDAO {
         statement = None,
         marking = ListMap(
           (PossibleAnswer(ukLimitedCompany)            -> Mark.Pass),
-          (PossibleAnswer(limitedLiabilityPartnership) -> Mark.Pass),
-          (PossibleAnswer(limitedPartnership)          -> Mark.Pass),
-          (PossibleAnswer(scottishLimitedPartnership)  -> Mark.Pass),
+          (PossibleAnswer(partnership)                 -> Mark.Pass),
           (PossibleAnswer(nonUkCompanyWithoutUkBranch) -> Mark.Fail),
           (PossibleAnswer(noneOfTheAbove)              -> Mark.Fail)
         ),
@@ -217,6 +217,105 @@ object QuestionnaireDAO {
         summary = Some("Website URL")
       )
 
+      // Partnership
+
+      val questionPartnershipType = Question.ChooseOneOfQuestion(
+        Question.Id("12d71132-b562-40fb-8ef0-9a7d3619a1a8"),
+        Wording("What type of partnership do you work for?"),
+        statement = None,
+        marking = ListMap(
+          (PossibleAnswer(limitedLiabilityPartnership) -> Mark.Pass),
+          (PossibleAnswer(limitedPartnership)          -> Mark.Pass),
+          (PossibleAnswer(scottishLimitedPartnership)  -> Mark.Pass)
+        ),
+        errorInfo = ErrorInfo("Select your partnership type").some,
+        summary = Some("Partnership type")
+      )
+
+      val questionPartnershipCompanyNumber = Question.CompanyNumberQuestion(
+        Question.Id("8dde244b-ccd4-415c-a92c-183dea26cab5"),
+        Wording("What’s the company registration number (CRN)?"),
+        statement = Statement(
+          CompoundFragment(
+            StatementText("You can "),
+            StatementLink("search for the CRN (opens in new tab)", "https://find-and-update.company-information.service.gov.uk/"),
+            StatementText(" in the Companies House register.")
+          )
+        ).some,
+        hintText =
+          StatementText("It has 8 characters, for example 01234567 or AC012345.").some,
+        errorInfo = ErrorInfo(
+          "Your company number must have 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total",
+          "Enter your company registration number, like 01234567"
+        ).some,
+        summary = Some("Company registration number")
+      )
+
+      val questionPartnershipConfirmCompanyName = Question.ConfirmCompanyNameQuestion(
+        Question.Id("c0693ab4-d034-4abc-96d2-d2b977549e92"),
+        Wording("Is this your company?"),
+        statement = None,
+        yesMarking = Mark.Pass,
+        noMarking = Mark.Fail,
+        errorInfo = ErrorInfo("Select Yes if the company name is correct").some,
+        summary = Some("Registered company name")
+      )
+
+      val questionPartnershipInvalidCompanyName = Question.ForwardToQuestion(
+        Question.Id("5318d486-3978-42d4-b9d0-a7d9ad953a1f"),
+        questionPartnershipCompanyNumber.id,
+        Wording("Please re-enter your company registration number"),
+        statement = Statement(
+          StatementText("If you entered your company number incorrectly then please re-enter your company registration number on the next page")
+        ).some
+      )
+
+      val questionPartnershipConfirmCompanyAddress = Question.ConfirmCompanyAddressQuestion(
+        Question.Id("82242e26-b782-43fc-94f6-ead356c7d7de"),
+        Wording("Is this the correct registered address for your company?"),
+        statement = None,
+        yesMarking = Mark.Pass,
+        noMarking = Mark.Fail,
+        errorInfo = ErrorInfo("Select Yes if the company address is correct").some,
+        summary = Some("Registered address")
+      )
+
+      val questionPartnershipInvalidCompanyAddress = Question.AcknowledgementOnly(
+        Question.Id("7b7228a2-0e52-4c27-baaa-17c33aa9704d"),
+        Wording("You must change the registered address with Companies House"),
+        statement = Statement(
+          CompoundFragment(
+            StatementText("We can only access the address registered with Companies House. If this is not correct, you must "),
+            StatementLink("update the address online (opens a new tab)", "https://www.gov.uk/government/publications/change-a-registered-office-address-ad01"),
+            StatementText(".")
+          ),
+          StatementText("You cannot complete the security checks for your company until the registered address has been updated.")
+        ).some
+      )
+
+      val questionPartnershipOrgUTR = Question.TextQuestion(
+        Question.Id("99ecc90b-fb94-44fb-a8fa-7a05f98e588e"),
+        Wording("What’s the Unique Taxpayer Reference (UTR)?"),
+        statement = Statement(
+          StatementText("You can find it on tax returns or other tax documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’."),
+          StatementLink("Ask for a copy of your Corporation Tax UTR (opens in new tab)", "https://www.gov.uk/find-lost-utr-number")
+        ).some,
+        hintText = StatementText("Your UTR can be 10 or 13 digits long.").some,
+        errorInfo = ErrorInfo("Your  Unique Taxpayer Reference cannot be blank", "Enter your Unique Taxpayer Reference, like 1234567890").some,
+        summary = Some("Corporation tax UTR")
+      )
+
+      val questionPartnershipOrgWebsite = Question.TextQuestion(
+        Question.Id("0626fd67-013b-4444-a870-c30cbcc7f01a"),
+        Wording("What is your website URL?"),
+        statement = None,
+        hintText = StatementText("Website URL").some,
+        absence = ("My company doesn't have a website", Mark.Fail).some,
+        validation = TextValidation.Url.some,
+        errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some,
+        summary = Some("Website URL")
+      )
+
       // Non-UK company without a branch or place of business in the UK
 
       val questionNonUkWithoutCompanyName = Question.TextQuestion(
@@ -267,45 +366,102 @@ object QuestionnaireDAO {
           // UK limited company
           QuestionItem(
             questionLtdCompanyNumber,
-            AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany, limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership))
+            AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany))
           ),
           QuestionItem(
             questionLtdConfirmCompanyName,
-            AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany, limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership))
+            AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany))
           ),
           QuestionItem(
             questionLtdInvalidCompanyName,
             NonEmptyList.of(
-              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany, limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany)),
               AskWhen.AskWhenAnswer(questionLtdConfirmCompanyName, "No")
             )
           ),
           QuestionItem(
             questionLtdConfirmCompanyAddress,
             NonEmptyList.of(
-              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany, limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany)),
               AskWhen.AskWhenAnswer(questionLtdConfirmCompanyName, "Yes")
             )
           ),
           QuestionItem(
             questionLtdInvalidCompanyAddress,
             NonEmptyList.of(
-              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany, limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany)),
               AskWhen.AskWhenAnswer(questionLtdConfirmCompanyAddress, "No")
             )
           ),
           QuestionItem(
             questionLtdOrgUTR,
             NonEmptyList.of(
-              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany, limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany)),
               AskWhen.AskWhenAnswer(questionLtdConfirmCompanyAddress, "Yes")
             )
           ),
           QuestionItem(
             questionLtdOrgWebsite,
             NonEmptyList.of(
-              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany, limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany)),
               AskWhen.AskWhenAnswer(questionLtdConfirmCompanyAddress, "Yes")
+            )
+          ),
+
+          // Partnership
+          QuestionItem(questionPartnershipType, AskWhen.AskWhenAnswer(questionOrgType, partnership)),
+          QuestionItem(
+            questionPartnershipCompanyNumber,
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswer(questionOrgType, partnership),
+              AskWhen.AskWhenAnswers(questionPartnershipType, NonEmptyList.of(limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership))
+            )
+          ),
+          QuestionItem(
+            questionPartnershipConfirmCompanyName,
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswer(questionOrgType, partnership),
+              AskWhen.AskWhenAnswers(questionPartnershipType, NonEmptyList.of(limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership))
+            )
+          ),
+          QuestionItem(
+            questionPartnershipInvalidCompanyName,
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswer(questionOrgType, partnership),
+              AskWhen.AskWhenAnswers(questionPartnershipType, NonEmptyList.of(limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
+              AskWhen.AskWhenAnswer(questionPartnershipConfirmCompanyName, "No")
+            )
+          ),
+          QuestionItem(
+            questionPartnershipConfirmCompanyAddress,
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswer(questionOrgType, partnership),
+              AskWhen.AskWhenAnswers(questionPartnershipType, NonEmptyList.of(limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
+              AskWhen.AskWhenAnswer(questionPartnershipConfirmCompanyName, "Yes")
+            )
+          ),
+          QuestionItem(
+            questionPartnershipInvalidCompanyAddress,
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswer(questionOrgType, partnership),
+              AskWhen.AskWhenAnswers(questionPartnershipType, NonEmptyList.of(limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
+              AskWhen.AskWhenAnswer(questionPartnershipConfirmCompanyAddress, "No")
+            )
+          ),
+          QuestionItem(
+            questionPartnershipOrgUTR,
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswer(questionOrgType, partnership),
+              AskWhen.AskWhenAnswers(questionPartnershipType, NonEmptyList.of(limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
+              AskWhen.AskWhenAnswer(questionPartnershipConfirmCompanyAddress, "Yes")
+            )
+          ),
+          QuestionItem(
+            questionPartnershipOrgWebsite,
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswer(questionOrgType, partnership),
+              AskWhen.AskWhenAnswers(questionPartnershipType, NonEmptyList.of(limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
+              AskWhen.AskWhenAnswer(questionPartnershipConfirmCompanyAddress, "Yes")
             )
           ),
 
