@@ -124,7 +124,7 @@ object QuestionnaireDAO {
         marking = ListMap(
           (PossibleAnswer(ukLimitedCompany)            -> Mark.Pass),
           (PossibleAnswer(partnership)                 -> Mark.Pass),
-          (PossibleAnswer(nonUkCompanyWithoutUkBranch) -> Mark.Pass),
+          (PossibleAnswer(nonUkCompanyWithoutUkBranch) -> Mark.Fail),
           (PossibleAnswer(noneOfTheAbove)              -> Mark.Fail)
         ),
         errorInfo = ErrorInfo("Select your business type").some,
@@ -336,6 +336,19 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some
       )
 
+      val questionNonUkWithoutAttachment = Question.AttachmentQuestion(
+        Question.Id("019feccc-4457-7605-bd0e-037821ff0123"),
+        Wording("Upload the tax registration document for your company"),
+        statement = None,
+        hintText =
+          StatementText("You can upload your registration document as a scanned copy or photo of the original. The selected file must be smaller than 10MB.").some,
+        errorInfo = ErrorInfo(
+          "Upload your registration document as a scanned copy or photo of the original.",
+          "The selected file must be smaller than 10MB."
+        ).some,
+        summary = Some("Tax document")
+      )
+
       // None of the above
 
       val questionNoneOfTheAbove = Question.AcknowledgementOnly(
@@ -455,6 +468,7 @@ object QuestionnaireDAO {
           // Non-UK company without a branch or place of business in the UK
           QuestionItem(questionNonUkWithoutCompanyName, AskWhen.AskWhenAnswer(questionOrgType, nonUkCompanyWithoutUkBranch)),
           QuestionItem(questionNonUkWithoutWebsite, AskWhen.AskWhenAnswer(questionOrgType, nonUkCompanyWithoutUkBranch)),
+          QuestionItem(questionNonUkWithoutAttachment, AskWhen.AskWhenAnswer(questionOrgType, nonUkCompanyWithoutUkBranch)),
 
           // None of the above
           QuestionItem(questionNoneOfTheAbove, AskWhen.AskWhenAnswer(questionOrgType, noneOfTheAbove))
