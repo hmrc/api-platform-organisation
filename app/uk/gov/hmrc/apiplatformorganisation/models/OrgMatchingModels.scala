@@ -19,18 +19,16 @@ package uk.gov.hmrc.apiplatformorganisation.models
 import play.api.libs.json.{Json, OFormat}
 
 case class SaMatchingRequest(
-    selfAssessmentUniqueTaxPayerRef: String,
-    taxPayerType: String,
-    taxPayerName: String,
-    address: Address
+    identifier: Identifier,
+    registryMarker: String
   )
 
 object SaMatchingRequest {
-  implicit val format: OFormat[SaMatchingRequest] = Json.format[SaMatchingRequest]
+  given OFormat[SaMatchingRequest] = Json.format[SaMatchingRequest]
 }
 
-case class Address(addressLine1: String, postcode: String)
+case class Identifier(`type`: String, value: String)
 
-object Address {
-  implicit val format: OFormat[Address] = Json.format[Address]
+object Identifier {
+  given OFormat[Identifier] = Json.format[Identifier]
 }

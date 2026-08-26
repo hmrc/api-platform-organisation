@@ -26,6 +26,8 @@ class AppConfig @Inject() (config: Configuration) extends ServicesConfig(config)
 
   val appName: String                     = config.get[String]("appName")
   val authToken: String                   = config.get[String]("internal-auth.token")
+  val ucrToken: String                    = config.get[String]("ucr-customer-api.token")
+  val ucrCustomerApiUri: String           = config.get[String]("ucr-customer-api.uri")
   val companiesHouseKey: String           = config.get[String]("companies-house.api-key")
   val companiesHouseUri: String           = config.get[String]("companies-house.uri")
   val thirdPartyDeveloperUrl: String      = baseUrl("third-party-developer")
