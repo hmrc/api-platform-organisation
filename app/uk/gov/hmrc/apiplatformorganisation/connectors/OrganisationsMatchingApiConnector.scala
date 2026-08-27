@@ -32,12 +32,12 @@ import uk.gov.hmrc.apiplatformorganisation.models.SaMatchingRequest
 // $COVERAGE-OFF$
 
 class OrganisationsMatchingApiConnector @Inject() (http: HttpClientV2, config: AppConfig)(implicit val ec: ExecutionContext) extends Logging {
-  lazy val serviceBaseUrl: String = config.organisationsMatchingApiUrl
+  lazy val serviceBaseUrl: String = config.ucrCustomerApiUri
 
   def matchOrganisationSa(request: SaMatchingRequest, hc: HeaderCarrier): Future[JsValue] = {
-    implicit val headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(config.authToken)), extraHeaders = Seq("CorrelationId" -> UUID.randomUUID().toString))
+    implicit val headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(s"Basic ${config.ucrToken}")), extraHeaders = Seq("CorrelationId" -> UUID.randomUUID().toString))
 
-    http.post(url"$serviceBaseUrl/self-assessment")
+    http.post(url"$serviceBaseUrl/mulesoft/customer/v2/api/organisations/identifier-search")
       .withBody(Json.toJson(request))
       .execute[JsValue]
   }
