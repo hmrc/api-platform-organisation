@@ -326,6 +326,13 @@ object QuestionnaireDAO {
         errorInfo = ErrorInfo("Your company name cannot be blank", "Enter your company name").some
       )
 
+      val questionNonUkWithoutAddress = Question.InternationalAddressQuestion(
+        Question.Id("775b3592-1c45-4b10-b13c-5bf213c7f9c9"),
+        Wording("Enter the registered address for the company"),
+        statement = None,
+        errorInfo = ErrorInfo("Your company address cannot be blank", "Enter your company address").some
+      )
+
       val questionNonUkWithoutWebsite = Question.TextQuestion(
         Question.Id("917c788b-5bd3-45f5-a263-05940fe38c87"),
         Wording("What is your website URL?"),
@@ -467,6 +474,7 @@ object QuestionnaireDAO {
 
           // Non-UK company without a branch or place of business in the UK
           QuestionItem(questionNonUkWithoutCompanyName, AskWhen.AskWhenAnswer(questionOrgType, nonUkCompanyWithoutUkBranch)),
+          QuestionItem(questionNonUkWithoutAddress, AskWhen.AskWhenAnswer(questionOrgType, nonUkCompanyWithoutUkBranch)),
           QuestionItem(questionNonUkWithoutWebsite, AskWhen.AskWhenAnswer(questionOrgType, nonUkCompanyWithoutUkBranch)),
           QuestionItem(questionNonUkWithoutAttachment, AskWhen.AskWhenAnswer(questionOrgType, nonUkCompanyWithoutUkBranch)),
 
