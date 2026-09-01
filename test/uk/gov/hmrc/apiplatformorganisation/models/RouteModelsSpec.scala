@@ -34,7 +34,6 @@ class RouteModelsSpec extends AsyncHmrcSpec {
 
     "correctly handle SimpleOrganisationId" in {
       val simpleId                    = SimpleOrganisationId(testUuid)
-      println(s"************** ${testUuid.toString()}")
       simpleId.toString mustBe expectedUuidString
       val convertedId: OrganisationId = simpleId
       convertedId mustBe OrganisationId(testUuid)
