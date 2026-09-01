@@ -323,14 +323,16 @@ object QuestionnaireDAO {
         Wording("What is the company name?"),
         statement = None,
         validation = TextValidation.OrganisationName.some,
-        errorInfo = ErrorInfo("Your company name cannot be blank", "Enter your company name").some
+        errorInfo = ErrorInfo("Your company name cannot be blank", "Enter your company name").some,
+        summary = Some("Registered company name")
       )
 
       val questionNonUkWithoutAddress = Question.InternationalAddressQuestion(
         Question.Id("775b3592-1c45-4b10-b13c-5bf213c7f9c9"),
         Wording("Enter the registered address for the company"),
         statement = None,
-        errorInfo = ErrorInfo("Your company address cannot be blank", "Enter your company address").some
+        errorInfo = ErrorInfo("Your company address cannot be blank", "Enter your company address").some,
+        summary = Some("Registered address")
       )
 
       val questionNonUkWithoutWebsite = Question.TextQuestion(
@@ -340,7 +342,8 @@ object QuestionnaireDAO {
         hintText = StatementText("Website URL").some,
         absence = ("My partnership doesn't have a website", Mark.Fail).some,
         validation = TextValidation.Url.some,
-        errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some
+        errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some,
+        summary = Some("Website URL")
       )
 
       val questionNonUkWithoutAttachment = Question.AttachmentQuestion(
