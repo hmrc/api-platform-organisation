@@ -356,7 +356,7 @@ object QuestionnaireDAO {
           "Upload your registration document as a scanned copy or photo of the original.",
           "The selected file must be smaller than 10MB."
         ).some,
-        summary = Some("Tax document")
+        summary = Some("Tax registration document")
       )
 
       // None of the above
