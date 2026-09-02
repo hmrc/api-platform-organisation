@@ -62,6 +62,7 @@ object QuestionnaireDAO {
       "partnershipTypeId"              -> OrganisationDetails.questionPartnershipType.id,
       "organisationNameLtdId"          -> OrganisationDetails.questionLtdConfirmCompanyName.id,
       "organisationNameNonUkWithoutId" -> OrganisationDetails.questionNonUkWithoutCompanyName.id,
+      "attachmentNonUkWithoutId"       -> OrganisationDetails.questionNonUkWithoutAttachment.id,
       "responsibleIndividualNameId"    -> ResponsibleIndividualDetails.questionRIName.id
     )
   )
