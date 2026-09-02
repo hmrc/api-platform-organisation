@@ -340,7 +340,7 @@ object QuestionnaireDAO {
         Wording("What is your website URL?"),
         statement = None,
         hintText = StatementText("Website URL").some,
-        absence = ("My partnership doesn't have a website", Mark.Fail).some,
+        absence = ("My company doesn't have a website", Mark.Fail).some,
         validation = TextValidation.Url.some,
         errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some,
         summary = Some("Website URL")
