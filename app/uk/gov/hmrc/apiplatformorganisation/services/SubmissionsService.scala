@@ -191,6 +191,7 @@ class SubmissionsService @Inject() (
       val submissionWithoutCompanyDetails = Submission.updateLatestAdditionalDataTo(submission.latestInstance.additionalData.map(_.copy(companyDetails = None)))(submission)
       val answers                         = submissionWithoutCompanyDetails.latestInstance.answersToQuestions
 
+      //question ids that invalidate nested answers once changed -add any new ones here
       questionId match {
         case id if id == questionLtdCompanyNumber.id         =>
           Submission.updateLatestAnswersTo(answers - questionLtdConfirmCompanyName.id)(submissionWithoutCompanyDetails)
