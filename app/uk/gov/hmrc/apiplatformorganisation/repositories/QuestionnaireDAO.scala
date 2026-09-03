@@ -47,8 +47,10 @@ object QuestionnaireDAO {
   // Organisation types
   final val ukLimitedCompany            = "UK limited company"
   final val partnership                 = "Partnership"
+  final val generalPartnership          = "General partnership"
   final val limitedLiabilityPartnership = "Limited liability partnership"
   final val limitedPartnership          = "Limited partnership"
+  final val scottishPartnership         = "Scottish partnership"
   final val scottishLimitedPartnership  = "Scottish limited partnership"
   final val nonUkCompanyWithoutUkBranch = "Non-UK company without a branch or place of business in the UK"
   final val noneOfTheAbove              = "None of the above"
@@ -224,12 +226,31 @@ object QuestionnaireDAO {
         Wording("What type of partnership do you work for?"),
         statement = None,
         marking = ListMap(
+          (PossibleAnswer(generalPartnership)          -> Mark.Pass),
           (PossibleAnswer(limitedLiabilityPartnership) -> Mark.Pass),
           (PossibleAnswer(limitedPartnership)          -> Mark.Pass),
+          (PossibleAnswer(scottishPartnership)         -> Mark.Pass),
           (PossibleAnswer(scottishLimitedPartnership)  -> Mark.Pass)
         ),
         errorInfo = ErrorInfo("Select your partnership type").some,
         summary = Some("Partnership type")
+      )
+
+      val questionPartnershipCompanyName = Question.TextQuestion(
+        Question.Id("6c571e1c-2215-4921-b526-2e478464d3fa"),
+        Wording("What is the partnership name?"),
+        statement = None,
+        validation = TextValidation.OrganisationName.some,
+        errorInfo = ErrorInfo("Your partnership name cannot be blank", "Enter your partnership name").some,
+        summary = Some("Partnership name")
+      )
+
+      val questionPartnershipAddress = Question.AddressQuestion(
+        Question.Id("ad1a1c5d-9f98-4460-92d2-04e08c63ac4f"),
+        Wording("Enter the registered address for the partnership"),
+        statement = None,
+        errorInfo = ErrorInfo("Your partnership address cannot be blank", "Enter your partnership address").some,
+        summary = Some("Registered address")
       )
 
       val questionPartnershipCompanyNumber = Question.CompanyNumberQuestion(
@@ -421,6 +442,20 @@ object QuestionnaireDAO {
           // Partnership
           QuestionItem(questionPartnershipType, AskWhen.AskWhenAnswer(questionOrgType, partnership)),
           QuestionItem(
+            questionPartnershipCompanyName,
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswer(questionOrgType, partnership),
+              AskWhen.AskWhenAnswers(questionPartnershipType, NonEmptyList.of(generalPartnership, scottishPartnership))
+            )
+          ),
+          QuestionItem(
+            questionPartnershipAddress,
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswer(questionOrgType, partnership),
+              AskWhen.AskWhenAnswers(questionPartnershipType, NonEmptyList.of(generalPartnership, scottishPartnership))
+            )
+          ),
+          QuestionItem(
             questionPartnershipCompanyNumber,
             NonEmptyList.of(
               AskWhen.AskWhenAnswer(questionOrgType, partnership),
@@ -460,19 +495,11 @@ object QuestionnaireDAO {
           ),
           QuestionItem(
             questionPartnershipOrgUTR,
-            NonEmptyList.of(
-              AskWhen.AskWhenAnswer(questionOrgType, partnership),
-              AskWhen.AskWhenAnswers(questionPartnershipType, NonEmptyList.of(limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
-              AskWhen.AskWhenAnswer(questionPartnershipConfirmCompanyAddress, "Yes")
-            )
+            AskWhen.AskWhenAnswer(questionOrgType, partnership)
           ),
           QuestionItem(
             questionPartnershipOrgWebsite,
-            NonEmptyList.of(
-              AskWhen.AskWhenAnswer(questionOrgType, partnership),
-              AskWhen.AskWhenAnswers(questionPartnershipType, NonEmptyList.of(limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
-              AskWhen.AskWhenAnswer(questionPartnershipConfirmCompanyAddress, "Yes")
-            )
+            AskWhen.AskWhenAnswer(questionOrgType, partnership)
           ),
 
           // Non-UK company without a branch or place of business in the UK
