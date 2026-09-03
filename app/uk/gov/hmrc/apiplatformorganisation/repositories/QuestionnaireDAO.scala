@@ -62,8 +62,8 @@ object QuestionnaireDAO {
     Map(
       "organisationTypeId"             -> OrganisationDetails.questionOrgType.id,
       "partnershipTypeId"              -> OrganisationDetails.questionPartnershipType.id,
-      "organisationNameLtdId"          -> OrganisationDetails.questionLtdConfirmCompanyName.id,
       "organisationNameNonUkWithoutId" -> OrganisationDetails.questionNonUkWithoutCompanyName.id,
+      "organisationNamePartnershipId"  -> OrganisationDetails.questionPartnershipCompanyName.id,
       "responsibleIndividualNameId"    -> ResponsibleIndividualDetails.questionRIName.id
     )
   )
