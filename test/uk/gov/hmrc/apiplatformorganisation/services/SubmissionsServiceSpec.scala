@@ -543,7 +543,13 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
 
         val result = await(underTest.recordAnswers(submission.id, orgDetails.questionPartnershipCompanyNumber.id, Map(Question.answerKey -> Seq("87654321"))))
 
-        businessAnswerKeysOf(result) shouldBe Set(orgDetails.questionOrgType.id, orgDetails.questionPartnershipType.id, orgDetails.questionPartnershipCompanyNumber.id)
+        businessAnswerKeysOf(result) shouldBe Set(
+          orgDetails.questionOrgType.id,
+          orgDetails.questionPartnershipType.id,
+          orgDetails.questionPartnershipCompanyNumber.id,
+          orgDetails.questionPartnershipOrgUTR.id,
+          orgDetails.questionPartnershipOrgWebsite.id
+        )
       }
 
       "re-fetch and store the details of the new company when the company number is changed" in new Setup {
