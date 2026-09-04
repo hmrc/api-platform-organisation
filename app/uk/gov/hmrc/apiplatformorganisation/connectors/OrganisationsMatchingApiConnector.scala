@@ -21,6 +21,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 import play.api.Logging
+import play.api.http.HeaderNames.AUTHORIZATION
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.HttpReads.Implicits.*
@@ -34,11 +35,11 @@ import uk.gov.hmrc.apiplatformorganisation.models.SaMatchingRequest
 class OrganisationsMatchingApiConnector @Inject() (http: HttpClientV2, config: AppConfig)(implicit val ec: ExecutionContext) extends Logging {
   lazy val serviceBaseUrl: String = config.ucrCustomerApiUri
 
-  def matchOrganisationSa(request: SaMatchingRequest, hc: HeaderCarrier): Future[JsValue] = {
-    implicit val headerCarrier: HeaderCarrier = hc.copy(authorization = Some(Authorization(s"Basic ${config.ucrToken}")), extraHeaders = Seq("CorrelationId" -> UUID.randomUUID().toString))
+  def matchOrganisationSa(request: SaMatchingRequest)(implicit hc: HeaderCarrier): Future[JsValue] = {
 
     http.post(url"$serviceBaseUrl/mulesoft/customer/v2/api/organisations/identifier-search")
       .withBody(Json.toJson(request))
+      .setHeader(AUTHORIZATION -> s"Basic ${config.ucrToken}", "CorrelationId" -> UUID.randomUUID().toString, "system-id" -> "APIPlatform")
       .execute[JsValue]
   }
 }

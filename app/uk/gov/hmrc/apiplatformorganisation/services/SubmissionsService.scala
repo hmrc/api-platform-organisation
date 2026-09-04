@@ -174,40 +174,66 @@ class SubmissionsService @Inject() (
       : Future[Either[ValidationErrors, ExtendedSubmission]] = {
     (
       for {
-        initialSubmission <- etValidation.fromOptionF(submissionsDAO.fetch(submissionId), ValidationErrors(ValidationError(message = "No such submission")))
-        extSubmission     <- etValidation.fromEither(AnswerQuestion.recordAnswer(initialSubmission, questionId, rawAnswers))
-        submission        <- etValidation.fromEitherF(processQuestion(extSubmission, questionId))
-        savedSubmission   <- etValidation.liftF(submissionsDAO.update(submission))
-      } yield extSubmission.copy(submission = savedSubmission)
+        initialSubmission   <- etValidation.fromOptionF(submissionsDAO.fetch(submissionId), ValidationErrors(ValidationError(message = "No such submission")))
+        cleanedSubmission    = clearAnswersInvalidatedBy(questionId, initialSubmission, rawAnswers)
+        answeredSubmission  <- etValidation.fromEither(AnswerQuestion.recordAnswer(cleanedSubmission, questionId, rawAnswers).map(_.submission))
+        processedSubmission <- etValidation.fromEitherF(processQuestion(answeredSubmission, questionId))
+        savedSubmission     <- etValidation.liftF(submissionsDAO.update(processedSubmission))
+      } yield extendSubmission(savedSubmission)
     )
       .value
   }
 
-  private def processQuestion(extSubmission: ExtendedSubmission, questionId: Question.Id)(implicit hc: HeaderCarrier): Future[Either[ValidationErrors, Submission]] = {
-    val maybeQuestion = extSubmission.submission.findQuestion(questionId)
-    val maybeAnswer   = extSubmission.submission.latestInstance.answersToQuestions.get(questionId)
+  private def clearAnswersInvalidatedBy(questionId: Question.Id, submission: Submission, rawAnswers: Map[String, Seq[String]]): Submission = {
+    import QuestionnaireDAO.Questionnaires.OrganisationDetails.*
+
+    if (answerChanged(questionId, submission, rawAnswers)) {
+      val submissionWithoutCompanyDetails = Submission.updateLatestAdditionalDataTo(submission.latestInstance.additionalData.map(_.copy(companyDetails = None)))(submission)
+      val answers                         = submissionWithoutCompanyDetails.latestInstance.answersToQuestions
+
+      //question ids that invalidate nested answers once changed -add any new ones here
+      questionId match {
+        case id if id == questionLtdCompanyNumber.id         =>
+          Submission.updateLatestAnswersTo(answers - questionLtdConfirmCompanyName.id)(submissionWithoutCompanyDetails)
+        case id if id == questionPartnershipCompanyNumber.id =>
+          Submission.updateLatestAnswersTo(answers - questionPartnershipConfirmCompanyName.id)(submissionWithoutCompanyDetails)
+        case id if id == questionOrgType.id                  => submissionWithoutCompanyDetails
+        case _                                               => submission
+      }
+    } else submission
+  }
+
+  private def answerChanged(questionId: Question.Id, submission: Submission, rawAnswers: Map[String, Seq[String]]): Boolean = {
+    val previousAnswer = submission.latestInstance.answersToQuestions.get(questionId)
+    val newAnswer      = submission.findQuestion(questionId).flatMap(question => ValidateAnswers.validate(question, rawAnswers).toOption)
+    previousAnswer.isDefined && newAnswer.isDefined && previousAnswer != newAnswer
+  }
+
+  private def processQuestion(submission: Submission, questionId: Question.Id)(implicit hc: HeaderCarrier): Future[Either[ValidationErrors, Submission]] = {
+    val maybeQuestion = submission.findQuestion(questionId)
+    val maybeAnswer   = submission.latestInstance.answersToQuestions.get(questionId)
     (maybeQuestion, maybeAnswer) match {
-      case (Some(_: CompanyNumberQuestion), Some(a: CompanyNumberAnswer)) => processCompanyDetails(a.value, extSubmission)
-      case _                                                              => Future.successful(Right(extSubmission.submission))
+      case (Some(_: CompanyNumberQuestion), Some(a: CompanyNumberAnswer)) => processCompanyDetails(a.value, submission)
+      case _                                                              => Future.successful(Right(submission))
     }
   }
 
-  private def processCompanyDetails(companyNumber: String, extSubmission: ExtendedSubmission)(implicit hc: HeaderCarrier): Future[Either[ValidationErrors, Submission]] = {
+  private def processCompanyDetails(companyNumber: String, submission: Submission)(implicit hc: HeaderCarrier): Future[Either[ValidationErrors, Submission]] = {
     (
       for {
-        companyProfile <- etValidation.fromOptionF(
-                            companiesHouseConnector.getCompanyByNumber(companyNumber),
-                            ValidationErrors(ValidationError(key = ValidationError.companyNumberNotFoundKey, message = s"The company number ${companyNumber} was not found"))
-                          )
-        _              <- etValidation.cond(
-                            checkCompanyIsActive(companyProfile),
-                            (),
-                            ValidationErrors(ValidationError(message = "The company is not active, only companies that are trading can be set up on the Developer Hub"))
-                          )
-        companyDetails  = getCompanyDetails(companyNumber, companyProfile)
-        additionalData  = AdditionalData(Some(companyDetails))
-        submission      = Submission.updateLatestAdditionalDataTo(Some(additionalData))(extSubmission.submission)
-      } yield submission
+        companyProfile   <- etValidation.fromOptionF(
+                              companiesHouseConnector.getCompanyByNumber(companyNumber),
+                              ValidationErrors(ValidationError(key = ValidationError.companyNumberNotFoundKey, message = s"The company number ${companyNumber} was not found"))
+                            )
+        _                <- etValidation.cond(
+                              checkCompanyIsActive(companyProfile),
+                              (),
+                              ValidationErrors(ValidationError(message = "The company is not active, only companies that are trading can be set up on the Developer Hub"))
+                            )
+        companyDetails    = getCompanyDetails(companyNumber, companyProfile)
+        additionalData    = AdditionalData(Some(companyDetails))
+        updatedSubmission = Submission.updateLatestAdditionalDataTo(Some(additionalData))(submission)
+      } yield updatedSubmission
     ).value
   }
 
