@@ -32,4 +32,5 @@ class AppConfig @Inject() (config: Configuration) extends ServicesConfig(config)
   val companiesHouseUri: String           = config.get[String]("companies-house.uri")
   val thirdPartyDeveloperUrl: String      = baseUrl("third-party-developer")
   val organisationsMatchingApiUrl: String = baseUrl("organisations-matching-api")
+  val individualsMatchingApiUrl: String   = baseUrl("individuals-matching-api") + getConfString("individuals-matching-api.path", "")
 }

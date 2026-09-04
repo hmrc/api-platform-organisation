@@ -24,14 +24,15 @@ import play.api.mvc.{ControllerComponents, Result}
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
-import uk.gov.hmrc.apiplatformorganisation.connectors.OrganisationsMatchingApiConnector
-import uk.gov.hmrc.apiplatformorganisation.models.SaMatchingRequest
+import uk.gov.hmrc.apiplatformorganisation.connectors.{IndividualsMatchingApiConnector, OrganisationsMatchingApiConnector}
+import uk.gov.hmrc.apiplatformorganisation.models.{IndividualMatchingRequest, SaMatchingRequest}
 import uk.gov.hmrc.apiplatformorganisation.utils.ApplicationLogger
 
 // $COVERAGE-OFF$
 @Singleton
 class MatchingController @Inject() (
     organisationsMatchingApiConnector: OrganisationsMatchingApiConnector,
+    individualsMatchingApiConnector: IndividualsMatchingApiConnector,
     cc: ControllerComponents
   )(implicit val ec: ExecutionContext
   ) extends BackendController(cc) with ApplicationLogger {
@@ -40,6 +41,13 @@ class MatchingController @Inject() (
     withJsonBody[SaMatchingRequest] { body =>
       organisationsMatchingApiConnector.matchOrganisationSa(body)
         .map { companiesHouseCompanyProfile => Ok(Json.toJson(companiesHouseCompanyProfile)) } recover recovery
+    }
+  }
+
+  def matchIndividual() = Action.async(parse.json) { implicit request =>
+    withJsonBody[IndividualMatchingRequest] { body =>
+      individualsMatchingApiConnector.matchIndividual(body, hc)
+        .map(json => Ok(Json.toJson(json)))
     }
   }
 
