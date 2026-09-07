@@ -558,7 +558,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         result.value.submission.latestInstance.companyDetails.value.companyName shouldBe "New Company Name"
       }
 
-      "not clear any answers when the same company number is re-entered" in new Setup {
+      "clears the company confirmation answers when the same company number is re-entered" in new Setup {
         val submission = submissionAnsweredWith(riAnswers ++ ltdAnswers)
         SubmissionsDAOMock.Fetch.thenReturn(submission)
         SubmissionsDAOMock.Update.thenReturn()
@@ -566,7 +566,8 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
 
         val result = await(underTest.recordAnswers(submission.id, orgDetails.questionLtdCompanyNumber.id, Map(Question.answerKey -> Seq("12345678"))))
 
-        businessAnswerKeysOf(result) shouldBe ltdAnswers.keySet
+        result.value.submission.latestInstance.answersToQuestions.keySet should not contain orgDetails.questionLtdConfirmCompanyName.id
+        businessAnswerKeysOf(result) shouldBe Set(orgDetails.questionOrgType.id, orgDetails.questionLtdCompanyNumber.id)
       }
     }
 
