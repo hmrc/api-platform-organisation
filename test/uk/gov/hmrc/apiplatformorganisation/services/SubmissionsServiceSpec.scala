@@ -547,7 +547,6 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
           orgDetails.questionOrgType.id,
           orgDetails.questionPartnershipType.id,
           orgDetails.questionPartnershipCompanyNumber.id,
-          orgDetails.questionPartnershipOrgUTR.id,
           orgDetails.questionPartnershipOrgWebsite.id
         )
       }
