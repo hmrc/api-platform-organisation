@@ -38,7 +38,7 @@ class MatchingController @Inject() (
 
   def matchBySa() = Action.async(parse.json) { implicit request =>
     withJsonBody[SaMatchingRequest] { body =>
-      organisationsMatchingApiConnector.matchOrganisationSa(body, hc)
+      organisationsMatchingApiConnector.matchOrganisationSa(body)
         .map { companiesHouseCompanyProfile => Ok(Json.toJson(companiesHouseCompanyProfile)) } recover recovery
     }
   }

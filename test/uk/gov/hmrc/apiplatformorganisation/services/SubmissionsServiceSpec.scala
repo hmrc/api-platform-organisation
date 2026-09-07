@@ -96,6 +96,58 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         mockCompaniesHouseConnector,
         clock
       )
+
+    // Submission carrying the real questionnaire
+    val orgDetails = QuestionnaireDAO.Questionnaires.OrganisationDetails
+    val riDetails  = QuestionnaireDAO.Questionnaires.ResponsibleIndividualDetails
+
+    val riAnswers: Submission.AnswersToQuestions = Map(
+      riDetails.questionRIName.id     -> ActualAnswer.NameAnswer(FullName(Some("Yes"), Some("Bob"), Some("Roberts"))),
+      riDetails.questionRIJobTitle.id -> ActualAnswer.TextAnswer("Developer"),
+      riDetails.questionRIPhone.id    -> ActualAnswer.TextAnswer("01234567890")
+    )
+
+    val ltdAnswers: Submission.AnswersToQuestions = Map(
+      orgDetails.questionOrgType.id                  -> ActualAnswer.SingleChoiceAnswer(QuestionnaireDAO.ukLimitedCompany),
+      orgDetails.questionLtdCompanyNumber.id         -> ActualAnswer.CompanyNumberAnswer("12345678"),
+      orgDetails.questionLtdConfirmCompanyName.id    -> ActualAnswer.SingleChoiceAnswer("Yes"),
+      orgDetails.questionLtdConfirmCompanyAddress.id -> ActualAnswer.SingleChoiceAnswer("Yes"),
+      orgDetails.questionLtdOrgUTR.id                -> ActualAnswer.TextAnswer("1234567890"),
+      orgDetails.questionLtdOrgWebsite.id            -> ActualAnswer.TextAnswer("https://example.com")
+    )
+
+    val partnershipAnswers: Submission.AnswersToQuestions = Map(
+      orgDetails.questionOrgType.id                          -> ActualAnswer.SingleChoiceAnswer(QuestionnaireDAO.partnership),
+      orgDetails.questionPartnershipType.id                  -> ActualAnswer.SingleChoiceAnswer(QuestionnaireDAO.limitedLiabilityPartnership),
+      orgDetails.questionPartnershipCompanyNumber.id         -> ActualAnswer.CompanyNumberAnswer("12345678"),
+      orgDetails.questionPartnershipConfirmCompanyName.id    -> ActualAnswer.SingleChoiceAnswer("Yes"),
+      orgDetails.questionPartnershipConfirmCompanyAddress.id -> ActualAnswer.SingleChoiceAnswer("Yes"),
+      orgDetails.questionPartnershipOrgUTR.id                -> ActualAnswer.TextAnswer("1234567890"),
+      orgDetails.questionPartnershipOrgWebsite.id            -> ActualAnswer.TextAnswer("https://example.com")
+    )
+
+    val newCompanyProfile =
+      CompaniesHouseCompanyProfile(
+        "87654321",
+        "New Company Name",
+        "active",
+        Some(uk.gov.hmrc.apiplatformorganisation.models.RegisteredOfficeAddress(Some("2 New Street"), None, None, None, Some("London"), None, Some("NW1 2ZZ")))
+      )
+
+    def submissionAnsweredWith(answers: Submission.AnswersToQuestions): Submission =
+      Submission.create(
+        "bob@example.com",
+        submissionId,
+        Some(organisationId),
+        instant,
+        userId,
+        QuestionnaireDAO.Questionnaires.activeQuestionnaireGroupings,
+        QuestionnaireDAO.questionIdsOfInterest,
+        standardContext
+      ).hasCompletelyAnsweredWith(answers)
+
+    def businessAnswerKeysOf(result: Either[ValidationErrors, ExtendedSubmission]): Set[Question.Id] =
+      result.value.submission.latestInstance.answersToQuestions.keySet -- riAnswers.keySet
   }
 
   "SubmissionsService" when {
@@ -355,6 +407,51 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         SubmissionsDAOMock.Update.verifyCalled()
       }
 
+      "clear business answers and fetched company details when the business type is changed. Keep RI answers" in new Setup {
+        val submission = submissionAnsweredWith(riAnswers ++ ltdAnswers)
+        SubmissionsDAOMock.Fetch.thenReturn(submission)
+        SubmissionsDAOMock.Update.thenReturn()
+
+        val result = await(underTest.recordAnswers(submission.id, orgDetails.questionOrgType.id, Map(Question.answerKey -> Seq(QuestionnaireDAO.partnership))))
+
+        businessAnswerKeysOf(result) shouldBe Set(orgDetails.questionOrgType.id)
+        result.value.submission.latestInstance.companyDetails shouldBe None
+
+        val answers = result.value.submission.latestInstance.answersToQuestions
+        answers.view.filterKeys(riAnswers.keySet).toMap shouldBe riAnswers
+      }
+
+      "not clear any answers when a question with no ask-when dependents is changed" in new Setup {
+        val submission = submissionAnsweredWith(riAnswers ++ ltdAnswers)
+        SubmissionsDAOMock.Fetch.thenReturn(submission)
+        SubmissionsDAOMock.Update.thenReturn()
+
+        val result = await(underTest.recordAnswers(submission.id, orgDetails.questionLtdOrgWebsite.id, Map(Question.answerKey -> Seq("https://updated.example.com"))))
+
+        businessAnswerKeysOf(result) shouldBe ltdAnswers.keySet
+        result.value.submission.latestInstance.answersToQuestions.get(orgDetails.questionLtdOrgWebsite.id).value shouldBe ActualAnswer.TextAnswer("https://updated.example.com")
+      }
+
+      "fail when given an invalid question" in new Setup {
+        SubmissionsDAOMock.Fetch.thenReturn(aSubmission)
+        SubmissionsDAOMock.Update.thenReturn()
+
+        val result = await(underTest.recordAnswers(submissionId, Question.Id.random, Map(Question.answerKey -> Seq("Yes"))))
+
+        result.left.value shouldBe ValidationErrors(ValidationError(message = "Not valid for this submission"))
+      }
+
+      "fail when given a optional answer to non optional question" in new Setup {
+        SubmissionsDAOMock.Fetch.thenReturn(aSubmission)
+        SubmissionsDAOMock.Update.thenReturn()
+
+        val result = await(underTest.recordAnswers(submissionId, questionId, Map.empty))
+
+        result.left.value shouldBe ValidationErrors(ValidationError(message = "Question requires an answer"))
+      }
+    }
+
+    "recordAnswers for the company number question" should {
       "records new answers and process question for company number question" in new Setup {
         val baseSubmission              = buildPartiallyAnsweredSubmission()
         val question2_Id                = baseSubmission.allQuestionnaires.head.questions.toList(1).question.id
@@ -427,22 +524,49 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         result.left.value shouldBe ValidationErrors(ValidationError(message = "The company is not active, only companies that are trading can be set up on the Developer Hub"))
       }
 
-      "fail when given an invalid question" in new Setup {
-        SubmissionsDAOMock.Fetch.thenReturn(aSubmission)
+      "clear the confirmed name, address, UTR and website for a UK limited company when the company number is changed" in new Setup {
+        val submission = submissionAnsweredWith(riAnswers ++ ltdAnswers)
+        SubmissionsDAOMock.Fetch.thenReturn(submission)
         SubmissionsDAOMock.Update.thenReturn()
+        when(mockCompaniesHouseConnector.getCompanyByNumber(*)(*)).thenReturn(successful(Some(newCompanyProfile)))
 
-        val result = await(underTest.recordAnswers(submissionId, Question.Id.random, Map(Question.answerKey -> Seq("Yes"))))
+        val result = await(underTest.recordAnswers(submission.id, orgDetails.questionLtdCompanyNumber.id, Map(Question.answerKey -> Seq("87654321"))))
 
-        result.left.value shouldBe ValidationErrors(ValidationError(message = "Not valid for this submission"))
+        businessAnswerKeysOf(result) shouldBe Set(orgDetails.questionOrgType.id, orgDetails.questionLtdCompanyNumber.id)
       }
 
-      "fail when given a optional answer to non optional question" in new Setup {
-        SubmissionsDAOMock.Fetch.thenReturn(aSubmission)
+      "clear the confirmed name, address, UTR and website for a partnership when the company number is changed" in new Setup {
+        val submission = submissionAnsweredWith(riAnswers ++ partnershipAnswers)
+        SubmissionsDAOMock.Fetch.thenReturn(submission)
         SubmissionsDAOMock.Update.thenReturn()
+        when(mockCompaniesHouseConnector.getCompanyByNumber(*)(*)).thenReturn(successful(Some(newCompanyProfile)))
 
-        val result = await(underTest.recordAnswers(submissionId, questionId, Map.empty))
+        val result = await(underTest.recordAnswers(submission.id, orgDetails.questionPartnershipCompanyNumber.id, Map(Question.answerKey -> Seq("87654321"))))
 
-        result.left.value shouldBe ValidationErrors(ValidationError(message = "Question requires an answer"))
+        businessAnswerKeysOf(result) shouldBe Set(orgDetails.questionOrgType.id, orgDetails.questionPartnershipType.id, orgDetails.questionPartnershipCompanyNumber.id)
+      }
+
+      "re-fetch and store the details of the new company when the company number is changed" in new Setup {
+        val submission = submissionAnsweredWith(riAnswers ++ ltdAnswers)
+        SubmissionsDAOMock.Fetch.thenReturn(submission)
+        SubmissionsDAOMock.Update.thenReturn()
+        when(mockCompaniesHouseConnector.getCompanyByNumber(*)(*)).thenReturn(successful(Some(newCompanyProfile)))
+
+        val result = await(underTest.recordAnswers(submission.id, orgDetails.questionLtdCompanyNumber.id, Map(Question.answerKey -> Seq("87654321"))))
+
+        result.value.submission.latestInstance.companyDetails.value.companyNumber shouldBe "87654321"
+        result.value.submission.latestInstance.companyDetails.value.companyName shouldBe "New Company Name"
+      }
+
+      "not clear any answers when the same company number is re-entered" in new Setup {
+        val submission = submissionAnsweredWith(riAnswers ++ ltdAnswers)
+        SubmissionsDAOMock.Fetch.thenReturn(submission)
+        SubmissionsDAOMock.Update.thenReturn()
+        when(mockCompaniesHouseConnector.getCompanyByNumber(*)(*)).thenReturn(successful(Some(newCompanyProfile)))
+
+        val result = await(underTest.recordAnswers(submission.id, orgDetails.questionLtdCompanyNumber.id, Map(Question.answerKey -> Seq("12345678"))))
+
+        businessAnswerKeysOf(result) shouldBe ltdAnswers.keySet
       }
     }
 
