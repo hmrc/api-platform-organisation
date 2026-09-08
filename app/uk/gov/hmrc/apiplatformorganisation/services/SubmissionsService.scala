@@ -187,24 +187,31 @@ class SubmissionsService @Inject() (
   private def clearAnswersInvalidatedBy(questionId: Question.Id, submission: Submission, rawAnswers: Map[String, Seq[String]]): Submission = {
     import QuestionnaireDAO.Questionnaires.OrganisationDetails.*
 
-    if (answerChanged(questionId, submission, rawAnswers)) {
-      val submissionWithoutCompanyDetails = Submission.updateLatestAdditionalDataTo(submission.latestInstance.additionalData.map(_.copy(companyDetails = None)))(submission)
-      val answers                         = submissionWithoutCompanyDetails.latestInstance.answersToQuestions
-
-      // question ids that invalidate nested answers once changed - add any new ones here
-      questionId match {
-        case id if id == questionLtdCompanyNumber.id         => {
-          val resetQuestions = List(questionLtdConfirmCompanyName.id, questionLtdConfirmCompanyAddress.id, questionLtdOrgUTR.id)
-          Submission.updateLatestAnswersTo(answers -- resetQuestions)(submissionWithoutCompanyDetails)
-        }
-        case id if id == questionPartnershipCompanyNumber.id => {
-          val resetQuestions = List(questionPartnershipConfirmCompanyName.id, questionPartnershipConfirmCompanyAddress.id, questionPartnershipOrgUTR.id)
-          Submission.updateLatestAnswersTo(answers -- resetQuestions)(submissionWithoutCompanyDetails)
-        }
-        case id if id == questionOrgType.id                  => submissionWithoutCompanyDetails
-        case _                                               => submission
+    // clears any extra dependent answers and data, that are not cleared automatically as part of the ask-when linked answers prune.
+    // When needed, remove the question from the current questions set, that thus trigger a cascaded delete
+    questionId match {
+      case id if id == questionLtdCompanyNumber.id                                             => {
+        val clearAnswers: List[Question.Id] = List(questionLtdConfirmCompanyName.id, questionLtdConfirmCompanyAddress.id, questionLtdOrgUTR.id)
+        clearAnswerAndCompanyDetails(clearAnswers, submission)
       }
-    } else submission
+      case id if id == questionPartnershipCompanyNumber.id                                     => {
+        val clearAnswers: List[Question.Id] = List(questionPartnershipConfirmCompanyName.id, questionPartnershipConfirmCompanyAddress.id, questionPartnershipOrgUTR.id)
+        clearAnswerAndCompanyDetails(clearAnswers, submission)
+      }
+      case id if id == questionOrgType.id && answerChanged(questionId, submission, rawAnswers) =>
+        clearCompanyDetails(submission)
+      case _                                                                                   => submission
+    }
+  }
+
+  private def clearAnswerAndCompanyDetails(clearAnswers: List[Question.Id], submission: Submission) = {
+    val submissionWithoutCompanyDetails = clearCompanyDetails(submission)
+    val answers                         = submissionWithoutCompanyDetails.latestInstance.answersToQuestions
+    Submission.updateLatestAnswersTo(answers -- clearAnswers)(submissionWithoutCompanyDetails)
+  }
+
+  private def clearCompanyDetails(submission: Submission) = {
+    Submission.updateLatestAdditionalDataTo(submission.latestInstance.additionalData.map(_.copy(companyDetails = None)))(submission)
   }
 
   private def answerChanged(questionId: Question.Id, submission: Submission, rawAnswers: Map[String, Seq[String]]): Boolean = {
