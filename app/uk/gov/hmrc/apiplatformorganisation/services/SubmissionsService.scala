@@ -194,6 +194,8 @@ class SubmissionsService @Inject() (
         clearAnswerAndCompanyDetails(questionLtdConfirmCompanyName, submission)
       case id if id == questionPartnershipCompanyNumber.id                                     =>
         clearAnswerAndCompanyDetails(questionPartnershipConfirmCompanyName, submission)
+      case id if id == questionRegSocietyCompanyNumber.id                                      =>
+        clearAnswerAndCompanyDetails(questionRegSocietyConfirmCompanyName, submission)
       case id if id == questionOrgType.id && answerChanged(questionId, submission, rawAnswers) =>
         clearCompanyDetails(submission)
       case _                                                                                   => submission
