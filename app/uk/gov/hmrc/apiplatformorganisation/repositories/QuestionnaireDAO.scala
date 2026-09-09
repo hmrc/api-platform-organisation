@@ -50,6 +50,7 @@ object QuestionnaireDAO {
   final val limitedLiabilityPartnership = "Limited liability partnership"
   final val limitedPartnership          = "Limited partnership"
   final val scottishLimitedPartnership  = "Scottish limited partnership"
+  final val registeredSociety           = "Registered society"
   final val nonUkCompanyWithoutUkBranch = "Non-UK company without a branch or place of business in the UK"
   final val noneOfTheAbove              = "None of the above"
 
@@ -125,6 +126,7 @@ object QuestionnaireDAO {
         marking = ListMap(
           (PossibleAnswer(ukLimitedCompany)            -> Mark.Pass),
           (PossibleAnswer(partnership)                 -> Mark.Pass),
+          (PossibleAnswer(registeredSociety)           -> Mark.Pass),
           (PossibleAnswer(nonUkCompanyWithoutUkBranch) -> Mark.Fail),
           (PossibleAnswer(noneOfTheAbove)              -> Mark.Fail)
         ),
@@ -203,7 +205,7 @@ object QuestionnaireDAO {
           StatementLink("Ask for a copy of your Corporation Tax UTR (opens in new tab)", "https://www.gov.uk/find-lost-utr-number")
         ).some,
         hintText = StatementText("Your UTR can be 10 or 13 digits long.").some,
-        errorInfo = ErrorInfo("Your  Unique Taxpayer Reference cannot be blank", "Enter your Unique Taxpayer Reference, like 1234567890").some,
+        errorInfo = ErrorInfo("Your Unique Taxpayer Reference cannot be blank", "Enter your Unique Taxpayer Reference, like 1234567890").some,
         summary = Some("Corporation tax UTR")
       )
 
@@ -302,12 +304,98 @@ object QuestionnaireDAO {
           StatementLink("Ask for a copy of your Corporation Tax UTR (opens in new tab)", "https://www.gov.uk/find-lost-utr-number")
         ).some,
         hintText = StatementText("Your UTR can be 10 or 13 digits long.").some,
-        errorInfo = ErrorInfo("Your  Unique Taxpayer Reference cannot be blank", "Enter your Unique Taxpayer Reference, like 1234567890").some,
+        errorInfo = ErrorInfo("Your Unique Taxpayer Reference cannot be blank", "Enter your Unique Taxpayer Reference, like 1234567890").some,
         summary = Some("Corporation tax UTR")
       )
 
       val questionPartnershipOrgWebsite = Question.TextQuestion(
         Question.Id("0626fd67-013b-4444-a870-c30cbcc7f01a"),
+        Wording("What is your website URL?"),
+        statement = None,
+        hintText = StatementText("Website URL").some,
+        absence = ("My company doesn't have a website", Mark.Fail).some,
+        validation = TextValidation.Url.some,
+        errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some,
+        summary = Some("Website URL")
+      )
+
+      // Registered society
+
+      val questionRegSocietyCompanyNumber = Question.CompanyNumberQuestion(
+        Question.Id("b3b7dbd7-5d9b-4689-a764-6c17987999d5"),
+        Wording("What’s the company registration number (CRN)?"),
+        statement = Statement(
+          CompoundFragment(
+            StatementText("You can "),
+            StatementLink("search for the CRN (opens in new tab)", "https://find-and-update.company-information.service.gov.uk/"),
+            StatementText(" in the Companies House register.")
+          )
+        ).some,
+        hintText =
+          StatementText("It has 8 characters, for example 01234567 or AC012345.").some,
+        errorInfo = ErrorInfo(
+          "Your company number must have 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total",
+          "Enter your company registration number, like 01234567"
+        ).some,
+        summary = Some("Company registration number")
+      )
+
+      val questionRegSocietyConfirmCompanyName = Question.ConfirmCompanyNameQuestion(
+        Question.Id("f71f59e6-12dd-4fc5-840a-27b32d1c1b0b"),
+        Wording("Is this your company?"),
+        statement = None,
+        yesMarking = Mark.Pass,
+        noMarking = Mark.Fail,
+        errorInfo = ErrorInfo("Select Yes if the company name is correct").some,
+        summary = Some("Registered company name")
+      )
+
+      val questionRegSocietyInvalidCompanyName = Question.ForwardToQuestion(
+        Question.Id("ec9f8227-03eb-4845-9298-77616998f14f"),
+        questionRegSocietyCompanyNumber.id,
+        Wording("Please re-enter your company registration number"),
+        statement = Statement(
+          StatementText("If you entered your company number incorrectly then please re-enter your company registration number on the next page")
+        ).some
+      )
+
+      val questionRegSocietyConfirmCompanyAddress = Question.ConfirmCompanyAddressQuestion(
+        Question.Id("0744c585-5c7a-41e1-967d-9a581d7a5df2"),
+        Wording("Is this the correct registered address for your company?"),
+        statement = None,
+        yesMarking = Mark.Pass,
+        noMarking = Mark.Fail,
+        errorInfo = ErrorInfo("Select Yes if the company address is correct").some,
+        summary = Some("Registered address")
+      )
+
+      val questionRegSocietyInvalidCompanyAddress = Question.AcknowledgementOnly(
+        Question.Id("216f25f7-d426-40b9-b51f-6025f295f96d"),
+        Wording("You must change the registered address with Companies House"),
+        statement = Statement(
+          CompoundFragment(
+            StatementText("We can only access the address registered with Companies House. If this is not correct, you must "),
+            StatementLink("update the address online (opens a new tab)", "https://www.gov.uk/government/publications/change-a-registered-office-address-ad01"),
+            StatementText(".")
+          ),
+          StatementText("You cannot complete the security checks for your company until the registered address has been updated.")
+        ).some
+      )
+
+      val questionRegSocietyOrgUTR = Question.TextQuestion(
+        Question.Id("b597e292-91dc-4953-845c-53c6fe9873b0"),
+        Wording("What’s the Unique Taxpayer Reference (UTR)?"),
+        statement = Statement(
+          StatementText("You can find it on tax returns or other tax documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’."),
+          StatementLink("Ask for a copy of your Corporation Tax UTR (opens in new tab)", "https://www.gov.uk/find-lost-utr-number")
+        ).some,
+        hintText = StatementText("Your UTR can be 10 or 13 digits long.").some,
+        errorInfo = ErrorInfo("Your Unique Taxpayer Reference cannot be blank", "Enter your Unique Taxpayer Reference, like 1234567890").some,
+        summary = Some("Corporation tax UTR")
+      )
+
+      val questionRegSocietyOrgWebsite = Question.TextQuestion(
+        Question.Id("9edef5be-ae1a-4169-9b69-e8a818f3bed5"),
         Wording("What is your website URL?"),
         statement = None,
         hintText = StatementText("Website URL").some,
@@ -473,6 +561,51 @@ object QuestionnaireDAO {
               AskWhen.AskWhenAnswer(questionOrgType, partnership),
               AskWhen.AskWhenAnswers(questionPartnershipType, NonEmptyList.of(limitedLiabilityPartnership, limitedPartnership, scottishLimitedPartnership)),
               AskWhen.AskWhenAnswer(questionPartnershipConfirmCompanyAddress, "Yes")
+            )
+          ),
+
+          // Registered society
+          QuestionItem(
+            questionRegSocietyCompanyNumber,
+            AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(registeredSociety))
+          ),
+          QuestionItem(
+            questionRegSocietyConfirmCompanyName,
+            AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(registeredSociety))
+          ),
+          QuestionItem(
+            questionRegSocietyInvalidCompanyName,
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(registeredSociety)),
+              AskWhen.AskWhenAnswer(questionRegSocietyConfirmCompanyName, "No")
+            )
+          ),
+          QuestionItem(
+            questionRegSocietyConfirmCompanyAddress,
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(registeredSociety)),
+              AskWhen.AskWhenAnswer(questionRegSocietyConfirmCompanyName, "Yes")
+            )
+          ),
+          QuestionItem(
+            questionRegSocietyInvalidCompanyAddress,
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(registeredSociety)),
+              AskWhen.AskWhenAnswer(questionRegSocietyConfirmCompanyAddress, "No")
+            )
+          ),
+          QuestionItem(
+            questionRegSocietyOrgUTR,
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(registeredSociety)),
+              AskWhen.AskWhenAnswer(questionRegSocietyConfirmCompanyAddress, "Yes")
+            )
+          ),
+          QuestionItem(
+            questionRegSocietyOrgWebsite,
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(registeredSociety)),
+              AskWhen.AskWhenAnswer(questionRegSocietyConfirmCompanyAddress, "Yes")
             )
           ),
 

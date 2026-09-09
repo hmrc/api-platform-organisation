@@ -126,6 +126,15 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
       orgDetails.questionPartnershipOrgWebsite.id            -> ActualAnswer.TextAnswer("https://example.com")
     )
 
+    val regSocietyAnswers: Submission.AnswersToQuestions = Map(
+      orgDetails.questionOrgType.id                         -> ActualAnswer.SingleChoiceAnswer(QuestionnaireDAO.registeredSociety),
+      orgDetails.questionRegSocietyCompanyNumber.id         -> ActualAnswer.CompanyNumberAnswer("12345678"),
+      orgDetails.questionRegSocietyConfirmCompanyName.id    -> ActualAnswer.SingleChoiceAnswer("Yes"),
+      orgDetails.questionRegSocietyConfirmCompanyAddress.id -> ActualAnswer.SingleChoiceAnswer("Yes"),
+      orgDetails.questionRegSocietyOrgUTR.id                -> ActualAnswer.TextAnswer("1234567890"),
+      orgDetails.questionRegSocietyOrgWebsite.id            -> ActualAnswer.TextAnswer("https://example.com")
+    )
+
     val newCompanyProfile =
       CompaniesHouseCompanyProfile(
         "87654321",
@@ -544,6 +553,17 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         val result = await(underTest.recordAnswers(submission.id, orgDetails.questionPartnershipCompanyNumber.id, Map(Question.answerKey -> Seq("87654321"))))
 
         businessAnswerKeysOf(result) shouldBe Set(orgDetails.questionOrgType.id, orgDetails.questionPartnershipType.id, orgDetails.questionPartnershipCompanyNumber.id)
+      }
+
+      "clear the confirmed name, address, UTR and website for a registered society when the company number is changed" in new Setup {
+        val submission = submissionAnsweredWith(riAnswers ++ regSocietyAnswers)
+        SubmissionsDAOMock.Fetch.thenReturn(submission)
+        SubmissionsDAOMock.Update.thenReturn()
+        when(mockCompaniesHouseConnector.getCompanyByNumber(*)(*)).thenReturn(successful(Some(newCompanyProfile)))
+
+        val result = await(underTest.recordAnswers(submission.id, orgDetails.questionRegSocietyCompanyNumber.id, Map(Question.answerKey -> Seq("87654321"))))
+
+        businessAnswerKeysOf(result) shouldBe Set(orgDetails.questionOrgType.id, orgDetails.questionRegSocietyCompanyNumber.id)
       }
 
       "re-fetch and store the details of the new company when the company number is changed" in new Setup {
