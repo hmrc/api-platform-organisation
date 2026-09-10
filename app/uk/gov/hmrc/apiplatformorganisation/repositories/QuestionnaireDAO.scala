@@ -408,17 +408,11 @@ object QuestionnaireDAO {
           ),
           QuestionItem(
             questionLtdOrgUTR,
-            NonEmptyList.of(
-              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany)),
-              AskWhen.AskWhenAnswer(questionLtdConfirmCompanyAddress, "Yes")
-            )
+            AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany))
           ),
           QuestionItem(
             questionLtdOrgWebsite,
-            NonEmptyList.of(
-              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany)),
-              AskWhen.AskWhenAnswer(questionLtdConfirmCompanyAddress, "Yes")
-            )
+            AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany))
           ),
 
           // Partnership
