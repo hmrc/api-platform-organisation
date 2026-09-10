@@ -190,20 +190,24 @@ class SubmissionsService @Inject() (
     // clears any extra dependent answers and data, that are not cleared automatically as part of the ask-when linked answers prune.
     // When needed, remove the question from the current questions set, that thus trigger a cascaded delete
     questionId match {
-      case id if id == questionLtdCompanyNumber.id                                             =>
-        clearAnswerAndCompanyDetails(questionLtdConfirmCompanyName, submission)
-      case id if id == questionPartnershipCompanyNumber.id                                     =>
-        clearAnswerAndCompanyDetails(questionPartnershipConfirmCompanyName, submission)
+      case id if id == questionLtdCompanyNumber.id                                             => {
+        val clearAnswers: List[Question.Id] = List(questionLtdConfirmCompanyName.id, questionLtdConfirmCompanyAddress.id, questionLtdOrgUTR.id)
+        clearAnswerAndCompanyDetails(clearAnswers, submission)
+      }
+      case id if id == questionPartnershipCompanyNumber.id                                     => {
+        val clearAnswers: List[Question.Id] = List(questionPartnershipConfirmCompanyName.id, questionPartnershipConfirmCompanyAddress.id, questionPartnershipOrgUTR.id)
+        clearAnswerAndCompanyDetails(clearAnswers, submission)
+      }
       case id if id == questionOrgType.id && answerChanged(questionId, submission, rawAnswers) =>
         clearCompanyDetails(submission)
       case _                                                                                   => submission
     }
   }
 
-  private def clearAnswerAndCompanyDetails(questionLtdConfirmCompanyName: Question.ConfirmCompanyNameQuestion, submission: Submission) = {
+  private def clearAnswerAndCompanyDetails(clearAnswers: List[Question.Id], submission: Submission) = {
     val submissionWithoutCompanyDetails = clearCompanyDetails(submission)
     val answers                         = submissionWithoutCompanyDetails.latestInstance.answersToQuestions
-    Submission.updateLatestAnswersTo(answers - questionLtdConfirmCompanyName.id)(submissionWithoutCompanyDetails)
+    Submission.updateLatestAnswersTo(answers -- clearAnswers)(submissionWithoutCompanyDetails)
   }
 
   private def clearCompanyDetails(submission: Submission) = {
