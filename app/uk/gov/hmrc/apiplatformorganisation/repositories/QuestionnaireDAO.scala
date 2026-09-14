@@ -53,6 +53,7 @@ object QuestionnaireDAO {
   final val scottishPartnership         = "Scottish partnership"
   final val scottishLimitedPartnership  = "Scottish limited partnership"
   final val registeredSociety           = "Registered society"
+  final val nonUkCompanyWithUkBranch    = "Non-UK company with a branch or place of business in the UK"
   final val nonUkCompanyWithoutUkBranch = "Non-UK company without a branch or place of business in the UK"
   final val noneOfTheAbove              = "None of the above"
 
@@ -129,6 +130,7 @@ object QuestionnaireDAO {
           (PossibleAnswer(ukLimitedCompany)            -> Mark.Pass),
           (PossibleAnswer(partnership)                 -> Mark.Pass),
           (PossibleAnswer(registeredSociety)           -> Mark.Pass),
+          (PossibleAnswer(nonUkCompanyWithUkBranch)    -> Mark.Pass),
           (PossibleAnswer(nonUkCompanyWithoutUkBranch) -> Mark.Fail),
           (PossibleAnswer(noneOfTheAbove)              -> Mark.Fail)
         ),
@@ -426,6 +428,92 @@ object QuestionnaireDAO {
         summary = Some("Website URL")
       )
 
+      // Non-UK company with a branch or place of business in the UK
+
+      val questionNonUkBranchCompanyNumber = Question.CompanyNumberQuestion(
+        Question.Id("716aa391-2a0a-4183-9e71-6851075c5ebc"),
+        Wording("What’s the company registration number (CRN)?"),
+        statement = Statement(
+          CompoundFragment(
+            StatementText("You can "),
+            StatementLink("search for the CRN (opens in new tab)", "https://find-and-update.company-information.service.gov.uk/"),
+            StatementText(" in the Companies House register.")
+          )
+        ).some,
+        hintText =
+          StatementText("It has 8 characters, for example 01234567 or AC012345.").some,
+        errorInfo = ErrorInfo(
+          "Your company number must have 8 characters. If it's 7 characters or less, enter zeros at the start so that it's 8 characters in total",
+          "Enter your company registration number, like 01234567"
+        ).some,
+        summary = Some("Company registration number")
+      )
+
+      val questionNonUkBranchConfirmCompanyName = Question.ConfirmCompanyNameQuestion(
+        Question.Id("58a992ee-7ec8-4cdc-bd0b-d4754b1448c4"),
+        Wording("Is this your company?"),
+        statement = None,
+        yesMarking = Mark.Pass,
+        noMarking = Mark.Fail,
+        errorInfo = ErrorInfo("Select Yes if the company name is correct").some,
+        summary = Some("Registered company name")
+      )
+
+      val questionNonUkBranchInvalidCompanyName = Question.ForwardToQuestion(
+        Question.Id("05bf6539-f7e3-4e8d-8935-4d1fc7649ab5"),
+        questionNonUkBranchCompanyNumber.id,
+        Wording("Please re-enter your company registration number"),
+        statement = Statement(
+          StatementText("If you entered your company number incorrectly then please re-enter your company registration number on the next page")
+        ).some
+      )
+
+      val questionNonUkBranchConfirmCompanyAddress = Question.ConfirmCompanyAddressQuestion(
+        Question.Id("ac07e0d0-5e69-4c7c-bc9e-417621ef61a7"),
+        Wording("Is this the correct registered address for your company?"),
+        statement = None,
+        yesMarking = Mark.Pass,
+        noMarking = Mark.Fail,
+        errorInfo = ErrorInfo("Select Yes if the company address is correct").some,
+        summary = Some("Registered address")
+      )
+
+      val questionNonUkBranchInvalidCompanyAddress = Question.AcknowledgementOnly(
+        Question.Id("0d20ea43-c7c3-4cdf-a168-8813a73500e0"),
+        Wording("You must change the registered address with Companies House"),
+        statement = Statement(
+          CompoundFragment(
+            StatementText("We can only access the address registered with Companies House. If this is not correct, you must "),
+            StatementLink("update the address online (opens a new tab)", "https://www.gov.uk/government/publications/change-a-registered-office-address-ad01"),
+            StatementText(".")
+          ),
+          StatementText("You cannot complete the security checks for your company until the registered address has been updated.")
+        ).some
+      )
+
+      val questionNonUkBranchOrgUTR = Question.TextQuestion(
+        Question.Id("cba99082-89a0-4d7b-b573-14bbbb2fae26"),
+        Wording("What’s the Unique Taxpayer Reference (UTR)?"),
+        statement = Statement(
+          StatementText("You can find it on tax returns or other tax documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’."),
+          StatementLink("Ask for a copy of your Corporation Tax UTR (opens in new tab)", "https://www.gov.uk/find-lost-utr-number")
+        ).some,
+        hintText = StatementText("Your UTR can be 10 or 13 digits long.").some,
+        errorInfo = ErrorInfo("Your Unique Taxpayer Reference cannot be blank", "Enter your Unique Taxpayer Reference, like 1234567890").some,
+        summary = Some("Corporation tax UTR")
+      )
+
+      val questionNonUkBranchOrgWebsite = Question.TextQuestion(
+        Question.Id("8897bb8f-b0f0-4145-930a-5db6b1b3c10e"),
+        Wording("What is your website URL?"),
+        statement = None,
+        hintText = StatementText("Website URL").some,
+        absence = ("My company doesn't have a website", Mark.Fail).some,
+        validation = TextValidation.Url.some,
+        errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some,
+        summary = Some("Website URL")
+      )
+
       // Non-UK company without a branch or place of business in the UK
 
       val questionNonUkWithoutCompanyName = Question.TextQuestion(
@@ -633,6 +721,51 @@ object QuestionnaireDAO {
             NonEmptyList.of(
               AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(registeredSociety)),
               AskWhen.AskWhenAnswer(questionRegSocietyConfirmCompanyAddress, "Yes")
+            )
+          ),
+
+          // Non-UK company with a branch or place of business in the UK
+          QuestionItem(
+            questionNonUkBranchCompanyNumber,
+            AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(nonUkCompanyWithUkBranch))
+          ),
+          QuestionItem(
+            questionNonUkBranchConfirmCompanyName,
+            AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(nonUkCompanyWithUkBranch))
+          ),
+          QuestionItem(
+            questionNonUkBranchInvalidCompanyName,
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(nonUkCompanyWithUkBranch)),
+              AskWhen.AskWhenAnswer(questionNonUkBranchConfirmCompanyName, "No")
+            )
+          ),
+          QuestionItem(
+            questionNonUkBranchConfirmCompanyAddress,
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(nonUkCompanyWithUkBranch)),
+              AskWhen.AskWhenAnswer(questionNonUkBranchConfirmCompanyName, "Yes")
+            )
+          ),
+          QuestionItem(
+            questionNonUkBranchInvalidCompanyAddress,
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(nonUkCompanyWithUkBranch)),
+              AskWhen.AskWhenAnswer(questionNonUkBranchConfirmCompanyAddress, "No")
+            )
+          ),
+          QuestionItem(
+            questionNonUkBranchOrgUTR,
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(nonUkCompanyWithUkBranch)),
+              AskWhen.AskWhenAnswer(questionNonUkBranchConfirmCompanyAddress, "Yes")
+            )
+          ),
+          QuestionItem(
+            questionNonUkBranchOrgWebsite,
+            NonEmptyList.of(
+              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(nonUkCompanyWithUkBranch)),
+              AskWhen.AskWhenAnswer(questionNonUkBranchConfirmCompanyAddress, "Yes")
             )
           ),
 
