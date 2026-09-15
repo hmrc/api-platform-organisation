@@ -39,7 +39,7 @@ class OrganisationsMatchingApiConnector @Inject() (http: HttpClientV2, config: A
 
     http.post(url"$serviceBaseUrl/mulesoft/customer/v2/api/organisations/identifier-search")
       .withBody(Json.toJson(request))
-      .setHeader(AUTHORIZATION -> s"Basic ${config.ucrToken}", "CorrelationId" -> UUID.randomUUID().toString, "system-id" -> "APIPlatform")
+      .setHeader(AUTHORIZATION -> s"Basic ${config.ucrToken}", "CorrelationId" -> UUID.randomUUID().toString, "system-id" -> config.ucrSystemId)
       .execute[JsValue]
   }
 }
