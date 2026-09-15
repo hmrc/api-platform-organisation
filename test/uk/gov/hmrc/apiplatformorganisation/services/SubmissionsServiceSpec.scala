@@ -552,7 +552,12 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
 
         val result = await(underTest.recordAnswers(submission.id, orgDetails.questionPartnershipCompanyNumber.id, Map(Question.answerKey -> Seq("87654321"))))
 
-        businessAnswerKeysOf(result) shouldBe Set(orgDetails.questionOrgType.id, orgDetails.questionPartnershipType.id, orgDetails.questionPartnershipCompanyNumber.id)
+        businessAnswerKeysOf(result) shouldBe Set(
+          orgDetails.questionOrgType.id,
+          orgDetails.questionPartnershipType.id,
+          orgDetails.questionPartnershipCompanyNumber.id,
+          orgDetails.questionPartnershipOrgWebsite.id
+        )
       }
 
       "clear the confirmed name, address, UTR and website for a registered society when the company number is changed" in new Setup {
