@@ -135,6 +135,15 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
       orgDetails.questionRegSocietyOrgWebsite.id            -> ActualAnswer.TextAnswer("https://example.com")
     )
 
+    val nonUkBranchAnswers: Submission.AnswersToQuestions = Map(
+      orgDetails.questionOrgType.id                          -> ActualAnswer.SingleChoiceAnswer(QuestionnaireDAO.nonUkCompanyWithUkBranch),
+      orgDetails.questionNonUkBranchCompanyNumber.id         -> ActualAnswer.CompanyNumberAnswer("12345678"),
+      orgDetails.questionNonUkBranchConfirmCompanyName.id    -> ActualAnswer.SingleChoiceAnswer("Yes"),
+      orgDetails.questionNonUkBranchConfirmCompanyAddress.id -> ActualAnswer.SingleChoiceAnswer("Yes"),
+      orgDetails.questionNonUkBranchOrgUTR.id                -> ActualAnswer.TextAnswer("1234567890"),
+      orgDetails.questionNonUkBranchOrgWebsite.id            -> ActualAnswer.TextAnswer("https://example.com")
+    )
+
     val newCompanyProfile =
       CompaniesHouseCompanyProfile(
         "87654321",
@@ -569,6 +578,17 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         val result = await(underTest.recordAnswers(submission.id, orgDetails.questionRegSocietyCompanyNumber.id, Map(Question.answerKey -> Seq("87654321"))))
 
         businessAnswerKeysOf(result) shouldBe Set(orgDetails.questionOrgType.id, orgDetails.questionRegSocietyCompanyNumber.id)
+      }
+
+      "clear the confirmed name, address, UTR and website for a non-UK company with a UK branch when the company number is changed" in new Setup {
+        val submission = submissionAnsweredWith(riAnswers ++ nonUkBranchAnswers)
+        SubmissionsDAOMock.Fetch.thenReturn(submission)
+        SubmissionsDAOMock.Update.thenReturn()
+        when(mockCompaniesHouseConnector.getCompanyByNumber(*)(*)).thenReturn(successful(Some(newCompanyProfile)))
+
+        val result = await(underTest.recordAnswers(submission.id, orgDetails.questionNonUkBranchCompanyNumber.id, Map(Question.answerKey -> Seq("87654321"))))
+
+        businessAnswerKeysOf(result) shouldBe Set(orgDetails.questionOrgType.id, orgDetails.questionNonUkBranchCompanyNumber.id)
       }
 
       "re-fetch and store the details of the new company when the company number is changed" in new Setup {
