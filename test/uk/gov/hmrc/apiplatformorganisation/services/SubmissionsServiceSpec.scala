@@ -542,7 +542,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         result.left.value shouldBe ValidationErrors(ValidationError(message = "The company is not active, only companies that are trading can be set up on the Developer Hub"))
       }
 
-      "clear the confirmed name, address, UTR and website for a UK limited company when the company number is changed" in new Setup {
+      "clear the confirmed name, address, and UTR for a UK limited company when the company number is changed" in new Setup {
         val submission = submissionAnsweredWith(riAnswers ++ ltdAnswers)
         SubmissionsDAOMock.Fetch.thenReturn(submission)
         SubmissionsDAOMock.Update.thenReturn()
@@ -550,10 +550,14 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
 
         val result = await(underTest.recordAnswers(submission.id, orgDetails.questionLtdCompanyNumber.id, Map(Question.answerKey -> Seq("87654321"))))
 
-        businessAnswerKeysOf(result) shouldBe Set(orgDetails.questionOrgType.id, orgDetails.questionLtdCompanyNumber.id)
+        businessAnswerKeysOf(result) shouldBe Set(
+          orgDetails.questionOrgType.id,
+          orgDetails.questionLtdCompanyNumber.id,
+          orgDetails.questionLtdOrgWebsite.id
+        )
       }
 
-      "clear the confirmed name, address, UTR and website for a partnership when the company number is changed" in new Setup {
+      "clear the confirmed name, address, and UTR for a partnership when the company number is changed" in new Setup {
         val submission = submissionAnsweredWith(riAnswers ++ partnershipAnswers)
         SubmissionsDAOMock.Fetch.thenReturn(submission)
         SubmissionsDAOMock.Update.thenReturn()
@@ -612,7 +616,11 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         val result = await(underTest.recordAnswers(submission.id, orgDetails.questionLtdCompanyNumber.id, Map(Question.answerKey -> Seq("12345678"))))
 
         result.value.submission.latestInstance.answersToQuestions.keySet should not contain orgDetails.questionLtdConfirmCompanyName.id
-        businessAnswerKeysOf(result) shouldBe Set(orgDetails.questionOrgType.id, orgDetails.questionLtdCompanyNumber.id)
+        businessAnswerKeysOf(result) shouldBe Set(
+          orgDetails.questionOrgType.id,
+          orgDetails.questionLtdCompanyNumber.id,
+          orgDetails.questionLtdOrgWebsite.id
+        )
       }
     }
 

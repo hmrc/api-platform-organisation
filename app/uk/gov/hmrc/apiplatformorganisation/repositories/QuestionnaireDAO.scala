@@ -188,8 +188,9 @@ object QuestionnaireDAO {
         summary = Some("Registered address")
       )
 
-      val questionLtdInvalidCompanyAddress = Question.AcknowledgementOnly(
+      val questionLtdInvalidCompanyAddress = Question.ForwardToQuestion(
         Question.Id("83dcd911-e831-4edf-a44a-4b3023592d17"),
+        questionLtdCompanyNumber.id,
         Wording("You must change the registered address with Companies House"),
         statement = Statement(
           CompoundFragment(
@@ -306,8 +307,9 @@ object QuestionnaireDAO {
         summary = Some("Registered address")
       )
 
-      val questionPartnershipInvalidCompanyAddress = Question.AcknowledgementOnly(
+      val questionPartnershipInvalidCompanyAddress = Question.ForwardToQuestion(
         Question.Id("7b7228a2-0e52-4c27-baaa-17c33aa9704d"),
+        questionPartnershipCompanyNumber.id,
         Wording("You must change the registered address with Companies House"),
         statement = Statement(
           CompoundFragment(
@@ -603,17 +605,11 @@ object QuestionnaireDAO {
           ),
           QuestionItem(
             questionLtdOrgUTR,
-            NonEmptyList.of(
-              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany)),
-              AskWhen.AskWhenAnswer(questionLtdConfirmCompanyAddress, "Yes")
-            )
+            AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany))
           ),
           QuestionItem(
             questionLtdOrgWebsite,
-            NonEmptyList.of(
-              AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany)),
-              AskWhen.AskWhenAnswer(questionLtdConfirmCompanyAddress, "Yes")
-            )
+            AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany))
           ),
 
           // Partnership
