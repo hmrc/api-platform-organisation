@@ -135,6 +135,15 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
       orgDetails.questionRegSocietyOrgWebsite.id            -> ActualAnswer.TextAnswer("https://example.com")
     )
 
+    val nonUkBranchAnswers: Submission.AnswersToQuestions = Map(
+      orgDetails.questionOrgType.id                          -> ActualAnswer.SingleChoiceAnswer(QuestionnaireDAO.nonUkCompanyWithUkBranch),
+      orgDetails.questionNonUkBranchCompanyNumber.id         -> ActualAnswer.CompanyNumberAnswer("12345678"),
+      orgDetails.questionNonUkBranchConfirmCompanyName.id    -> ActualAnswer.SingleChoiceAnswer("Yes"),
+      orgDetails.questionNonUkBranchConfirmCompanyAddress.id -> ActualAnswer.SingleChoiceAnswer("Yes"),
+      orgDetails.questionNonUkBranchOrgUTR.id                -> ActualAnswer.TextAnswer("1234567890"),
+      orgDetails.questionNonUkBranchOrgWebsite.id            -> ActualAnswer.TextAnswer("https://example.com")
+    )
+
     val newCompanyProfile =
       CompaniesHouseCompanyProfile(
         "87654321",
@@ -533,7 +542,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         result.left.value shouldBe ValidationErrors(ValidationError(message = "The company is not active, only companies that are trading can be set up on the Developer Hub"))
       }
 
-      "clear the confirmed name, address, UTR and website for a UK limited company when the company number is changed" in new Setup {
+      "clear the confirmed name, address, and UTR for a UK limited company when the company number is changed" in new Setup {
         val submission = submissionAnsweredWith(riAnswers ++ ltdAnswers)
         SubmissionsDAOMock.Fetch.thenReturn(submission)
         SubmissionsDAOMock.Update.thenReturn()
@@ -541,10 +550,14 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
 
         val result = await(underTest.recordAnswers(submission.id, orgDetails.questionLtdCompanyNumber.id, Map(Question.answerKey -> Seq("87654321"))))
 
-        businessAnswerKeysOf(result) shouldBe Set(orgDetails.questionOrgType.id, orgDetails.questionLtdCompanyNumber.id)
+        businessAnswerKeysOf(result) shouldBe Set(
+          orgDetails.questionOrgType.id,
+          orgDetails.questionLtdCompanyNumber.id,
+          orgDetails.questionLtdOrgWebsite.id
+        )
       }
 
-      "clear the confirmed name, address, UTR and website for a partnership when the company number is changed" in new Setup {
+      "clear the confirmed name, address, and UTR for a partnership when the company number is changed" in new Setup {
         val submission = submissionAnsweredWith(riAnswers ++ partnershipAnswers)
         SubmissionsDAOMock.Fetch.thenReturn(submission)
         SubmissionsDAOMock.Update.thenReturn()
@@ -571,6 +584,17 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         businessAnswerKeysOf(result) shouldBe Set(orgDetails.questionOrgType.id, orgDetails.questionRegSocietyCompanyNumber.id)
       }
 
+      "clear the confirmed name, address, UTR and website for a non-UK company with a UK branch when the company number is changed" in new Setup {
+        val submission = submissionAnsweredWith(riAnswers ++ nonUkBranchAnswers)
+        SubmissionsDAOMock.Fetch.thenReturn(submission)
+        SubmissionsDAOMock.Update.thenReturn()
+        when(mockCompaniesHouseConnector.getCompanyByNumber(*)(*)).thenReturn(successful(Some(newCompanyProfile)))
+
+        val result = await(underTest.recordAnswers(submission.id, orgDetails.questionNonUkBranchCompanyNumber.id, Map(Question.answerKey -> Seq("87654321"))))
+
+        businessAnswerKeysOf(result) shouldBe Set(orgDetails.questionOrgType.id, orgDetails.questionNonUkBranchCompanyNumber.id)
+      }
+
       "re-fetch and store the details of the new company when the company number is changed" in new Setup {
         val submission = submissionAnsweredWith(riAnswers ++ ltdAnswers)
         SubmissionsDAOMock.Fetch.thenReturn(submission)
@@ -592,7 +616,11 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         val result = await(underTest.recordAnswers(submission.id, orgDetails.questionLtdCompanyNumber.id, Map(Question.answerKey -> Seq("12345678"))))
 
         result.value.submission.latestInstance.answersToQuestions.keySet should not contain orgDetails.questionLtdConfirmCompanyName.id
-        businessAnswerKeysOf(result) shouldBe Set(orgDetails.questionOrgType.id, orgDetails.questionLtdCompanyNumber.id)
+        businessAnswerKeysOf(result) shouldBe Set(
+          orgDetails.questionOrgType.id,
+          orgDetails.questionLtdCompanyNumber.id,
+          orgDetails.questionLtdOrgWebsite.id
+        )
       }
     }
 
