@@ -241,7 +241,10 @@ class SubmissionsService @Inject() (
         _                <- etValidation.cond(
                               checkCompanyIsActive(companyProfile),
                               (),
-                              ValidationErrors(ValidationError(message = "The company is not active, only companies that are trading can be set up on the Developer Hub"))
+                              ValidationErrors(ValidationError(
+                                key = ValidationError.companyNotActiveKey,
+                                message = "The company is not active, only companies that are trading can be set up on the Developer Hub"
+                              ))
                             )
         companyDetails    = getCompanyDetails(companyNumber, companyProfile)
         additionalData    = AdditionalData(Some(companyDetails))
