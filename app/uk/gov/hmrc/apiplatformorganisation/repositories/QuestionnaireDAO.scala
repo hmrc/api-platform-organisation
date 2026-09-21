@@ -46,6 +46,7 @@ object QuestionnaireDAO {
 
   // Organisation types
   final val ukLimitedCompany            = "UK limited company"
+  final val soleTrader                  = "Sole trader"
   final val partnership                 = "Partnership"
   final val generalPartnership          = "General partnership"
   final val limitedLiabilityPartnership = "Limited liability partnership"
@@ -66,6 +67,7 @@ object QuestionnaireDAO {
       "partnershipTypeId"              -> OrganisationDetails.questionPartnershipType.id,
       "organisationNameNonUkWithoutId" -> OrganisationDetails.questionNonUkWithoutCompanyName.id,
       "organisationNamePartnershipId"  -> OrganisationDetails.questionPartnershipCompanyName.id,
+      "organisationNameSoleTraderId"   -> OrganisationDetails.questionSoleTraderName.id,
       "attachmentNonUkWithoutId"       -> OrganisationDetails.questionNonUkWithoutAttachment.id,
       "responsibleIndividualNameId"    -> ResponsibleIndividualDetails.questionRIName.id
     )
@@ -77,7 +79,7 @@ object QuestionnaireDAO {
 
     object ResponsibleIndividualDetails {
 
-      val questionRIName = Question.NameQuestion(
+      val questionRIName = Question.ConfirmNameQuestion(
         Question.Id("f04afc8a-08e6-4a90-b6f3-3d6ffed6a373"),
         Wording("Is this your name?"),
         statement = Statement(
@@ -128,6 +130,7 @@ object QuestionnaireDAO {
         statement = None,
         marking = ListMap(
           (PossibleAnswer(ukLimitedCompany)            -> Mark.Pass),
+          (PossibleAnswer(soleTrader)                  -> Mark.Pass),
           (PossibleAnswer(partnership)                 -> Mark.Pass),
           (PossibleAnswer(registeredSociety)           -> Mark.Pass),
           (PossibleAnswer(nonUkCompanyWithUkBranch)    -> Mark.Pass),
@@ -223,6 +226,25 @@ object QuestionnaireDAO {
         validation = TextValidation.Url.some,
         errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some,
         summary = Some("Website URL")
+      )
+
+      // Sole trader
+
+      val questionSoleTraderName = Question.NameQuestion(
+        Question.Id("96f692a6-3fbd-4d58-8d43-824ac1e618a3"),
+        Wording("What is your full name?"),
+        statement = None,
+        errorInfo = ErrorInfo("Enter a first and last name", "First and last name cannot be blank").some,
+        summary = Some("Full name")
+      )
+
+      val questionSoleTraderDateOfBirth = Question.DateQuestion(
+        Question.Id("a8f2cdfc-8a10-4b51-9e2a-c198da7a169c"),
+        Wording("What’s your date of birth?"),
+        statement = Statement(StatementText("Date of birth")).some,
+        hintText = StatementText("For example, 27 3 1987").some,
+        errorInfo = ErrorInfo("Enter your date of birth", "Date of birth cannot be blank").some,
+        summary = Some("Date of birth")
       )
 
       // Partnership
@@ -394,8 +416,9 @@ object QuestionnaireDAO {
         summary = Some("Registered address")
       )
 
-      val questionRegSocietyInvalidCompanyAddress = Question.AcknowledgementOnly(
+      val questionRegSocietyInvalidCompanyAddress = Question.ForwardToQuestion(
         Question.Id("216f25f7-d426-40b9-b51f-6025f295f96d"),
+        questionRegSocietyCompanyNumber.id,
         Wording("You must change the registered address with Companies House"),
         statement = Statement(
           CompoundFragment(
@@ -480,8 +503,9 @@ object QuestionnaireDAO {
         summary = Some("Registered address")
       )
 
-      val questionNonUkBranchInvalidCompanyAddress = Question.AcknowledgementOnly(
+      val questionNonUkBranchInvalidCompanyAddress = Question.ForwardToQuestion(
         Question.Id("0d20ea43-c7c3-4cdf-a168-8813a73500e0"),
+        questionNonUkBranchCompanyNumber.id,
         Wording("You must change the registered address with Companies House"),
         statement = Statement(
           CompoundFragment(
@@ -610,6 +634,16 @@ object QuestionnaireDAO {
           QuestionItem(
             questionLtdOrgWebsite,
             AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany))
+          ),
+
+          // Sole trader
+          QuestionItem(
+            questionSoleTraderName,
+            AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(soleTrader))
+          ),
+          QuestionItem(
+            questionSoleTraderDateOfBirth,
+            AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(soleTrader))
           ),
 
           // Partnership

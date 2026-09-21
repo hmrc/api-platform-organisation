@@ -102,7 +102,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
     val riDetails  = QuestionnaireDAO.Questionnaires.ResponsibleIndividualDetails
 
     val riAnswers: Submission.AnswersToQuestions = Map(
-      riDetails.questionRIName.id     -> ActualAnswer.NameAnswer(FullName(Some("Yes"), Some("Bob"), Some("Roberts"))),
+      riDetails.questionRIName.id     -> ActualAnswer.ConfirmNameAnswer(ConfirmFullName(Some("Yes"), Some("Bob"), Some("Roberts"))),
       riDetails.questionRIJobTitle.id -> ActualAnswer.TextAnswer("Developer"),
       riDetails.questionRIPhone.id    -> ActualAnswer.TextAnswer("01234567890")
     )
