@@ -572,7 +572,7 @@ object QuestionnaireDAO {
 
       val questionNonUkWithoutAttachment = Question.AttachmentQuestion(
         Question.Id("019feccc-4457-7605-bd0e-037821ff0123"),
-        Wording("Upload the tax registration document for your company"),
+        Wording("Upload the tax registration document for {companyName}"),
         statement = None,
         hintText =
           StatementText("You can upload your registration document as a scanned copy or photo of the original. The selected file must be smaller than 10MB.").some,
