@@ -43,7 +43,7 @@ class SubmissionsRepositorySpec extends HmrcSpec {
       )
       val questionLtdConfirmCompanyAddress = Question.ConfirmCompanyAddressQuestion(
         Question.Id("e1dbf1a3-e28b-1c83-a739-86f1319ca8cc"),
-        Wording("Is this the correct registered address for your company?"),
+        Wording("Is this the correct registered address for {companyName}?"),
         statement = None,
         yesMarking = Mark.Pass,
         noMarking = Mark.Fail,
@@ -52,7 +52,7 @@ class SubmissionsRepositorySpec extends HmrcSpec {
       val example                          = QuestionItem(questionLtdConfirmCompanyAddress, AskWhen.AskWhenAnswer(questionOrgType, "UK limited company"))
 
       val qiJson =
-        """{"question":{"id":"e1dbf1a3-e28b-1c83-a739-86f1319ca8cc","wording":"Is this the correct registered address for your company?","yesMarking":"pass","noMarking":"fail","errorInfo":{"summary":"Select Yes if the company address is correct"},"questionType":"confirmCompanyAddress"},"askWhen":[{"questionId":"cbdf264f-be39-4638-92ff-6ecd2259c662","expectedValue":{"value":"UK limited company"},"askWhen":"askWhenAnswer"}]}"""
+        """{"question":{"id":"e1dbf1a3-e28b-1c83-a739-86f1319ca8cc","wording":"Is this the correct registered address for {companyName}?","yesMarking":"pass","noMarking":"fail","errorInfo":{"summary":"Select Yes if the company address is correct"},"questionType":"confirmCompanyAddress"},"askWhen":[{"questionId":"cbdf264f-be39-4638-92ff-6ecd2259c662","expectedValue":{"value":"UK limited company"},"askWhen":"askWhenAnswer"}]}"""
       testFromJson[QuestionItem](qiJson)(example)
     }
 
@@ -69,7 +69,7 @@ class SubmissionsRepositorySpec extends HmrcSpec {
       )
       val questionLtdConfirmCompanyAddress = Question.ConfirmCompanyAddressQuestion(
         Question.Id("e1dbf1a3-e28b-1c83-a739-86f1319ca8cc"),
-        Wording("Is this the correct registered address for your company?"),
+        Wording("Is this the correct registered address for {companyName}?"),
         statement = None,
         yesMarking = Mark.Pass,
         noMarking = Mark.Fail,
@@ -78,7 +78,7 @@ class SubmissionsRepositorySpec extends HmrcSpec {
       val example                          = QuestionItem(questionLtdConfirmCompanyAddress, AskWhen.AskWhenAnswer(questionOrgType, "UK limited company"))
 
       val oldQiJson =
-        """{"question":{"id":"e1dbf1a3-e28b-1c83-a739-86f1319ca8cc","wording":"Is this the correct registered address for your company?","yesMarking":"pass","noMarking":"fail","errorInfo":{"summary":"Select Yes if the company address is correct"},"questionType":"confirmCompanyAddress"},"askWhen":{"questionId":"cbdf264f-be39-4638-92ff-6ecd2259c662","expectedValue":{"value":"UK limited company"},"askWhen":"askWhenAnswer"}}"""
+        """{"question":{"id":"e1dbf1a3-e28b-1c83-a739-86f1319ca8cc","wording":"Is this the correct registered address for {companyName}?","yesMarking":"pass","noMarking":"fail","errorInfo":{"summary":"Select Yes if the company address is correct"},"questionType":"confirmCompanyAddress"},"askWhen":{"questionId":"cbdf264f-be39-4638-92ff-6ecd2259c662","expectedValue":{"value":"UK limited company"},"askWhen":"askWhenAnswer"}}"""
       testFromJson[QuestionItem](oldQiJson)(example)
     }
   }
