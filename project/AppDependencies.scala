@@ -6,7 +6,7 @@ object AppDependencies {
   private val hmrcMongoVersion = "2.14.0"
   private val commonDomainVersion = "1.4.0"
   private val orgDomainVersion = "1.19.0"
-  private val tpdDomainVersion = "1.3.0"
+  private val tpdDomainVersion = "1.4.0"
 
   val compile = Seq(
     "uk.gov.hmrc"       %% "bootstrap-backend-play-30"        % bootstrapVersion,
