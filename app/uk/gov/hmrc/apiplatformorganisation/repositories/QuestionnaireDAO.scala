@@ -183,7 +183,7 @@ object QuestionnaireDAO {
 
       val questionLtdConfirmCompanyAddress = Question.ConfirmCompanyAddressQuestion(
         Question.Id("e1dbf1a3-e28b-1c83-a739-86f1319ca8cc"),
-        Wording("Is this the correct registered address for your company?"),
+        Wording("Is this the correct registered address for {companyName}?"),
         statement = None,
         yesMarking = Mark.Pass,
         noMarking = Mark.Fail,
@@ -321,7 +321,7 @@ object QuestionnaireDAO {
 
       val questionPartnershipConfirmCompanyAddress = Question.ConfirmCompanyAddressQuestion(
         Question.Id("82242e26-b782-43fc-94f6-ead356c7d7de"),
-        Wording("Is this the correct registered address for your company?"),
+        Wording("Is this the correct registered address for {companyName}?"),
         statement = None,
         yesMarking = Mark.Pass,
         noMarking = Mark.Fail,
@@ -408,7 +408,7 @@ object QuestionnaireDAO {
 
       val questionRegSocietyConfirmCompanyAddress = Question.ConfirmCompanyAddressQuestion(
         Question.Id("0744c585-5c7a-41e1-967d-9a581d7a5df2"),
-        Wording("Is this the correct registered address for your company?"),
+        Wording("Is this the correct registered address for {companyName}?"),
         statement = None,
         yesMarking = Mark.Pass,
         noMarking = Mark.Fail,
@@ -495,7 +495,7 @@ object QuestionnaireDAO {
 
       val questionNonUkBranchConfirmCompanyAddress = Question.ConfirmCompanyAddressQuestion(
         Question.Id("ac07e0d0-5e69-4c7c-bc9e-417621ef61a7"),
-        Wording("Is this the correct registered address for your company?"),
+        Wording("Is this the correct registered address for {companyName}?"),
         statement = None,
         yesMarking = Mark.Pass,
         noMarking = Mark.Fail,
@@ -572,7 +572,7 @@ object QuestionnaireDAO {
 
       val questionNonUkWithoutAttachment = Question.AttachmentQuestion(
         Question.Id("019feccc-4457-7605-bd0e-037821ff0123"),
-        Wording("Upload the tax registration document for your company"),
+        Wording("Upload the tax registration document for {companyName}"),
         statement = None,
         hintText =
           StatementText("You can upload your registration document as a scanned copy or photo of the original. The selected file must be smaller than 10MB.").some,
