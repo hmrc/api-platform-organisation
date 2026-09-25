@@ -539,7 +539,10 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
 
         val result = await(underTest.recordAnswers(partiallyAnsweredSubmission.id, companyNumberQuestionId, Map(Question.answerKey -> Seq("12345678"))))
 
-        result.left.value shouldBe ValidationErrors(ValidationError(message = "The company is not active, only companies that are trading can be set up on the Developer Hub"))
+        result.left.value shouldBe ValidationErrors(ValidationError(
+          key = ValidationError.companyNotActiveKey,
+          message = "The company is not active, only companies that are trading can be set up on the Developer Hub"
+        ))
       }
 
       "clear the confirmed name, address, and UTR for a UK limited company when the company number is changed" in new Setup {
