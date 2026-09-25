@@ -19,7 +19,7 @@ package uk.gov.hmrc.apiplatformorganisation
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, OrganisationId, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Collaborator.Roles
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Collaborator, Collaborators, Organisation, OrganisationName}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Collaborator, Collaborators, Organisation, OrganisationAddress, OrganisationName}
 import uk.gov.hmrc.apiplatformorganisation.models.*
 
 object OrganisationIdData {
@@ -54,18 +54,59 @@ object RemoveMemberRequestData {
   val one: RemoveMemberRequest = RemoveMemberRequest(UserIdData.one, LaxEmailAddress("bob@example.com"))
 }
 
+object OrganisationAddressData {
+
+  val one: OrganisationAddress = OrganisationAddress(
+    addressLineOne = Some("1 main st"),
+    addressLineTwo = Some("Kings Cross"),
+    addressLineThree = None,
+    careOf = Some("Bob Roberts"),
+    country = Some("United Kingdom"),
+    locality = Some("London"),
+    poBox = Some("PO Box 123"),
+    postalCode = Some("AB1 2CD"),
+    premises = Some("Unit 1"),
+    region = Some("Greater London")
+  )
+}
+
+object ExtraOrganisationDataData {
+
+  val one: ExtraOrganisationData =
+    ExtraOrganisationData(Some("12345678"), Some("1234567890"), Some("https://example.com"), Some(OrganisationAddressData.one))
+}
+
 object OrganisationData extends FixedClock {
   val one: Organisation = Organisation(OrganisationIdData.one, OrganisationNameData.one, OrganisationTypeData.one, instant, Set(MemberData.one))
+
+  val withExtraData: Organisation =
+    one.copy(
+      companyNumber = ExtraOrganisationDataData.one.companyNumber,
+      corporationTaxUtr = ExtraOrganisationDataData.one.corporationTaxUtr,
+      websiteUrl = ExtraOrganisationDataData.one.websiteUrl,
+      address = ExtraOrganisationDataData.one.address
+    )
 }
 
 object StoredOrganisationData extends FixedClock {
   val one: StoredOrganisation = StoredOrganisation(OrganisationIdData.one, OrganisationNameData.one, OrganisationTypeData.one, instant, UserIdData.one, Set(MemberData.one))
+
+  val withExtraData: StoredOrganisation =
+    one.copy(
+      companyNumber = ExtraOrganisationDataData.one.companyNumber,
+      corporationTaxUtr = ExtraOrganisationDataData.one.corporationTaxUtr,
+      websiteUrl = ExtraOrganisationDataData.one.websiteUrl,
+      address = ExtraOrganisationDataData.one.address
+    )
 }
 
 trait OrganisationFixtures {
-  val standardOrg: Organisation                        = OrganisationData.one
-  val standardCreateRequest: CreateOrganisationRequest = CreateOrganisationRequestData.one
-  val standardAddMemberRequest: AddMemberRequest       = AddMemberRequestData.one
-  val standardRemoveMemberRequest: RemoveMemberRequest = RemoveMemberRequestData.one
-  val standardStoredOrg: StoredOrganisation            = StoredOrganisationData.one
+  val standardOrg: Organisation                          = OrganisationData.one
+  val standardOrgWithExtraData: Organisation             = OrganisationData.withExtraData
+  val standardExtraData: ExtraOrganisationData           = ExtraOrganisationDataData.one
+  val standardCreateRequest: CreateOrganisationRequest   = CreateOrganisationRequestData.one
+  val standardAddMemberRequest: AddMemberRequest         = AddMemberRequestData.one
+  val standardRemoveMemberRequest: RemoveMemberRequest   = RemoveMemberRequestData.one
+  val standardStoredOrg: StoredOrganisation              = StoredOrganisationData.one
+  val standardStoredOrgWithExtraData: StoredOrganisation = StoredOrganisationData.withExtraData
 }

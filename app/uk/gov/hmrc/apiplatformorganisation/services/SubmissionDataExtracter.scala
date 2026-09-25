@@ -18,6 +18,7 @@ package uk.gov.hmrc.apiplatformorganisation.services
 
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationName}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
+import uk.gov.hmrc.apiplatformorganisation.models.ExtraOrganisationData
 
 object SubmissionDataExtracter {
 
@@ -32,5 +33,14 @@ object SubmissionDataExtracter {
 
   def getOrganisationType(submission: Submission): Option[Organisation.OrganisationType] = {
     submission.organisationType
+  }
+
+  def getExtraOrganisationData(submission: Submission): ExtraOrganisationData = {
+    ExtraOrganisationData(
+      companyNumber = submission.companyNumber,
+      corporationTaxUtr = submission.corporationTaxUtr,
+      websiteUrl = submission.websiteUrl,
+      address = submission.organisationAddress
+    )
   }
 }

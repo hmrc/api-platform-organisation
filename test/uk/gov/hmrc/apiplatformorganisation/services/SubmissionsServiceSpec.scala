@@ -25,7 +25,7 @@ import org.scalatest.Inside
 import uk.gov.hmrc.http.HeaderCarrier
 
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationName}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationAddress, OrganisationName}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission.{AdditionalData, CompanyDetails}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services.{ValidationError, ValidationErrors}
@@ -33,7 +33,7 @@ import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.*
 import uk.gov.hmrc.apiplatformorganisation.connectors.CompaniesHouseConnector
 import uk.gov.hmrc.apiplatformorganisation.mocks.services.{OrganisationServiceMockModule, SubmissionReviewServiceMockModule}
 import uk.gov.hmrc.apiplatformorganisation.mocks.{AuditServiceMockModule, SubmissionsDAOMockModule}
-import uk.gov.hmrc.apiplatformorganisation.models.CompaniesHouseCompanyProfile
+import uk.gov.hmrc.apiplatformorganisation.models.{CompaniesHouseCompanyProfile, ExtraOrganisationData}
 import uk.gov.hmrc.apiplatformorganisation.repositories.QuestionnaireDAO
 import uk.gov.hmrc.apiplatformorganisation.util.AsyncHmrcSpec
 import uk.gov.hmrc.apiplatformorganisation.{OrganisationFixtures, SubmissionReviewFixtures}
@@ -232,10 +232,36 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         OrganisationServiceMock.CreateOrganisation.verifyCalledWith(
           OrganisationName("Company name"),
           Organisation.OrganisationType.UkLimitedCompany,
-          samplePassSubmittedSubmission.startedBy
+          samplePassSubmittedSubmission.startedBy,
+          ExtraOrganisationData(Some("12345678"), Some("1234567890"), Some("https://www.bobsburgers.com"), Some(OrganisationAddress()))
         )
         val updatedSubmission: Submission = SubmissionsDAOMock.Update.verifyCalledWith()
         updatedSubmission.organisationId shouldBe Some(standardOrg.id)
+      }
+
+      "approve a submission with no extra organisation data" in new Setup {
+        val soleTraderAnswers: Submission.AnswersToQuestions = Map(
+          orgDetails.questionOrgType.id        -> ActualAnswer.SingleChoiceAnswer(QuestionnaireDAO.soleTrader),
+          orgDetails.questionSoleTraderName.id -> ActualAnswer.TextAnswer("Bob Roberts")
+        )
+        val submission                                       = submissionAnsweredWith(soleTraderAnswers).copy(id = completedSubmissionId).withSubmittedProgress().submission
+
+        SubmissionsDAOMock.Fetch.thenReturn(submission)
+        OrganisationServiceMock.CreateOrganisation.thenReturn(standardOrg)
+        SubmissionsDAOMock.Update.thenReturn()
+        SubmissionReviewServiceMock.ApproveSubmissionReview.thenReturn(approvedSubmissionReview)
+        AuditServiceMock.AuditApproveOrganisationSubmission.thenReturn()
+
+        val result: Either[String, Submission] = await(underTest.approve(submissionId, "bob@example.com", Some("comment")))
+
+        result.value.status shouldBe Submission.Status.Granted(instant, "bob@example.com", Some("comment"), None)
+
+        OrganisationServiceMock.CreateOrganisation.verifyCalledWith(
+          OrganisationName("Bob Roberts"),
+          Organisation.OrganisationType.SoleTrader,
+          submission.startedBy,
+          ExtraOrganisationData()
+        )
       }
 
       "fail to approve a submission that hasn't been submitted" in new Setup {

@@ -22,6 +22,7 @@ import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, OrganisationId, UserId}
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationName}
+import uk.gov.hmrc.apiplatformorganisation.models.ExtraOrganisationData
 import uk.gov.hmrc.apiplatformorganisation.services.OrganisationService
 
 trait OrganisationServiceMockModule extends MockitoSugar with ArgumentMatchersSugar {
@@ -30,13 +31,15 @@ trait OrganisationServiceMockModule extends MockitoSugar with ArgumentMatchersSu
     val aMock = mock[OrganisationService]
 
     object CreateOrganisation {
-      def thenReturn(org: Organisation) = when(aMock.create(*[OrganisationName], *[Organisation.OrganisationType], *[UserId])(*)).thenReturn(Future.successful(org))
 
-      def verifyCalledWith(organisationName: OrganisationName, organisationType: Organisation.OrganisationType, requestedBy: UserId) =
-        verify(aMock).create(eqTo(organisationName), eqTo(organisationType), eqTo(requestedBy))(*)
+      def thenReturn(org: Organisation) =
+        when(aMock.create(*[OrganisationName], *[Organisation.OrganisationType], *[UserId], *[ExtraOrganisationData])(*)).thenReturn(Future.successful(org))
+
+      def verifyCalledWith(organisationName: OrganisationName, organisationType: Organisation.OrganisationType, requestedBy: UserId, extraOrganisationData: ExtraOrganisationData) =
+        verify(aMock).create(eqTo(organisationName), eqTo(organisationType), eqTo(requestedBy), eqTo(extraOrganisationData))(*)
 
       def verifyNotCalled() =
-        verify(aMock, never).create(*[OrganisationName], *[Organisation.OrganisationType], *[UserId])(*)
+        verify(aMock, never).create(*[OrganisationName], *[Organisation.OrganisationType], *[UserId], *[ExtraOrganisationData])(*)
     }
 
     object Delete {
