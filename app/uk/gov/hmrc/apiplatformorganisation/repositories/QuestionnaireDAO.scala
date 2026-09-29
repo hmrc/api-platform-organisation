@@ -68,6 +68,13 @@ object QuestionnaireDAO {
       "organisationNamePartnershipId"  -> OrganisationDetails.questionPartnershipCompanyNameId,
       "organisationNameSoleTraderId"   -> OrganisationDetails.questionSoleTraderNameId,
       "attachmentNonUkWithoutId"       -> OrganisationDetails.questionNonUkWithoutAttachmentId,
+      "utrLtdId"                       -> OrganisationDetails.questionLtdOrgUTRId,
+      "utrPartnershipId"               -> OrganisationDetails.questionPartnershipOrgUTRId,
+      "websiteUrlLtdId"                -> OrganisationDetails.questionLtdOrgWebsiteId,
+      "websiteUrlPartnershipId"        -> OrganisationDetails.questionPartnershipOrgWebsiteId,
+      "websiteUrlNonUkWithoutId"       -> OrganisationDetails.questionNonUkWithoutWebsiteId,
+      "addressPartnershipId"           -> OrganisationDetails.questionPartnershipAddressId,
+      "addressNonUkWithoutId"          -> OrganisationDetails.questionNonUkWithoutAddressId,
       "responsibleIndividualNameId"    -> ResponsibleIndividualDetails.questionRINameId
     )
   )

@@ -101,15 +101,16 @@ class SubmissionsService @Inject() (
     import SubmissionDataExtracter.*
     (
       for {
-        submission        <- fromOptionF(submissionsDAO.fetch(submissionId), "No such submission")
-        _                 <- cond(submission.status.isSubmitted, (), "Submission not submitted")
-        organisationName  <- fromOption(getOrganisationName(submission), "No organisation name found")
-        organisationType  <- fromOption(getOrganisationType(submission), "No organisation type found")
-        organisation      <- liftF(organisationService.create(organisationName, organisationType, submission.startedBy))
-        approvedSubmission = Submission.grant(instant, approvedBy, comment, None)(submission)
-        savedSubmission   <- liftF(submissionsDAO.update(approvedSubmission.copy(organisationId = Some(organisation.id))))
-        _                 <- liftF(submissionReviewService.approve(savedSubmission.id, approvedBy, comment))
-        _                 <- liftF(auditService.auditApproveOrganisationSubmission(savedSubmission))
+        submission           <- fromOptionF(submissionsDAO.fetch(submissionId), "No such submission")
+        _                    <- cond(submission.status.isSubmitted, (), "Submission not submitted")
+        organisationName     <- fromOption(getOrganisationName(submission), "No organisation name found")
+        organisationType     <- fromOption(getOrganisationType(submission), "No organisation type found")
+        extraOrganisationData = getExtraOrganisationData(submission)
+        organisation         <- liftF(organisationService.create(organisationName, organisationType, submission.startedBy, extraOrganisationData))
+        approvedSubmission    = Submission.grant(instant, approvedBy, comment, None)(submission)
+        savedSubmission      <- liftF(submissionsDAO.update(approvedSubmission.copy(organisationId = Some(organisation.id))))
+        _                    <- liftF(submissionReviewService.approve(savedSubmission.id, approvedBy, comment))
+        _                    <- liftF(auditService.auditApproveOrganisationSubmission(savedSubmission))
       } yield savedSubmission
     )
       .value

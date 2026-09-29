@@ -25,7 +25,7 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.Organisation
-import uk.gov.hmrc.apiplatformorganisation.models.{AddMemberRequest, CreateOrganisationRequest, RemoveMemberRequest, SearchOrganisationRequest}
+import uk.gov.hmrc.apiplatformorganisation.models.{AddMemberRequest, CreateOrganisationRequest, ExtraOrganisationData, RemoveMemberRequest, SearchOrganisationRequest}
 import uk.gov.hmrc.apiplatformorganisation.services.OrganisationService
 
 object OrganisationController {
@@ -39,7 +39,7 @@ class OrganisationController @Inject() (cc: ControllerComponents, organisationSe
   import OrganisationController.*
 
   def create(): Action[CreateOrganisationRequest] = Action.async(parse.json[CreateOrganisationRequest]) { implicit request =>
-    organisationService.create(request.body.organisationName, request.body.organisationType, request.body.requestedBy).map(org => Ok(Json.toJson(org)))
+    organisationService.create(request.body.organisationName, request.body.organisationType, request.body.requestedBy, ExtraOrganisationData()).map(org => Ok(Json.toJson(org)))
   }
 
   def fetch(organisationId: OrganisationId) = Action.async { _ =>
