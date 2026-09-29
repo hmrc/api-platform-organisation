@@ -170,6 +170,18 @@ class SubmissionsService @Inject() (
       .value
   }
 
+  def recordTicket(submissionId: SubmissionId, supportTicketId: Option[Int], supportTicketRef: Option[String])(implicit hc: HeaderCarrier)
+      : Future[Either[ValidationErrors, ExtendedSubmission]] = {
+    (
+      for {
+        initialSubmission       <- etValidation.fromOptionF(submissionsDAO.fetch(submissionId), ValidationErrors(ValidationError(message = "No such submission")))
+        additionalSubmissionData = Some(AdditionalSubmissionData(supportTicketId, supportTicketRef))
+        savedSubmission         <- etValidation.liftF(submissionsDAO.update(initialSubmission.copy(additionalSubmissionData = additionalSubmissionData)))
+      } yield extendSubmission(savedSubmission)
+    )
+      .value
+  }
+
   def recordAnswers(submissionId: SubmissionId, questionId: Question.Id, rawAnswers: Map[String, Seq[String]])(implicit hc: HeaderCarrier)
       : Future[Either[ValidationErrors, ExtendedSubmission]] = {
     (

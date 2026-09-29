@@ -82,6 +82,7 @@ object SubmissionsRepository {
     given OFormat[QuestionIdsOfInterest] = Json.format[QuestionIdsOfInterest]
     given OFormat[Submission.Instance]   = Json.format[Submission.Instance]
 
+    given OFormat[AdditionalSubmissionData]     = Json.format[AdditionalSubmissionData]
     given submissionFormat: OFormat[Submission] = Json.format[Submission]
   }
 }

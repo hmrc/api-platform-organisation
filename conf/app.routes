@@ -18,6 +18,7 @@ GET         /submission/marked/organisation/:oid    uk.gov.hmrc.apiplatformorgan
 
 GET         /submission/:sid                        uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.fetchSubmission(sid: SimpleSubmissionId)
 POST        /submission/:sid/question/:qid          uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.recordAnswers(sid: SimpleSubmissionId, qid: Question.Id)
+POST        /submission/:sid/ticket                 uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.recordTicket(sid: SimpleSubmissionId)
 
 POST        /submission/:sid                        uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.submitSubmission(sid: SimpleSubmissionId)
 POST        /submission/:sid/approve                uk.gov.hmrc.apiplatformorganisation.controllers.SubmissionsController.approveSubmission(sid: SimpleSubmissionId)
