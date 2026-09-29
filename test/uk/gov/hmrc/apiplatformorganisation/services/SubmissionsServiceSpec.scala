@@ -558,28 +558,6 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         )
       }
 
-      // "clear the confirmed name, address, UTR and website for a registered society when the company number is changed" in new Setup {
-      //   val submission = submissionAnsweredWith(riAnswers ++ regSocietyAnswers)
-      //   SubmissionsDAOMock.Fetch.thenReturn(submission)
-      //   SubmissionsDAOMock.Update.thenReturn()
-      //   when(mockCompaniesHouseConnector.getCompanyByNumber(*)(*)).thenReturn(successful(Some(newCompanyProfile)))
-
-      //   val result = await(underTest.recordAnswers(submission.id, orgDetails.questionRegSocietyCompanyNumber.id, Map(Question.answerKey -> Seq("87654321"))))
-
-      //   businessAnswerKeysOf(result) shouldBe Set(orgDetails.questionOrgType.id, orgDetails.questionRegSocietyCompanyNumber.id)
-      // }
-
-      // "clear the confirmed name, address, UTR and website for a non-UK company with a UK branch when the company number is changed" in new Setup {
-      //   val submission = submissionAnsweredWith(riAnswers ++ nonUkBranchAnswers)
-      //   SubmissionsDAOMock.Fetch.thenReturn(submission)
-      //   SubmissionsDAOMock.Update.thenReturn()
-      //   when(mockCompaniesHouseConnector.getCompanyByNumber(*)(*)).thenReturn(successful(Some(newCompanyProfile)))
-
-      //   val result = await(underTest.recordAnswers(submission.id, orgDetails.questionNonUkBranchCompanyNumber.id, Map(Question.answerKey -> Seq("87654321"))))
-
-      //   businessAnswerKeysOf(result) shouldBe Set(orgDetails.questionOrgType.id, orgDetails.questionNonUkBranchCompanyNumber.id)
-      // }
-
       "re-fetch and store the details of the new company when the company number is changed" in new Setup {
         val submission = submissionAnsweredWith(riAnswers ++ ltdAnswers)
         SubmissionsDAOMock.Fetch.thenReturn(submission)
@@ -600,10 +578,12 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
 
         val result = await(underTest.recordAnswers(submission.id, orgDetails.questionLtdCompanyNumber.id, Map(Question.answerKey -> Seq("12345678"))))
 
-        result.value.submission.latestInstance.answersToQuestions.keySet should not contain orgDetails.questionLtdConfirmCompanyName.id
         businessAnswerKeysOf(result) shouldBe Set(
           orgDetails.questionOrgType.id,
           orgDetails.questionLtdCompanyNumber.id,
+          orgDetails.questionLtdConfirmCompanyName.id,
+          orgDetails.questionLtdConfirmCompanyAddress.id,
+          orgDetails.questionLtdOrgUTR.id,
           orgDetails.questionLtdOrgWebsite.id
         )
       }
