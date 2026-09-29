@@ -56,6 +56,12 @@ class OrganisationRepositoryISpec extends AnyWordSpec
       await(repository.collection.find().toFuture()).head shouldBe standardStoredOrg
     }
 
+    "insert single org with extra organisation data" in {
+      await(repository.collection.find().toFuture()).length shouldBe 0
+      await(underTest.save(standardStoredOrgWithExtraData))
+      await(repository.collection.find().toFuture()).head shouldBe standardStoredOrgWithExtraData
+    }
+
     "fetch" in {
       await(repository.collection.find().toFuture()).length shouldBe 0
       await(underTest.save(standardStoredOrg))

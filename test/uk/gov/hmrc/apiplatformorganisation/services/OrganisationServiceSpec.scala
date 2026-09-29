@@ -33,7 +33,7 @@ import uk.gov.hmrc.apiplatform.modules.tpd.core.dto.{GetRegisteredOrUnregistered
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 import uk.gov.hmrc.apiplatformorganisation.mocks.connectors.{EmailConnectorMockModule, ThirdPartyDeveloperConnectorMockModule}
 import uk.gov.hmrc.apiplatformorganisation.mocks.repositories.OrganisationRepositoryMockModule
-import uk.gov.hmrc.apiplatformorganisation.models.StoredOrganisation
+import uk.gov.hmrc.apiplatformorganisation.models.{ExtraOrganisationData, StoredOrganisation}
 import uk.gov.hmrc.apiplatformorganisation.util.AsyncHmrcSpec
 import uk.gov.hmrc.apiplatformorganisation.{MemberData, OrganisationFixtures}
 
@@ -84,8 +84,16 @@ class OrganisationServiceSpec extends AsyncHmrcSpec
     "create" should {
       "transform returned storedOrg" in new Setup {
         OrganisationRepositoryMock.Save.willReturn(standardStoredOrg)
-        val result = await(underTest.create(standardCreateRequest.organisationName, standardCreateRequest.organisationType, standardCreateRequest.requestedBy))
+        val result =
+          await(underTest.create(standardCreateRequest.organisationName, standardCreateRequest.organisationType, standardCreateRequest.requestedBy, ExtraOrganisationData()))
         result shouldBe standardOrg
+      }
+
+      "transform returned storedOrg with extra organisation data" in new Setup {
+        OrganisationRepositoryMock.Save.willReturn(standardStoredOrgWithExtraData)
+        val result =
+          await(underTest.create(standardCreateRequest.organisationName, standardCreateRequest.organisationType, standardCreateRequest.requestedBy, standardExtraData))
+        result shouldBe standardOrgWithExtraData
       }
     }
 

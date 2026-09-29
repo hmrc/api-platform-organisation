@@ -17,10 +17,11 @@
 package uk.gov.hmrc.apiplatformorganisation.services
 
 import uk.gov.hmrc.apiplatform.modules.common.utils.HmrcSpec
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.OrganisationName
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{OrganisationAddress, OrganisationName}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission.{AdditionalData, CompanyDetails}
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ActualAnswer, Submission}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.SubmissionsTestData
+import uk.gov.hmrc.apiplatformorganisation.models.ExtraOrganisationData
 
 class SubmissionDataExtracterSpec extends HmrcSpec with SubmissionsTestData {
 
@@ -36,5 +37,34 @@ class SubmissionDataExtracterSpec extends HmrcSpec with SubmissionsTestData {
     val additionalData        = AdditionalData(Some(CompanyDetails("12345678", "Company name")))
     val submissionWithOrgName = Submission.updateLatestAdditionalDataTo(Some(additionalData))(aSubmission)
     SubmissionDataExtracter.getOrganisationName(submissionWithOrgName) shouldBe Some(OrganisationName("Company name"))
+  }
+
+  "getExtraOrganisationData for UK company" in {
+    val submission = Submission.updateLatestAdditionalDataTo(Some(AdditionalData(Some(sampleCompanyDetails))))(
+      aSubmission.hasCompletelyAnsweredWith(samplePassAnswersToQuestions)
+    )
+
+    SubmissionDataExtracter.getExtraOrganisationData(submission) shouldBe ExtraOrganisationData(
+      companyNumber = Some(sampleCompanyDetails.companyNumber),
+      corporationTaxUtr = Some("1234567890"),
+      websiteUrl = Some("https://www.bobsburgers.com"),
+      address = Some(OrganisationAddress(
+        addressLineOne = sampleCompanyDetails.addressLineOne,
+        addressLineTwo = sampleCompanyDetails.addressLineTwo,
+        careOf = sampleCompanyDetails.careOf,
+        country = sampleCompanyDetails.country,
+        locality = sampleCompanyDetails.locality,
+        poBox = sampleCompanyDetails.poBox,
+        postalCode = sampleCompanyDetails.postalCode,
+        premises = sampleCompanyDetails.premises,
+        region = sampleCompanyDetails.region
+      ))
+    )
+  }
+
+  "getExtraOrganisationData for sole trader" in {
+    val submission = aSubmission.hasCompletelyAnsweredWith(Map(OrganisationDetails.questionOrgType.id -> ActualAnswer.SingleChoiceAnswer("Sole trader")))
+
+    SubmissionDataExtracter.getExtraOrganisationData(submission) shouldBe ExtraOrganisationData()
   }
 }
