@@ -94,7 +94,7 @@ trait SubmissionsDAOMockModule extends MockitoSugar with ArgumentMatchersSugar {
       def verifyCalled() =
         verify(aMock, atLeast(1)).update(*[Submission])
 
-      def verifyCalledWith() = {
+      def verifyCalledWith(): Submission = {
         val capture: Captor[Submission] = ArgCaptor[Submission]
         verify(aMock, atLeast(1)).update(capture)
         capture.value

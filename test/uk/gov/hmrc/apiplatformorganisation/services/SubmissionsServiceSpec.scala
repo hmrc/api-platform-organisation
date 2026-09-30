@@ -402,6 +402,25 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
       }
     }
 
+    "recordTicket" should {
+      "stores ticket ID and ticket reference" in new Setup {
+        val ticketId                       = Some(12345)
+        val ticketRef                      = Some("abcdfg")
+        val expectedAdditionalData         = AdditionalSubmissionData(supportTicketId = ticketId, supportTicketRef = ticketRef)
+        val expectedSubmission: Submission = aSubmission.copy(additionalSubmissionData = Some(expectedAdditionalData))
+        SubmissionsDAOMock.Fetch.thenReturn(aSubmission)
+        SubmissionsDAOMock.Update.thenReturn()
+
+        val result: Either[ValidationErrors, ExtendedSubmission] = await(underTest.recordTicket(submissionId, supportTicketId = ticketId, supportTicketRef = ticketRef))
+
+        val out: ExtendedSubmission = result.value
+        out.submission.additionalSubmissionData.get shouldBe expectedAdditionalData
+
+        val calledWithSubmission: Submission = SubmissionsDAOMock.Update.verifyCalledWith()
+        calledWithSubmission shouldBe expectedSubmission
+      }
+    }
+
     "recordAnswers" should {
       "records new answers when given a valid question" in new Setup {
         SubmissionsDAOMock.Fetch.thenReturn(aSubmission)

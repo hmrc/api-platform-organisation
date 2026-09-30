@@ -27,7 +27,7 @@ import play.api.mvc.Result
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 
-import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{ExtendedSubmission, MarkedSubmission, Question, Submission}
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.{AdditionalSubmissionData, ExtendedSubmission, MarkedSubmission, Question, Submission}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.SubmissionsTestData
 import uk.gov.hmrc.apiplatformorganisation.mocks.SubmissionsServiceMockModule
 import uk.gov.hmrc.apiplatformorganisation.util.*
@@ -326,6 +326,35 @@ class SubmissionsControllerSpec extends AsyncHmrcSpec with SubmissionsTestData {
 
       val answerJsonBody: JsValue = Json.toJson(SubmissionsController.RecordAnswersRequest(Map(Question.answerKey -> Seq("Yes"))))
       val result: Future[Result]  = underTest.recordAnswers(submissionId, questionId)(FakeRequest(PUT, "/").withBody(answerJsonBody))
+
+      status(result) shouldBe BAD_REQUEST
+    }
+  }
+
+  "recordTicket" should {
+    val ticketId            = Some(12345)
+    val ticketRef           = Some("abcdfg")
+    val recordTicketRequest = SubmissionsController.RecordTicketRequest(supportTicketId = ticketId, supportTicketRef = ticketRef)
+
+    "return an OK response" in new Setup {
+      implicit val writes: OWrites[SubmissionsController.RecordTicketRequest] = Json.writes[SubmissionsController.RecordTicketRequest]
+
+      SubmissionsServiceMock.RecordTicket.thenReturn(ExtendedSubmission(answeringSubmission, answeringSubmission.withIncompleteProgress().questionnaireProgress))
+
+      val answerJsonBody: JsValue = Json.toJson(recordTicketRequest)
+
+      val result: Future[Result] = underTest.recordTicket(submissionId)(FakeRequest(POST, "/").withBody(answerJsonBody))
+
+      status(result) shouldBe OK
+    }
+
+    "return an bad request response when something goes wrong" in new Setup {
+      implicit val writes: OWrites[SubmissionsController.RecordTicketRequest] = Json.writes[SubmissionsController.RecordTicketRequest]
+
+      SubmissionsServiceMock.RecordTicket.thenFails("bang")
+
+      val answerJsonBody: JsValue = Json.toJson(recordTicketRequest)
+      val result: Future[Result]  = underTest.recordTicket(submissionId)(FakeRequest(POST, "/").withBody(answerJsonBody))
 
       status(result) shouldBe BAD_REQUEST
     }

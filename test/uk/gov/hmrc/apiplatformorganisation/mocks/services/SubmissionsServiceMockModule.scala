@@ -161,6 +161,15 @@ trait SubmissionsServiceMockModule extends MockitoSugar with ArgumentMatchersSug
         when(aMock.recordAnswers(*[SubmissionId], *[Question.Id], *[Map[String, Seq[String]]])(*)).thenReturn(successful(Left(ValidationErrors(ValidationError(message = error)))))
     }
 
+    object RecordTicket {
+
+      def thenReturn(extSubmission: ExtendedSubmission) =
+        when(aMock.recordTicket(*[SubmissionId], *, *)(*)).thenReturn(successful(Right(extSubmission)))
+
+      def thenFails(error: String) =
+        when(aMock.recordTicket(*[SubmissionId], *, *)(*)).thenReturn(successful(Left(ValidationErrors(ValidationError(message = error)))))
+    }
+
     object Store {
 
       def thenReturnWith(s: Submission) =
