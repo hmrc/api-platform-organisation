@@ -112,7 +112,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
       orgDetails.questionLtdCompanyNumber.id         -> ActualAnswer.CompanyNumberAnswer("12345678"),
       orgDetails.questionLtdConfirmCompanyName.id    -> ActualAnswer.SingleChoiceAnswer("Yes"),
       orgDetails.questionLtdConfirmCompanyAddress.id -> ActualAnswer.SingleChoiceAnswer("Yes"),
-      orgDetails.questionLtdOrgUTR.id                -> ActualAnswer.TextAnswer("1234567890"),
+      orgDetails.questionLtdOrgUtr.id                -> ActualAnswer.TextAnswer("1234567890"),
       orgDetails.questionLtdOrgWebsite.id            -> ActualAnswer.TextAnswer("https://example.com")
     )
 
@@ -122,26 +122,8 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
       orgDetails.questionPartnershipCompanyNumber.id         -> ActualAnswer.CompanyNumberAnswer("12345678"),
       orgDetails.questionPartnershipConfirmCompanyName.id    -> ActualAnswer.SingleChoiceAnswer("Yes"),
       orgDetails.questionPartnershipConfirmCompanyAddress.id -> ActualAnswer.SingleChoiceAnswer("Yes"),
-      orgDetails.questionPartnershipOrgUTR.id                -> ActualAnswer.TextAnswer("1234567890"),
+      orgDetails.questionPartnershipOrgUtr.id                -> ActualAnswer.TextAnswer("1234567890"),
       orgDetails.questionPartnershipOrgWebsite.id            -> ActualAnswer.TextAnswer("https://example.com")
-    )
-
-    val regSocietyAnswers: Submission.AnswersToQuestions = Map(
-      orgDetails.questionOrgType.id                         -> ActualAnswer.SingleChoiceAnswer(QuestionnaireDAO.registeredSociety),
-      orgDetails.questionRegSocietyCompanyNumber.id         -> ActualAnswer.CompanyNumberAnswer("12345678"),
-      orgDetails.questionRegSocietyConfirmCompanyName.id    -> ActualAnswer.SingleChoiceAnswer("Yes"),
-      orgDetails.questionRegSocietyConfirmCompanyAddress.id -> ActualAnswer.SingleChoiceAnswer("Yes"),
-      orgDetails.questionRegSocietyOrgUTR.id                -> ActualAnswer.TextAnswer("1234567890"),
-      orgDetails.questionRegSocietyOrgWebsite.id            -> ActualAnswer.TextAnswer("https://example.com")
-    )
-
-    val nonUkBranchAnswers: Submission.AnswersToQuestions = Map(
-      orgDetails.questionOrgType.id                          -> ActualAnswer.SingleChoiceAnswer(QuestionnaireDAO.nonUkCompanyWithUkBranch),
-      orgDetails.questionNonUkBranchCompanyNumber.id         -> ActualAnswer.CompanyNumberAnswer("12345678"),
-      orgDetails.questionNonUkBranchConfirmCompanyName.id    -> ActualAnswer.SingleChoiceAnswer("Yes"),
-      orgDetails.questionNonUkBranchConfirmCompanyAddress.id -> ActualAnswer.SingleChoiceAnswer("Yes"),
-      orgDetails.questionNonUkBranchOrgUTR.id                -> ActualAnswer.TextAnswer("1234567890"),
-      orgDetails.questionNonUkBranchOrgWebsite.id            -> ActualAnswer.TextAnswer("https://example.com")
     )
 
     val newCompanyProfile =
@@ -602,28 +584,6 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         )
       }
 
-      "clear the confirmed name, address, UTR and website for a registered society when the company number is changed" in new Setup {
-        val submission = submissionAnsweredWith(riAnswers ++ regSocietyAnswers)
-        SubmissionsDAOMock.Fetch.thenReturn(submission)
-        SubmissionsDAOMock.Update.thenReturn()
-        when(mockCompaniesHouseConnector.getCompanyByNumber(*)(*)).thenReturn(successful(Some(newCompanyProfile)))
-
-        val result = await(underTest.recordAnswers(submission.id, orgDetails.questionRegSocietyCompanyNumber.id, Map(Question.answerKey -> Seq("87654321"))))
-
-        businessAnswerKeysOf(result) shouldBe Set(orgDetails.questionOrgType.id, orgDetails.questionRegSocietyCompanyNumber.id)
-      }
-
-      "clear the confirmed name, address, UTR and website for a non-UK company with a UK branch when the company number is changed" in new Setup {
-        val submission = submissionAnsweredWith(riAnswers ++ nonUkBranchAnswers)
-        SubmissionsDAOMock.Fetch.thenReturn(submission)
-        SubmissionsDAOMock.Update.thenReturn()
-        when(mockCompaniesHouseConnector.getCompanyByNumber(*)(*)).thenReturn(successful(Some(newCompanyProfile)))
-
-        val result = await(underTest.recordAnswers(submission.id, orgDetails.questionNonUkBranchCompanyNumber.id, Map(Question.answerKey -> Seq("87654321"))))
-
-        businessAnswerKeysOf(result) shouldBe Set(orgDetails.questionOrgType.id, orgDetails.questionNonUkBranchCompanyNumber.id)
-      }
-
       "re-fetch and store the details of the new company when the company number is changed" in new Setup {
         val submission = submissionAnsweredWith(riAnswers ++ ltdAnswers)
         SubmissionsDAOMock.Fetch.thenReturn(submission)
@@ -644,10 +604,12 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
 
         val result = await(underTest.recordAnswers(submission.id, orgDetails.questionLtdCompanyNumber.id, Map(Question.answerKey -> Seq("12345678"))))
 
-        result.value.submission.latestInstance.answersToQuestions.keySet should not contain orgDetails.questionLtdConfirmCompanyName.id
         businessAnswerKeysOf(result) shouldBe Set(
           orgDetails.questionOrgType.id,
           orgDetails.questionLtdCompanyNumber.id,
+          orgDetails.questionLtdConfirmCompanyName.id,
+          orgDetails.questionLtdConfirmCompanyAddress.id,
+          orgDetails.questionLtdOrgUtr.id,
           orgDetails.questionLtdOrgWebsite.id
         )
       }

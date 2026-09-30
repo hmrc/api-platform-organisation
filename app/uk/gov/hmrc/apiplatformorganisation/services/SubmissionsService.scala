@@ -190,20 +190,10 @@ class SubmissionsService @Inject() (
 
     // clears any extra dependent answers and data, that are not cleared automatically as part of the ask-when linked answers prune.
     // When needed, remove the question from the current questions set, that thus trigger a cascaded delete
-    questionId match {
-      case id if id == questionLtdCompanyNumber.id                                             =>
-        val clearAnswers = List(questionLtdConfirmCompanyName.id, questionLtdConfirmCompanyAddress.id, questionLtdOrgUTR.id)
-        clearAnswersAndCompanyDetails(clearAnswers, submission)
-      case id if id == questionPartnershipCompanyNumber.id                                     =>
-        val clearAnswers = List(questionPartnershipConfirmCompanyName.id, questionPartnershipConfirmCompanyAddress.id, questionPartnershipOrgUTR.id)
-        clearAnswersAndCompanyDetails(clearAnswers, submission)
-      case id if id == questionRegSocietyCompanyNumber.id                                      =>
-        clearAnswersAndCompanyDetails(List(questionRegSocietyConfirmCompanyName.id), submission)
-      case id if id == questionNonUkBranchCompanyNumber.id                                     =>
-        clearAnswersAndCompanyDetails(List(questionNonUkBranchConfirmCompanyName.id), submission)
-      case id if id == questionOrgType.id && answerChanged(questionId, submission, rawAnswers) =>
-        clearCompanyDetails(submission)
-      case _                                                                                   => submission
+    val clearQuestionsOnChange = submission.findQuestion(questionId).fold(None)(q => q.clearQuestionsOnChange)
+    clearQuestionsOnChange match {
+      case Some(ids) if answerChanged(questionId, submission, rawAnswers) => clearAnswersAndCompanyDetails(ids.toList, submission)
+      case _                                                              => submission
     }
   }
 
