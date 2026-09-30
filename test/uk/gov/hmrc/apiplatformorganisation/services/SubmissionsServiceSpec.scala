@@ -112,7 +112,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
       orgDetails.questionLtdCompanyNumber.id         -> ActualAnswer.CompanyNumberAnswer("12345678"),
       orgDetails.questionLtdConfirmCompanyName.id    -> ActualAnswer.SingleChoiceAnswer("Yes"),
       orgDetails.questionLtdConfirmCompanyAddress.id -> ActualAnswer.SingleChoiceAnswer("Yes"),
-      orgDetails.questionLtdOrgUTR.id                -> ActualAnswer.TextAnswer("1234567890"),
+      orgDetails.questionLtdOrgUtr.id                -> ActualAnswer.TextAnswer("1234567890"),
       orgDetails.questionLtdOrgWebsite.id            -> ActualAnswer.TextAnswer("https://example.com")
     )
 
@@ -122,7 +122,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
       orgDetails.questionPartnershipCompanyNumber.id         -> ActualAnswer.CompanyNumberAnswer("12345678"),
       orgDetails.questionPartnershipConfirmCompanyName.id    -> ActualAnswer.SingleChoiceAnswer("Yes"),
       orgDetails.questionPartnershipConfirmCompanyAddress.id -> ActualAnswer.SingleChoiceAnswer("Yes"),
-      orgDetails.questionPartnershipOrgUTR.id                -> ActualAnswer.TextAnswer("1234567890"),
+      orgDetails.questionPartnershipOrgUtr.id                -> ActualAnswer.TextAnswer("1234567890"),
       orgDetails.questionPartnershipOrgWebsite.id            -> ActualAnswer.TextAnswer("https://example.com")
     )
 
@@ -609,7 +609,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
           orgDetails.questionLtdCompanyNumber.id,
           orgDetails.questionLtdConfirmCompanyName.id,
           orgDetails.questionLtdConfirmCompanyAddress.id,
-          orgDetails.questionLtdOrgUTR.id,
+          orgDetails.questionLtdOrgUtr.id,
           orgDetails.questionLtdOrgWebsite.id
         )
       }

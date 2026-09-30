@@ -68,8 +68,8 @@ object QuestionnaireDAO {
       "organisationNamePartnershipId"  -> OrganisationDetails.questionPartnershipCompanyNameId,
       "organisationNameSoleTraderId"   -> OrganisationDetails.questionSoleTraderNameId,
       "attachmentNonUkWithoutId"       -> OrganisationDetails.questionNonUkWithoutAttachmentId,
-      "utrLtdId"                       -> OrganisationDetails.questionLtdOrgUTRId,
-      "utrPartnershipId"               -> OrganisationDetails.questionPartnershipOrgUTRId,
+      "utrLtdId"                       -> OrganisationDetails.questionLtdOrgUtrId,
+      "utrPartnershipId"               -> OrganisationDetails.questionPartnershipOrgUtrId,
       "websiteUrlLtdId"                -> OrganisationDetails.questionLtdOrgWebsiteId,
       "websiteUrlPartnershipId"        -> OrganisationDetails.questionPartnershipOrgWebsiteId,
       "websiteUrlNonUkWithoutId"       -> OrganisationDetails.questionNonUkWithoutWebsiteId,
@@ -142,7 +142,7 @@ object QuestionnaireDAO {
       val questionLtdInvalidCompanyNameId    = Question.Id("3a3c881f-9ca1-444f-9919-76a046694700")
       val questionLtdConfirmCompanyAddressId = Question.Id("e1dbf1a3-e28b-1c83-a739-86f1319ca8cc")
       val questionLtdInvalidCompanyAddressId = Question.Id("83dcd911-e831-4edf-a44a-4b3023592d17")
-      val questionLtdOrgUTRId                = Question.Id("6be23951-ac69-47bf-aa56-86d3d690ee0b")
+      val questionLtdOrgUtrId                = Question.Id("6be23951-ac69-47bf-aa56-86d3d690ee0b")
       val questionLtdOrgWebsiteId            = Question.Id("b2dbf6a1-e39b-4c38-a524-19f0854ca1cc")
 
       val questionSoleTraderNameId        = Question.Id("96f692a6-3fbd-4d58-8d43-824ac1e618a3")
@@ -155,7 +155,7 @@ object QuestionnaireDAO {
       val questionPartnershipInvalidCompanyNameId    = Question.Id("5318d486-3978-42d4-b9d0-a7d9ad953a1f")
       val questionPartnershipConfirmCompanyAddressId = Question.Id("82242e26-b782-43fc-94f6-ead356c7d7de")
       val questionPartnershipInvalidCompanyAddressId = Question.Id("7b7228a2-0e52-4c27-baaa-17c33aa9704d")
-      val questionPartnershipOrgUTRId                = Question.Id("99ecc90b-fb94-44fb-a8fa-7a05f98e588e")
+      val questionPartnershipOrgUtrId                = Question.Id("99ecc90b-fb94-44fb-a8fa-7a05f98e588e")
       val questionPartnershipOrgWebsiteId            = Question.Id("0626fd67-013b-4444-a870-c30cbcc7f01a")
 
       val questionNonUkWithoutCompanyNameId = Question.Id("26cbc31c-4d32-41cb-8630-2cff89d0976a")
@@ -181,7 +181,7 @@ object QuestionnaireDAO {
           questionLtdCompanyNumberId,
           questionLtdConfirmCompanyNameId,
           questionLtdConfirmCompanyAddressId,
-          questionLtdOrgUTRId,
+          questionLtdOrgUtrId,
           questionLtdOrgWebsiteId
         ))
       )
@@ -208,7 +208,7 @@ object QuestionnaireDAO {
         clearQuestionsOnChange = Some(NonEmptyList.of(
           questionLtdConfirmCompanyNameId,
           questionLtdConfirmCompanyAddressId,
-          questionLtdOrgUTRId
+          questionLtdOrgUtrId
         ))
       )
 
@@ -255,8 +255,8 @@ object QuestionnaireDAO {
         ).some
       )
 
-      val questionLtdOrgUTR = Question.TextQuestion(
-        questionLtdOrgUTRId,
+      val questionLtdOrgUtr = Question.TextQuestion(
+        questionLtdOrgUtrId,
         Wording("What’s the Unique Taxpayer Reference (UTR)?"),
         statement = Statement(
           StatementText("You can find it on tax returns or other tax documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’."),
@@ -318,7 +318,7 @@ object QuestionnaireDAO {
           questionPartnershipCompanyNumberId,
           questionPartnershipConfirmCompanyNameId,
           questionPartnershipConfirmCompanyAddressId,
-          questionPartnershipOrgUTRId,
+          questionPartnershipOrgUtrId,
           questionPartnershipOrgWebsiteId
         ))
       )
@@ -360,7 +360,7 @@ object QuestionnaireDAO {
         clearQuestionsOnChange = Some(NonEmptyList.of(
           questionPartnershipConfirmCompanyNameId,
           questionPartnershipConfirmCompanyAddressId,
-          questionPartnershipOrgUTRId
+          questionPartnershipOrgUtrId
         ))
       )
 
@@ -407,8 +407,8 @@ object QuestionnaireDAO {
         ).some
       )
 
-      val questionPartnershipOrgUTR = Question.TextQuestion(
-        questionPartnershipOrgUTRId,
+      val questionPartnershipOrgUtr = Question.TextQuestion(
+        questionPartnershipOrgUtrId,
         Wording("What’s the Unique Taxpayer Reference (UTR)?"),
         statement = Statement(
           StatementText("You can find it on tax returns or other tax documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’."),
@@ -510,7 +510,7 @@ object QuestionnaireDAO {
             )
           ),
           QuestionItem(
-            questionLtdOrgUTR,
+            questionLtdOrgUtr,
             AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(ukLimitedCompany, registeredSociety, nonUkCompanyWithUkBranch))
           ),
           QuestionItem(
@@ -583,7 +583,7 @@ object QuestionnaireDAO {
             )
           ),
           QuestionItem(
-            questionPartnershipOrgUTR,
+            questionPartnershipOrgUtr,
             AskWhen.AskWhenAnswer(questionOrgType, partnership)
           ),
           QuestionItem(
