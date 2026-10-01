@@ -22,7 +22,7 @@ import play.api.libs.json.*
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{OrganisationId, UserId}
-import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Collaborator, Collaborators, Organisation, OrganisationName}
+import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Collaborator, Collaborators, Organisation, OrganisationAddress, OrganisationName}
 
 case class StoredOrganisation(
     id: OrganisationId,
@@ -30,19 +30,50 @@ case class StoredOrganisation(
     organisationType: Organisation.OrganisationType,
     createdDateTime: Instant,
     requestedBy: UserId,
-    collaborators: Set[Collaborator]
+    collaborators: Set[Collaborator],
+    companyNumber: Option[String] = None,
+    corporationTaxUtr: Option[String] = None,
+    websiteUrl: Option[String] = None,
+    address: Option[OrganisationAddress] = None
   )
 
 object StoredOrganisation {
   implicit val dateFormat: Format[Instant]                           = MongoJavatimeFormats.instantFormat
   implicit val storedOrganisationFormat: OFormat[StoredOrganisation] = Json.format[StoredOrganisation]
 
-  def create(organisationName: OrganisationName, organisationType: Organisation.OrganisationType, requestedBy: UserId, createdTime: Instant): StoredOrganisation = {
+  def create(
+      organisationName: OrganisationName,
+      organisationType: Organisation.OrganisationType,
+      requestedBy: UserId,
+      createdTime: Instant,
+      extraOrganisationData: ExtraOrganisationData
+    ): StoredOrganisation = {
     val responsibleIndividual = Collaborators.ResponsibleIndividual(requestedBy)
-    StoredOrganisation(OrganisationId.random, organisationName, organisationType, createdTime, requestedBy, Set(responsibleIndividual))
+    StoredOrganisation(
+      OrganisationId.random,
+      organisationName,
+      organisationType,
+      createdTime,
+      requestedBy,
+      Set(responsibleIndividual),
+      extraOrganisationData.companyNumber,
+      extraOrganisationData.corporationTaxUtr,
+      extraOrganisationData.websiteUrl,
+      extraOrganisationData.address
+    )
   }
 
   def asOrganisation(data: StoredOrganisation): Organisation = {
-    Organisation(data.id, data.name, data.organisationType, data.createdDateTime, data.collaborators)
+    Organisation(
+      data.id,
+      data.name,
+      data.organisationType,
+      data.createdDateTime,
+      data.collaborators,
+      data.companyNumber,
+      data.corporationTaxUtr,
+      data.websiteUrl,
+      data.address
+    )
   }
 }

@@ -101,15 +101,16 @@ class SubmissionsService @Inject() (
     import SubmissionDataExtracter.*
     (
       for {
-        submission        <- fromOptionF(submissionsDAO.fetch(submissionId), "No such submission")
-        _                 <- cond(submission.status.isSubmitted, (), "Submission not submitted")
-        organisationName  <- fromOption(getOrganisationName(submission), "No organisation name found")
-        organisationType  <- fromOption(getOrganisationType(submission), "No organisation type found")
-        organisation      <- liftF(organisationService.create(organisationName, organisationType, submission.startedBy))
-        approvedSubmission = Submission.grant(instant, approvedBy, comment, None)(submission)
-        savedSubmission   <- liftF(submissionsDAO.update(approvedSubmission.copy(organisationId = Some(organisation.id))))
-        _                 <- liftF(submissionReviewService.approve(savedSubmission.id, approvedBy, comment))
-        _                 <- liftF(auditService.auditApproveOrganisationSubmission(savedSubmission))
+        submission           <- fromOptionF(submissionsDAO.fetch(submissionId), "No such submission")
+        _                    <- cond(submission.status.isSubmitted, (), "Submission not submitted")
+        organisationName     <- fromOption(getOrganisationName(submission), "No organisation name found")
+        organisationType     <- fromOption(getOrganisationType(submission), "No organisation type found")
+        extraOrganisationData = getExtraOrganisationData(submission)
+        organisation         <- liftF(organisationService.create(organisationName, organisationType, submission.startedBy, extraOrganisationData))
+        approvedSubmission    = Submission.grant(instant, approvedBy, comment, None)(submission)
+        savedSubmission      <- liftF(submissionsDAO.update(approvedSubmission.copy(organisationId = Some(organisation.id))))
+        _                    <- liftF(submissionReviewService.approve(savedSubmission.id, approvedBy, comment))
+        _                    <- liftF(auditService.auditApproveOrganisationSubmission(savedSubmission))
       } yield savedSubmission
     )
       .value
@@ -201,20 +202,10 @@ class SubmissionsService @Inject() (
 
     // clears any extra dependent answers and data, that are not cleared automatically as part of the ask-when linked answers prune.
     // When needed, remove the question from the current questions set, that thus trigger a cascaded delete
-    questionId match {
-      case id if id == questionLtdCompanyNumber.id                                             =>
-        val clearAnswers = List(questionLtdConfirmCompanyName.id, questionLtdConfirmCompanyAddress.id, questionLtdOrgUTR.id)
-        clearAnswersAndCompanyDetails(clearAnswers, submission)
-      case id if id == questionPartnershipCompanyNumber.id                                     =>
-        val clearAnswers = List(questionPartnershipConfirmCompanyName.id, questionPartnershipConfirmCompanyAddress.id, questionPartnershipOrgUTR.id)
-        clearAnswersAndCompanyDetails(clearAnswers, submission)
-      case id if id == questionRegSocietyCompanyNumber.id                                      =>
-        clearAnswersAndCompanyDetails(List(questionRegSocietyConfirmCompanyName.id), submission)
-      case id if id == questionNonUkBranchCompanyNumber.id                                     =>
-        clearAnswersAndCompanyDetails(List(questionNonUkBranchConfirmCompanyName.id), submission)
-      case id if id == questionOrgType.id && answerChanged(questionId, submission, rawAnswers) =>
-        clearCompanyDetails(submission)
-      case _                                                                                   => submission
+    val clearQuestionsOnChange = submission.findQuestion(questionId).fold(None)(q => q.clearQuestionsOnChange)
+    clearQuestionsOnChange match {
+      case Some(ids) if answerChanged(questionId, submission, rawAnswers) => clearAnswersAndCompanyDetails(ids.toList, submission)
+      case _                                                              => submission
     }
   }
 
