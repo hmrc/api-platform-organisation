@@ -37,6 +37,9 @@ object SubmissionsController {
   case class RecordAnswersRequest(responses: Map[String, Seq[String]])
   implicit val readsRecordAnswersRequest: Reads[RecordAnswersRequest] = Json.reads[RecordAnswersRequest]
 
+  case class RecordTicketRequest(supportTicketId: Option[Int], supportTicketRef: Option[String])
+  implicit val readsRecordTicketRequest: Reads[RecordTicketRequest] = Json.reads[RecordTicketRequest]
+
   case class CreateSubmissionRequest(requestedBy: String)
   implicit val readsCreateSubmissionRequest: Reads[CreateSubmissionRequest] = Json.reads[CreateSubmissionRequest]
 
@@ -161,6 +164,15 @@ class SubmissionsController @Inject() (
 
     withJsonBody[RecordAnswersRequest] { answersRequest =>
       service.recordAnswers(submissionId, questionId, answersRequest.responses).map(_.fold(failed, success))
+    }
+  }
+
+  def recordTicket(submissionId: SubmissionId): Action[JsValue] = Action.async(parse.json) { implicit request =>
+    val failed = (msg: ValidationErrors) => BadRequest(Json.toJson(msg))
+
+    val success = (s: ExtendedSubmission) => Ok(Json.toJson(s))
+    withJsonBody[RecordTicketRequest] { ticketRequest =>
+      service.recordTicket(submissionId, ticketRequest.supportTicketId, ticketRequest.supportTicketRef).map(_.fold(failed, success))
     }
   }
 }
