@@ -158,7 +158,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         val result: Either[String, Submission] = await(underTest.create(userId, "bob@example.com"))
 
         inside(result.value) {
-          case _ @Submission(_, _, _, startedBy, _, _, instances, _) =>
+          case _ @Submission(_, _, _, startedBy, _, _, instances, _, _) =>
             startedBy shouldBe userId
             instances.head.answersToQuestions.size shouldBe 0
         }
@@ -407,6 +407,25 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         val result = await(underTest.fetchLatestMarkedSubmissionByUserId(userId))
 
         result.left.value shouldBe "Submission cannot be marked yet"
+      }
+    }
+
+    "recordTicket" should {
+      "stores ticket ID and ticket reference" in new Setup {
+        val ticketId                       = Some(12345)
+        val ticketRef                      = Some("abcdfg")
+        val expectedAdditionalData         = AdditionalSubmissionData(supportTicketId = ticketId, supportTicketRef = ticketRef)
+        val expectedSubmission: Submission = aSubmission.copy(additionalSubmissionData = Some(expectedAdditionalData))
+        SubmissionsDAOMock.Fetch.thenReturn(aSubmission)
+        SubmissionsDAOMock.Update.thenReturn()
+
+        val result: Either[ValidationErrors, ExtendedSubmission] = await(underTest.recordTicket(submissionId, supportTicketId = ticketId, supportTicketRef = ticketRef))
+
+        val out: ExtendedSubmission = result.value
+        out.submission.additionalSubmissionData.get shouldBe expectedAdditionalData
+
+        val calledWithSubmission: Submission = SubmissionsDAOMock.Update.verifyCalledWith()
+        calledWithSubmission shouldBe expectedSubmission
       }
     }
 
