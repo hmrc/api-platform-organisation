@@ -18,13 +18,23 @@ package uk.gov.hmrc.apiplatformorganisation.models
 
 import play.api.libs.json.{Json, OFormat}
 
-case class SaMatchingRequest(
+case class UCROrganisationRequest(
     identifier: Identifier,
     registryMarker: String
   )
 
-object SaMatchingRequest {
-  given OFormat[SaMatchingRequest] = Json.format[SaMatchingRequest]
+object UCROrganisationRequest {
+  given OFormat[UCROrganisationRequest] = Json.format[UCROrganisationRequest]
+}
+
+case class UCRIndividualsRequest(
+    identifier: Identifier,
+    registryMarker: String,
+    excludeDeceased: Boolean
+  )
+
+object UCRIndividualsRequest {
+  given OFormat[UCRIndividualsRequest] = Json.format[UCRIndividualsRequest]
 }
 
 case class Identifier(`type`: String, value: String)

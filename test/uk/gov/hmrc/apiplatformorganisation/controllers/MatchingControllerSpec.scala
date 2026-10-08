@@ -28,32 +28,25 @@ import play.api.libs.json.Json
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 
-import uk.gov.hmrc.apiplatformorganisation.connectors.OrganisationsMatchingApiConnector
-import uk.gov.hmrc.apiplatformorganisation.mocks.connectors.IndividualsMatchingApiConnectorMockModule
-import uk.gov.hmrc.apiplatformorganisation.models.IndividualMatchingRequest
+import uk.gov.hmrc.apiplatformorganisation.mocks.connectors.UCRCustomerApiConnectorMockModule
+import uk.gov.hmrc.apiplatformorganisation.models.{Identifier, UCRIndividualsRequest}
 
 class MatchingControllerSpec extends AnyWordSpec
     with Matchers
-    with IndividualsMatchingApiConnectorMockModule {
+    with UCRCustomerApiConnectorMockModule {
   implicit val ec: ExecutionContext            = ExecutionContext.global
   implicit lazy val materializer: Materializer = NoMaterializer
 
   trait Setup {
-    val organisationsMatchingApiConnector = mock[OrganisationsMatchingApiConnector]
-
-    val underTest = new MatchingController(
-      organisationsMatchingApiConnector,
-      IndividualsMatchingApiConnectorMock.aMock,
-      Helpers.stubControllerComponents()
-    )
+    val underTest = new MatchingController(UCRCustomerApiConnectorMock.aMock, Helpers.stubControllerComponents())
   }
 
   "matchIndividual" should {
     "return 200 with the matched JSON" in new Setup {
       val matchResult = Json.obj("_links" -> Json.obj("individual" -> Json.obj("href" -> "/individuals/matching/abc-123")))
-      IndividualsMatchingApiConnectorMock.MatchIndividual.succeeds(matchResult)
+      UCRCustomerApiConnectorMock.IndividualIdentifierSearch.succeeds(matchResult)
 
-      val request     = IndividualMatchingRequest("John", "Smith", "AA000000A", "1990-01-01")
+      val request     = UCRIndividualsRequest(Identifier("nino", "123456"), "GREEN", true)
       val fakeRequest = FakeRequest("POST", "/matching/individual").withHeaders("content-type" -> "application/json").withBody(Json.toJson(request))
       val result      = underTest.matchIndividual()(fakeRequest)
 
