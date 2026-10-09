@@ -22,21 +22,27 @@ import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 
 import play.api.libs.json.JsValue
 
-import uk.gov.hmrc.apiplatformorganisation.connectors.IndividualsMatchingApiConnector
+import uk.gov.hmrc.apiplatformorganisation.connectors.UCRCustomerApiConnector
 
-trait IndividualsMatchingApiConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
+trait UCRCustomerApiConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
 
-  trait AbstractIndividualsMatchingApiConnectorMock {
-    def aMock: IndividualsMatchingApiConnector
+  trait UCRCustomerApiConnectorConnectorMock {
+    def aMock: UCRCustomerApiConnector
 
-    object MatchIndividual {
+    object IndividualIdentifierSearch {
 
       def succeeds(json: JsValue) =
-        when(aMock.matchIndividual(*, *)).thenReturn(successful(json))
+        when(aMock.individualIdentifierSearch(*)(*)).thenReturn(successful(json))
+    }
+
+    object OrganisationIdentifierSearch {
+
+      def succeeds(json: JsValue) =
+        when(aMock.organisationIdentifierSearch(*)(*)).thenReturn(successful(json))
     }
   }
 
-  object IndividualsMatchingApiConnectorMock extends AbstractIndividualsMatchingApiConnectorMock {
-    val aMock = mock[IndividualsMatchingApiConnector]
+  object UCRCustomerApiConnectorMock extends UCRCustomerApiConnectorConnectorMock {
+    val aMock = mock[UCRCustomerApiConnector]
   }
 }

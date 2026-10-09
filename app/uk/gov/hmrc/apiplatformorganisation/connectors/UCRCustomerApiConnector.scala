@@ -26,18 +26,24 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, SessionId as _, StringContextOps, *}
+import uk.gov.hmrc.http.{SessionId as _, *}
 
 import uk.gov.hmrc.apiplatformorganisation.config.AppConfig
-import uk.gov.hmrc.apiplatformorganisation.models.SaMatchingRequest
+import uk.gov.hmrc.apiplatformorganisation.models.{UCRIndividualsRequest, UCROrganisationRequest}
 // $COVERAGE-OFF$
 
-class OrganisationsMatchingApiConnector @Inject() (http: HttpClientV2, config: AppConfig)(implicit val ec: ExecutionContext) extends Logging {
+class UCRCustomerApiConnector @Inject() (http: HttpClientV2, config: AppConfig)(implicit val ec: ExecutionContext) extends Logging {
   lazy val serviceBaseUrl: String = config.ucrCustomerApiUri
 
-  def matchOrganisationSa(request: SaMatchingRequest)(implicit hc: HeaderCarrier): Future[JsValue] = {
-
+  def organisationIdentifierSearch(request: UCROrganisationRequest)(implicit hc: HeaderCarrier): Future[JsValue] = {
     http.post(url"$serviceBaseUrl/mulesoft/customer/v2/api/organisations/identifier-search")
+      .withBody(Json.toJson(request))
+      .setHeader(AUTHORIZATION -> s"Basic ${config.ucrToken}", "CorrelationId" -> UUID.randomUUID().toString, "system-id" -> config.ucrSystemId)
+      .execute[JsValue]
+  }
+
+  def individualIdentifierSearch(request: UCRIndividualsRequest)(implicit hc: HeaderCarrier): Future[JsValue] = {
+    http.post(url"$serviceBaseUrl/mulesoft/customer/v2/api/individuals/identifier-search")
       .withBody(Json.toJson(request))
       .setHeader(AUTHORIZATION -> s"Basic ${config.ucrToken}", "CorrelationId" -> UUID.randomUUID().toString, "system-id" -> config.ucrSystemId)
       .execute[JsValue]
