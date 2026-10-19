@@ -66,5 +66,12 @@ trait EmailConnectorMockModule extends MockitoSugar with ArgumentMatchersSugar {
       def verifyCalledWith(organisationName: OrganisationName, email: LaxEmailAddress, role: String, recipients: Set[LaxEmailAddress]) =
         verify.sendMemberRemovedNotification(eqTo(organisationName), eqTo(email), eqTo(role), eqTo(recipients))(*)
     }
+
+    object SendOrganisationApprovedNotification {
+      def succeeds() = when(aMock.sendOrganisationApprovedNotification(*[OrganisationName], *)(*)).thenReturn(Future.successful(HasSucceeded))
+
+      def verifyCalledWith(organisationName: OrganisationName, recipients: Set[LaxEmailAddress]) =
+        verify.sendOrganisationApprovedNotification(eqTo(organisationName), eqTo(recipients))(*)
+    }
   }
 }

@@ -31,7 +31,7 @@ import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.A
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Question.CompanyNumberQuestion
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission.{AdditionalData, CompanyDetails}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services.*
-import uk.gov.hmrc.apiplatformorganisation.connectors.CompaniesHouseConnector
+import uk.gov.hmrc.apiplatformorganisation.connectors.{CompaniesHouseConnector, EmailConnector, ThirdPartyDeveloperConnector}
 import uk.gov.hmrc.apiplatformorganisation.models.CompaniesHouseCompanyProfile
 import uk.gov.hmrc.apiplatformorganisation.repositories.*
 
@@ -43,6 +43,8 @@ class SubmissionsService @Inject() (
     organisationService: OrganisationService,
     auditService: AuditService,
     companiesHouseConnector: CompaniesHouseConnector,
+    emailConnector: EmailConnector,
+    thirdPartyDeveloperConnector: ThirdPartyDeveloperConnector,
     val clock: Clock
   )(implicit val ec: ExecutionContext
   ) extends EitherTHelper[String] with ClockNow {
@@ -106,10 +108,13 @@ class SubmissionsService @Inject() (
         organisationName     <- fromOption(getOrganisationName(submission), "No organisation name found")
         organisationType     <- fromOption(getOrganisationType(submission), "No organisation type found")
         extraOrganisationData = getExtraOrganisationData(submission)
+        userDetails          <- liftF(thirdPartyDeveloperConnector.getRegisteredOrUnregisteredUsers(List(submission.startedBy)))
+        submitterDetails     <- fromOption(userDetails.users.headOption, "Submitter not found")
         organisation         <- liftF(organisationService.create(organisationName, organisationType, submission.startedBy, extraOrganisationData))
         approvedSubmission    = Submission.grant(instant, approvedBy, comment, None)(submission)
         savedSubmission      <- liftF(submissionsDAO.update(approvedSubmission.copy(organisationId = Some(organisation.id))))
         _                    <- liftF(submissionReviewService.approve(savedSubmission.id, approvedBy, comment))
+        _                    <- liftF(emailConnector.sendOrganisationApprovedNotification(organisationName, Set(submitterDetails.email)))
         _                    <- liftF(auditService.auditApproveOrganisationSubmission(savedSubmission))
       } yield savedSubmission
     )
