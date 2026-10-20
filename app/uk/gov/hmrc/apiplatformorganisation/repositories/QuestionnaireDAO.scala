@@ -147,6 +147,7 @@ object QuestionnaireDAO {
 
       val questionSoleTraderNameId        = Question.Id("96f692a6-3fbd-4d58-8d43-824ac1e618a3")
       val questionSoleTraderDateOfBirthId = Question.Id("a8f2cdfc-8a10-4b51-9e2a-c198da7a169c")
+      val questionSoleTraderAddressId     = Question.Id("d1a79045-1d1c-4383-8624-ecc23179e5c3")
 
       val questionPartnershipCompanyNameId           = Question.Id("6c571e1c-2215-4921-b526-2e478464d3fa")
       val questionPartnershipAddressId               = Question.Id("ad1a1c5d-9f98-4460-92d2-04e08c63ac4f")
@@ -295,6 +296,14 @@ object QuestionnaireDAO {
         hintText = StatementText("For example, 27 3 1987").some,
         errorInfo = ErrorInfo("Enter your date of birth", "Date of birth cannot be blank").some,
         summary = Some("Date of birth")
+      )
+
+      val questionSoleTraderAddress = Question.AddressQuestion(
+        questionSoleTraderAddressId,
+        Wording("Enter your address"),
+        statement = None,
+        errorInfo = ErrorInfo("Your address cannot be blank", "Enter your address").some,
+        summary = Some("Address")
       )
 
       // Partnership
@@ -525,6 +534,10 @@ object QuestionnaireDAO {
           ),
           QuestionItem(
             questionSoleTraderDateOfBirth,
+            AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(soleTrader))
+          ),
+          QuestionItem(
+            questionSoleTraderAddress,
             AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(soleTrader))
           ),
 
