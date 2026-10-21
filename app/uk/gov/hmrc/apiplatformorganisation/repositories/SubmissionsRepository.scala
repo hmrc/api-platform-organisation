@@ -33,6 +33,7 @@ import uk.gov.hmrc.mongo.play.json.formats.{MongoFormats, MongoJavatimeFormats}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.services.NonEmptyListFormatters
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
+import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.ActualAnswer.*
 
 object SubmissionsRepository {
 
@@ -46,6 +47,25 @@ object SubmissionsRepository {
 
     import Submission.Status.*
     import Question.*
+
+    given OFormat[Attachment] = Json.format[Attachment]
+
+    given OFormat[AttachmentAnswer] = Json.format[AttachmentAnswer]
+
+    given OFormat[ActualAnswer] = Union.from[ActualAnswer]("answerType")
+      .and[MultipleChoiceAnswer]("multipleChoice")
+      .and[SingleChoiceAnswer]("singleChoice")
+      .and[DateAnswer]("date")
+      .and[AddressAnswer]("address")
+      .and[InternationalAddressAnswer]("internationalAddress")
+      .and[NameAnswer]("name")
+      .and[ConfirmNameAnswer]("confirmName")
+      .and[CompanyNumberAnswer]("companyNumber")
+      .and[AttachmentAnswer]("attachment")
+      .and[TextAnswer]("text")
+      .andType("acknowledged", () => AcknowledgedAnswer)
+      .andType("noAnswer", () => NoAnswer)
+      .format
 
     case class OldQuestionItem(question: Question, askWhen: AskWhen)
 
