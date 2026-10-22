@@ -471,7 +471,7 @@ object QuestionnaireDAO {
 
       val questionNonUkWithoutAttachment = Question.AttachmentQuestion(
         questionNonUkWithoutAttachmentId,
-        Wording("Upload the tax registration document for {companyName}"),
+        Wording("Upload a tax registration document for {companyName}"),
         statement = Statement(
           StatementText("Your tax registration document must:"),
           StatementBullets(
