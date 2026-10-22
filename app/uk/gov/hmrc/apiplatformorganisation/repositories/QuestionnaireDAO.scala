@@ -71,6 +71,7 @@ object QuestionnaireDAO {
       "utrLtdId"                       -> OrganisationDetails.questionLtdOrgUtrId,
       "utrPartnershipId"               -> OrganisationDetails.questionPartnershipOrgUtrId,
       "websiteUrlLtdId"                -> OrganisationDetails.questionLtdOrgWebsiteId,
+      "websiteUrlSoleTraderId"         -> OrganisationDetails.questionSoleTraderOrgWebsiteId,
       "websiteUrlPartnershipId"        -> OrganisationDetails.questionPartnershipOrgWebsiteId,
       "websiteUrlNonUkWithoutId"       -> OrganisationDetails.questionNonUkWithoutWebsiteId,
       "addressPartnershipId"           -> OrganisationDetails.questionPartnershipAddressId,
@@ -149,6 +150,7 @@ object QuestionnaireDAO {
       val questionSoleTraderDateOfBirthId = Question.Id("a8f2cdfc-8a10-4b51-9e2a-c198da7a169c")
       val questionSoleTraderAddressId     = Question.Id("d1a79045-1d1c-4383-8624-ecc23179e5c3")
       val questionSoleTraderOrgUtrId      = Question.Id("8a52a2ec-d670-4256-afbc-6e2704ed7210")
+      val questionSoleTraderOrgWebsiteId  = Question.Id("1ea720a2-7000-4d43-ae92-43d7e84c9b22")
 
       val questionPartnershipCompanyNameId           = Question.Id("6c571e1c-2215-4921-b526-2e478464d3fa")
       val questionPartnershipAddressId               = Question.Id("ad1a1c5d-9f98-4460-92d2-04e08c63ac4f")
@@ -269,12 +271,14 @@ object QuestionnaireDAO {
         summary = Some("Corporation tax UTR")
       )
 
-      val questionLtdOrgWebsite = Question.TextQuestion(
+      val questionLtdOrgWebsite = Question.ConditionalTextQuestion(
         questionLtdOrgWebsiteId,
-        Wording("What is your website URL?"),
-        statement = None,
-        hintText = StatementText("Website URL").some,
-        absence = ("My company doesn't have a website", Mark.Fail).some,
+        Wording("Does {companyName} have a website?"),
+        statement = Statement(
+          StatementText("We'll use this to check if your organisation is active."),
+          StatementText("Your website does not have to be about the software you're developing.")
+        ).some,
+        label = Question.Label("Enter your website address").some,
         validation = TextValidation.Url.some,
         errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some,
         summary = Some("Website URL")
@@ -317,6 +321,19 @@ object QuestionnaireDAO {
         hintText = StatementText("Your UTR can be 10 or 13 digits long.").some,
         errorInfo = ErrorInfo("Your Unique Taxpayer Reference cannot be blank", "Enter your Unique Taxpayer Reference, like 1234567890").some,
         summary = Some("Self Assessment UTR")
+      )
+
+      val questionSoleTraderOrgWebsite = Question.ConditionalTextQuestion(
+        questionSoleTraderOrgWebsiteId,
+        Wording("Do you have a website?"),
+        statement = Statement(
+          StatementText("We'll use this to check if your organisation is active."),
+          StatementText("Your website does not have to be about the software you're developing.")
+        ).some,
+        label = Question.Label("Enter your website address").some,
+        validation = TextValidation.Url.some,
+        errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some,
+        summary = Some("Website URL")
       )
 
       // Partnership
@@ -441,12 +458,14 @@ object QuestionnaireDAO {
         summary = Some("Corporation tax UTR")
       )
 
-      val questionPartnershipOrgWebsite = Question.TextQuestion(
+      val questionPartnershipOrgWebsite = Question.ConditionalTextQuestion(
         questionPartnershipOrgWebsiteId,
-        Wording("What is your website URL?"),
-        statement = None,
-        hintText = StatementText("Website URL").some,
-        absence = ("My company doesn't have a website", Mark.Fail).some,
+        Wording("Does {companyName} have a website?"),
+        statement = Statement(
+          StatementText("We'll use this to check if your organisation is active."),
+          StatementText("Your website does not have to be about the software you're developing.")
+        ).some,
+        label = Question.Label("Enter your website address").some,
         validation = TextValidation.Url.some,
         errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some,
         summary = Some("Website URL")
@@ -471,12 +490,14 @@ object QuestionnaireDAO {
         summary = Some("Registered address")
       )
 
-      val questionNonUkWithoutWebsite = Question.TextQuestion(
+      val questionNonUkWithoutWebsite = Question.ConditionalTextQuestion(
         questionNonUkWithoutWebsiteId,
-        Wording("What is your website URL?"),
-        statement = None,
-        hintText = StatementText("Website URL").some,
-        absence = ("My company doesn't have a website", Mark.Fail).some,
+        Wording("Does {companyName} have a website?"),
+        statement = Statement(
+          StatementText("We'll use this to check if your organisation is active."),
+          StatementText("Your website does not have to be about the software you're developing.")
+        ).some,
+        label = Question.Label("Enter your website address").some,
         validation = TextValidation.Url.some,
         errorInfo = ErrorInfo("Enter a website address in the correct format, like https://example.com", "Enter a URL in the correct format, like https://example.com").some,
         summary = Some("Website URL")
@@ -555,6 +576,10 @@ object QuestionnaireDAO {
           ),
           QuestionItem(
             questionSoleTraderOrgUtr,
+            AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(soleTrader))
+          ),
+          QuestionItem(
+            questionSoleTraderOrgWebsite,
             AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(soleTrader))
           ),
 
