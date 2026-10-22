@@ -477,14 +477,9 @@ object QuestionnaireDAO {
           StatementBullets(
             StatementText("be equivalent to one of these UK registrations: VAT, Companies House, Corporation Tax or Self Assessment"),
             StatementText("include the original document as it was issued"),
-            StatementText("if the original language is not in English, you must provide a copy with English translation")
+            StatementText("include an English translation if the original document is not in English")
           )
         ).some,
-        afterStatement = Statement(
-          StatementText("Submit your organisation registration within 3 days of uploading a tax document. After that, you must upload the document again.")
-        ).some,
-        hintText =
-          StatementText("Accepted file types are:").some,
         errorInfo = ErrorInfo(
           "Upload your registration document as a scanned copy or photo of the original.",
           "The selected file must be smaller than 10MB."
