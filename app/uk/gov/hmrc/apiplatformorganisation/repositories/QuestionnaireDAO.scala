@@ -274,9 +274,10 @@ object QuestionnaireDAO {
       val questionLtdOrgWebsite = Question.ConditionalTextQuestion(
         questionLtdOrgWebsiteId,
         Wording("Does {companyName} have a website?"),
-        statement = Statement(
-          StatementText("We'll use this to check if your organisation is active."),
-          StatementText("Your website does not have to be about the software you're developing.")
+        statement = None,
+        hintText = StatementText(
+          "We'll use this to check if your organisation is active.<br>" +
+            "Your website does not have to be about the software you're developing."
         ).some,
         label = Question.Label("Enter your website address").some,
         validation = TextValidation.Url.some,
@@ -462,9 +463,10 @@ object QuestionnaireDAO {
       val questionPartnershipOrgWebsite = Question.ConditionalTextQuestion(
         questionPartnershipOrgWebsiteId,
         Wording("Does {companyName} have a website?"),
-        statement = Statement(
-          StatementText("We'll use this to check if your organisation is active."),
-          StatementText("Your website does not have to be about the software you're developing.")
+        statement = None,
+        hintText = StatementText(
+          "We'll use this to check if your organisation is active.<br>" +
+            "Your website does not have to be about the software you're developing."
         ).some,
         label = Question.Label("Enter your website address").some,
         validation = TextValidation.Url.some,
@@ -494,9 +496,10 @@ object QuestionnaireDAO {
       val questionNonUkWithoutWebsite = Question.ConditionalTextQuestion(
         questionNonUkWithoutWebsiteId,
         Wording("Does {companyName} have a website?"),
-        statement = Statement(
-          StatementText("We'll use this to check if your organisation is active."),
-          StatementText("Your website does not have to be about the software you're developing.")
+        statement = None,
+        hintText = StatementText(
+          "We'll use this to check if your organisation is active.<br>" +
+            "Your website does not have to be about the software you're developing."
         ).some,
         label = Question.Label("Enter your website address").some,
         validation = TextValidation.Url.some,
