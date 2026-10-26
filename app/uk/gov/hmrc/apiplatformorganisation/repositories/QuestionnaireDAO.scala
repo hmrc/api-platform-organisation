@@ -326,9 +326,10 @@ object QuestionnaireDAO {
       val questionSoleTraderOrgWebsite = Question.ConditionalTextQuestion(
         questionSoleTraderOrgWebsiteId,
         Wording("Do you have a website?"),
-        statement = Statement(
-          StatementText("We'll use this to check if your organisation is active."),
-          StatementText("Your website does not have to be about the software you're developing.")
+        statement = None,
+        hintText = StatementText(
+          "We'll use this to check if your organisation is active.<br>" +
+            "Your website does not have to be about the software you're developing."
         ).some,
         label = Question.Label("Enter your website address").some,
         validation = TextValidation.Url.some,
