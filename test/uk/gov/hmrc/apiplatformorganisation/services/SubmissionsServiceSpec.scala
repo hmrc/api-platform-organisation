@@ -113,7 +113,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
       orgDetails.questionLtdConfirmCompanyName.id    -> ActualAnswer.SingleChoiceAnswer("Yes"),
       orgDetails.questionLtdConfirmCompanyAddress.id -> ActualAnswer.SingleChoiceAnswer("Yes"),
       orgDetails.questionLtdOrgUtr.id                -> ActualAnswer.TextAnswer("1234567890"),
-      orgDetails.questionLtdOrgWebsite.id            -> ActualAnswer.TextAnswer("https://example.com")
+      orgDetails.questionLtdOrgWebsite.id            -> ActualAnswer.ConditionalTextAnswer(ConditionalText(Some("Yes"), Some("https://example.com")))
     )
 
     val partnershipAnswers: Submission.AnswersToQuestions = Map(
@@ -123,7 +123,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
       orgDetails.questionPartnershipConfirmCompanyName.id    -> ActualAnswer.SingleChoiceAnswer("Yes"),
       orgDetails.questionPartnershipConfirmCompanyAddress.id -> ActualAnswer.SingleChoiceAnswer("Yes"),
       orgDetails.questionPartnershipOrgUtr.id                -> ActualAnswer.TextAnswer("1234567890"),
-      orgDetails.questionPartnershipOrgWebsite.id            -> ActualAnswer.TextAnswer("https://example.com")
+      orgDetails.questionPartnershipOrgWebsite.id            -> ActualAnswer.ConditionalTextAnswer(ConditionalText(Some("Yes"), Some("https://example.com")))
     )
 
     val newCompanyProfile =
@@ -442,7 +442,13 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
       }
 
       "records new answers when given a valid optional question" in new Setup {
-        SubmissionsDAOMock.Fetch.thenReturn(aSubmission)
+        val optionalTextQuestion = Question.TextQuestion(optionalQuestionId, Wording("What is your website URL?"), None, absence = Some(("No website", Mark.Fail)))
+        val submission           = aSubmission.copy(groups =
+          NonEmptyList.of(
+            testGroups.head.copy(links = NonEmptyList.of(questionnaire.copy(questions = NonEmptyList.of(QuestionItem(optionalTextQuestion)))))
+          )
+        )
+        SubmissionsDAOMock.Fetch.thenReturn(submission)
         SubmissionsDAOMock.Update.thenReturn()
 
         val result = await(underTest.recordAnswers(submissionId, optionalQuestionId, Map.empty))
@@ -471,10 +477,13 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         SubmissionsDAOMock.Fetch.thenReturn(submission)
         SubmissionsDAOMock.Update.thenReturn()
 
-        val result = await(underTest.recordAnswers(submission.id, orgDetails.questionLtdOrgWebsite.id, Map(Question.answerKey -> Seq("https://updated.example.com"))))
+        val result = await(underTest.recordAnswers(submission.id, orgDetails.questionLtdOrgWebsite.id, Map("isPresent" -> Seq("Yes"), "text" -> Seq("https://updated.example.com"))))
 
         businessAnswerKeysOf(result) shouldBe ltdAnswers.keySet
-        result.value.submission.latestInstance.answersToQuestions.get(orgDetails.questionLtdOrgWebsite.id).value shouldBe ActualAnswer.TextAnswer("https://updated.example.com")
+        result.value.submission.latestInstance.answersToQuestions.get(orgDetails.questionLtdOrgWebsite.id).value shouldBe ActualAnswer.ConditionalTextAnswer(ConditionalText(
+          Some("Yes"),
+          Some("https://updated.example.com")
+        ))
       }
 
       "fail when given an invalid question" in new Setup {
