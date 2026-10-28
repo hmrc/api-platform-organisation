@@ -148,6 +148,7 @@ object QuestionnaireDAO {
       val questionSoleTraderNameId        = Question.Id("96f692a6-3fbd-4d58-8d43-824ac1e618a3")
       val questionSoleTraderDateOfBirthId = Question.Id("a8f2cdfc-8a10-4b51-9e2a-c198da7a169c")
       val questionSoleTraderAddressId     = Question.Id("d1a79045-1d1c-4383-8624-ecc23179e5c3")
+      val questionSoleTraderOrgUtrId      = Question.Id("8a52a2ec-d670-4256-afbc-6e2704ed7210")
 
       val questionPartnershipCompanyNameId           = Question.Id("6c571e1c-2215-4921-b526-2e478464d3fa")
       val questionPartnershipAddressId               = Question.Id("ad1a1c5d-9f98-4460-92d2-04e08c63ac4f")
@@ -304,6 +305,18 @@ object QuestionnaireDAO {
         statement = None,
         errorInfo = ErrorInfo("Your address cannot be blank", "Enter your address").some,
         summary = Some("Address")
+      )
+
+      val questionSoleTraderOrgUtr = Question.TextQuestion(
+        questionSoleTraderOrgUtrId,
+        Wording("What’s your Self Assessment Unique Taxpayer Reference (UTR)?"),
+        statement = Statement(
+          StatementText("You can find it in your Personal Tax Account, the HMRC app or on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’."),
+          StatementLink("Get more help to find your UTR (opens in new tab)", "https://www.gov.uk/find-utr-number")
+        ).some,
+        hintText = StatementText("Your UTR can be 10 or 13 digits long.").some,
+        errorInfo = ErrorInfo("Your Unique Taxpayer Reference cannot be blank", "Enter your Unique Taxpayer Reference, like 1234567890").some,
+        summary = Some("Self Assessment UTR")
       )
 
       // Partnership
@@ -543,6 +556,10 @@ object QuestionnaireDAO {
           ),
           QuestionItem(
             questionSoleTraderAddress,
+            AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(soleTrader))
+          ),
+          QuestionItem(
+            questionSoleTraderOrgUtr,
             AskWhen.AskWhenAnswers(questionOrgType, NonEmptyList.of(soleTrader))
           ),
 
