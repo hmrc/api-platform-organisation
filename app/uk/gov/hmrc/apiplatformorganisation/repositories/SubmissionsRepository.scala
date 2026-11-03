@@ -63,6 +63,7 @@ object SubmissionsRepository {
       .and[CompanyNumberAnswer]("companyNumber")
       .and[AttachmentAnswer]("attachment")
       .and[TextAnswer]("text")
+      .and[ConditionalTextAnswer]("conditionalText")
       .andType("acknowledged", () => AcknowledgedAnswer)
       .andType("noAnswer", () => NoAnswer)
       .format
