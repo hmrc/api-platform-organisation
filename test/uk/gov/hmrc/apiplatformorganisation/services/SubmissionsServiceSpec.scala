@@ -31,7 +31,9 @@ import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission.{AdditionalData, CompanyDetails}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services.{ValidationError, ValidationErrors}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.*
+import uk.gov.hmrc.apiplatform.modules.tpd.core.domain.models.User
 import uk.gov.hmrc.apiplatform.modules.tpd.core.dto.{GetRegisteredOrUnregisteredUsersResponse, RegisteredOrUnregisteredUser}
+import uk.gov.hmrc.apiplatform.modules.tpd.emailpreferences.domain.models.EmailPreferences
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 import uk.gov.hmrc.apiplatformorganisation.connectors.CompaniesHouseConnector
 import uk.gov.hmrc.apiplatformorganisation.mocks.connectors.{EmailConnectorMockModule, ThirdPartyDeveloperConnectorMockModule}
@@ -158,8 +160,8 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
     def businessAnswerKeysOf(result: Either[ValidationErrors, ExtendedSubmission]): Set[Question.Id] =
       result.value.submission.latestInstance.answersToQuestions.keySet -- riAnswers.keySet
 
-    val startedByEmail                           = LaxEmailAddress("started.by@example.com")
-    val getRegisteredOrUnregisteredUsersResponse = GetRegisteredOrUnregisteredUsersResponse(List(RegisteredOrUnregisteredUser(userId, startedByEmail, true, true)))
+    val startedByEmail = LaxEmailAddress("joe.bloggs@example.com")
+    val testUser       = User(startedByEmail, "Joe", "Bloggs", instant, instant, true, None, List.empty, None, EmailPreferences.noPreferences, userId, 0, None)
   }
 
   "SubmissionsService" when {
@@ -214,7 +216,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
           .submission)
 
         SubmissionsDAOMock.Fetch.thenReturn(samplePassSubmittedSubmission)
-        ThirdPartyDeveloperConnectorMock.GetRegisteredOrUnregisteredUsers.succeeds(List(samplePassSubmittedSubmission.startedBy), getRegisteredOrUnregisteredUsersResponse)
+        ThirdPartyDeveloperConnectorMock.FetchDeveloper.succeeds(Some(testUser))
         OrganisationServiceMock.CreateOrganisation.thenReturn(standardOrg)
         SubmissionsDAOMock.Update.thenReturn()
         SubmissionReviewServiceMock.ApproveSubmissionReview.thenReturn(approvedSubmissionReview)
@@ -233,7 +235,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         )
         val updatedSubmission: Submission = SubmissionsDAOMock.Update.verifyCalledWith()
         updatedSubmission.organisationId shouldBe Some(standardOrg.id)
-        EmailConnectorMock.SendOrganisationApprovedNotification.verifyCalledWith(OrganisationName("Company name"), Set(startedByEmail))
+        EmailConnectorMock.SendOrganisationApprovedNotification.verifyCalledWith(OrganisationName("Company name"), "Joe Bloggs", startedByEmail)
       }
 
       "approve a submission with no extra organisation data" in new Setup {
@@ -244,7 +246,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         val submission                                       = submissionAnsweredWith(soleTraderAnswers).copy(id = completedSubmissionId).withSubmittedProgress().submission
 
         SubmissionsDAOMock.Fetch.thenReturn(submission)
-        ThirdPartyDeveloperConnectorMock.GetRegisteredOrUnregisteredUsers.succeeds(List(submission.startedBy), getRegisteredOrUnregisteredUsersResponse)
+        ThirdPartyDeveloperConnectorMock.FetchDeveloper.succeeds(Some(testUser))
         OrganisationServiceMock.CreateOrganisation.thenReturn(standardOrg)
         SubmissionsDAOMock.Update.thenReturn()
         SubmissionReviewServiceMock.ApproveSubmissionReview.thenReturn(approvedSubmissionReview)
@@ -261,7 +263,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
           submission.startedBy,
           ExtraOrganisationData()
         )
-        EmailConnectorMock.SendOrganisationApprovedNotification.verifyCalledWith(OrganisationName("Bob Roberts"), Set(startedByEmail))
+        EmailConnectorMock.SendOrganisationApprovedNotification.verifyCalledWith(OrganisationName("Bob Roberts"), "Joe Bloggs", startedByEmail)
       }
 
       "fail to approve a submission that hasn't been submitted" in new Setup {

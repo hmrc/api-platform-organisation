@@ -116,11 +116,13 @@ class EmailConnector @Inject() (httpClient: HttpClientV2, config: EmailConnector
       .map(_ => HasSucceeded)
   }
 
-  def sendOrganisationApprovedNotification(organisationName: OrganisationName, recipients: Set[LaxEmailAddress])(implicit hc: HeaderCarrier): Future[HasSucceeded] = {
+  def sendOrganisationApprovedNotification(organisationName: OrganisationName, requesterName: String, recipient: LaxEmailAddress)(implicit hc: HeaderCarrier)
+      : Future[HasSucceeded] = {
     post(SendEmailRequest(
-      recipients,
+      Set(recipient),
       organisationApprovedNotification,
       Map(
+        "requesterName"    -> requesterName,
         "organisationName" -> organisationName.value
       )
     ))

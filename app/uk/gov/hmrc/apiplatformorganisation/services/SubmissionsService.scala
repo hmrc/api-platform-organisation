@@ -108,13 +108,13 @@ class SubmissionsService @Inject() (
         organisationName     <- fromOption(getOrganisationName(submission), "No organisation name found")
         organisationType     <- fromOption(getOrganisationType(submission), "No organisation type found")
         extraOrganisationData = getExtraOrganisationData(submission)
-        userDetails          <- liftF(thirdPartyDeveloperConnector.getRegisteredOrUnregisteredUsers(List(submission.startedBy)))
-        submitterDetails     <- fromOption(userDetails.users.headOption, "Submitter not found")
+        submitterDetails     <- fromOptionF(thirdPartyDeveloperConnector.fetchDeveloper(submission.startedBy), "Submitter not found")
+        submitterName         = s"${submitterDetails.firstName} ${submitterDetails.lastName}"
         organisation         <- liftF(organisationService.create(organisationName, organisationType, submission.startedBy, extraOrganisationData))
         approvedSubmission    = Submission.grant(instant, approvedBy, comment, None)(submission)
         savedSubmission      <- liftF(submissionsDAO.update(approvedSubmission.copy(organisationId = Some(organisation.id))))
         _                    <- liftF(submissionReviewService.approve(savedSubmission.id, approvedBy, comment))
-        _                    <- liftF(emailConnector.sendOrganisationApprovedNotification(organisationName, Set(submitterDetails.email)))
+        _                    <- liftF(emailConnector.sendOrganisationApprovedNotification(organisationName, submitterName, submitterDetails.email))
         _                    <- liftF(auditService.auditApproveOrganisationSubmission(savedSubmission))
       } yield savedSubmission
     )
