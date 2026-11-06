@@ -59,6 +59,7 @@ class EmailConnector @Inject() (httpClient: HttpClientV2, config: EmailConnector
   val addedMemberToOrganisationNotification             = "apiAddedMemberToOrganisationNotification"
   val removedMemberFromOrganisationConfirmation         = "apiRemovedMemberFromOrganisationConfirmation"
   val removedMemberFromOrganisationNotification         = "apiRemovedMemberFromOrganisationNotification"
+  val organisationApprovedNotification                  = "apiOrganisationApprovedNotification"
 
   def sendRegisteredMemberAddedConfirmation(organisationName: OrganisationName, recipients: Set[LaxEmailAddress])(implicit hc: HeaderCarrier): Future[HasSucceeded] = {
     post(SendEmailRequest(
@@ -109,6 +110,19 @@ class EmailConnector @Inject() (httpClient: HttpClientV2, config: EmailConnector
       Map(
         "emailAddress"     -> emailAddress.text,
         "role"             -> role,
+        "organisationName" -> organisationName.value
+      )
+    ))
+      .map(_ => HasSucceeded)
+  }
+
+  def sendOrganisationApprovedNotification(organisationName: OrganisationName, requesterName: String, recipient: LaxEmailAddress)(implicit hc: HeaderCarrier)
+      : Future[HasSucceeded] = {
+    post(SendEmailRequest(
+      Set(recipient),
+      organisationApprovedNotification,
+      Map(
+        "requesterName"    -> requesterName,
         "organisationName" -> organisationName.value
       )
     ))

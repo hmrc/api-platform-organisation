@@ -26,7 +26,9 @@ import uk.gov.hmrc.utils.WireMockSupport
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
+import uk.gov.hmrc.apiplatform.modules.tpd.core.domain.models.User
 import uk.gov.hmrc.apiplatform.modules.tpd.core.dto.{GetRegisteredOrUnregisteredUsersResponse, RegisteredOrUnregisteredUser}
+import uk.gov.hmrc.apiplatform.modules.tpd.emailpreferences.domain.models.EmailPreferences
 import uk.gov.hmrc.apiplatform.modules.tpd.test.builders.UserBuilder
 import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 import uk.gov.hmrc.apiplatformorganisation.stubs.ThirdPartyDeveloperStub
@@ -53,6 +55,7 @@ class ThirdPartyDeveloperConnectorISpec extends AsyncHmrcSpec
     val userEmail: LaxEmailAddress = "thirdpartydeveloper@example.com".toLaxEmail
     val userId: UserId             = idOf(userEmail)
     val userDetails                = RegisteredOrUnregisteredUser(userId, userEmail, true, true)
+    val user                       = User(LaxEmailAddress("bob@example.com"), "Bob", "Fleming", instant, instant, true, None, List.empty, None, EmailPreferences.noPreferences, userId, 0, None)
 
     val underTest: ThirdPartyDeveloperConnector = app.injector.instanceOf[ThirdPartyDeveloperConnector]
   }
@@ -89,6 +92,24 @@ class ThirdPartyDeveloperConnectorISpec extends AsyncHmrcSpec
 
       intercept[UpstreamErrorResponse] {
         await(underTest.getRegisteredOrUnregisteredUsers(List(userId)))
+      }.statusCode shouldBe INTERNAL_SERVER_ERROR
+    }
+  }
+
+  "fetchDeveloper" should {
+    "return a user's details" in new Setup {
+      ThirdPartyDeveloperStub.FetchDeveloper.succeeds(userId, nowAsText)
+
+      private val result = await(underTest.fetchDeveloper(userId))
+
+      result shouldBe Some(user)
+    }
+
+    "throw an UpstreamErrorResponse when the call returns an internal server error" in new Setup {
+      ThirdPartyDeveloperStub.FetchDeveloper.throwsAnException()
+
+      intercept[UpstreamErrorResponse] {
+        await(underTest.fetchDeveloper(userId))
       }.statusCode shouldBe INTERNAL_SERVER_ERROR
     }
   }

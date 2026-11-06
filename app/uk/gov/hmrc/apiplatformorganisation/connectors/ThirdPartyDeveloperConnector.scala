@@ -27,6 +27,7 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{SessionId as _, StringContextOps, *}
 
 import uk.gov.hmrc.apiplatform.modules.common.domain.models.{LaxEmailAddress, UserId}
+import uk.gov.hmrc.apiplatform.modules.tpd.core.domain.models.User
 import uk.gov.hmrc.apiplatform.modules.tpd.core.dto.{FindOrCreateUserIdRequest, FindUserIdResponse, GetRegisteredOrUnregisteredUsersResponse, GetUsersRequest}
 import uk.gov.hmrc.apiplatformorganisation.config.AppConfig
 
@@ -49,4 +50,9 @@ class ThirdPartyDeveloperConnector @Inject() (
       .withBody(Json.toJson(FindOrCreateUserIdRequest(emailAddress)))
       .execute[FindUserIdResponse]
       .map(_.userId)
+
+  def fetchDeveloper(id: UserId)(implicit hc: HeaderCarrier): Future[Option[User]] = {
+    http.get(url"$serviceBaseUrl/developer?${Seq("developerId" -> id.toString())}")
+      .execute[Option[User]]
+  }
 }
