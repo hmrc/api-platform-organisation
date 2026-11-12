@@ -24,13 +24,19 @@ import org.scalatest.Inside
 
 import uk.gov.hmrc.http.HeaderCarrier
 
+import uk.gov.hmrc.apiplatform.modules.common.domain.models.LaxEmailAddress
 import uk.gov.hmrc.apiplatform.modules.common.utils.FixedClock
 import uk.gov.hmrc.apiplatform.modules.organisations.domain.models.{Organisation, OrganisationAddress, OrganisationName}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.*
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.models.Submission.{AdditionalData, CompanyDetails}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.domain.services.{ValidationError, ValidationErrors}
 import uk.gov.hmrc.apiplatform.modules.organisations.submissions.utils.*
+import uk.gov.hmrc.apiplatform.modules.tpd.core.domain.models.User
+import uk.gov.hmrc.apiplatform.modules.tpd.core.dto.{GetRegisteredOrUnregisteredUsersResponse, RegisteredOrUnregisteredUser}
+import uk.gov.hmrc.apiplatform.modules.tpd.emailpreferences.domain.models.EmailPreferences
+import uk.gov.hmrc.apiplatform.modules.tpd.test.utils.LocalUserIdTracker
 import uk.gov.hmrc.apiplatformorganisation.connectors.CompaniesHouseConnector
+import uk.gov.hmrc.apiplatformorganisation.mocks.connectors.{EmailConnectorMockModule, ThirdPartyDeveloperConnectorMockModule}
 import uk.gov.hmrc.apiplatformorganisation.mocks.services.{OrganisationServiceMockModule, SubmissionReviewServiceMockModule}
 import uk.gov.hmrc.apiplatformorganisation.mocks.{AuditServiceMockModule, SubmissionsDAOMockModule}
 import uk.gov.hmrc.apiplatformorganisation.models.{CompaniesHouseCompanyProfile, ExtraOrganisationData}
@@ -47,9 +53,12 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
       with SubmissionReviewServiceMockModule
       with OrganisationServiceMockModule
       with AuditServiceMockModule
+      with EmailConnectorMockModule
+      with ThirdPartyDeveloperConnectorMockModule
       with SubmissionsTestData
       with SubmissionReviewFixtures
       with OrganisationFixtures
+      with LocalUserIdTracker
       with AsIdsHelpers {
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -94,6 +103,8 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         OrganisationServiceMock.aMock,
         AuditServiceMock.aMock,
         mockCompaniesHouseConnector,
+        EmailConnectorMock.aMock,
+        ThirdPartyDeveloperConnectorMock.aMock,
         clock
       )
 
@@ -148,6 +159,9 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
 
     def businessAnswerKeysOf(result: Either[ValidationErrors, ExtendedSubmission]): Set[Question.Id] =
       result.value.submission.latestInstance.answersToQuestions.keySet -- riAnswers.keySet
+
+    val startedByEmail = LaxEmailAddress("joe.bloggs@example.com")
+    val testUser       = User(startedByEmail, "Joe", "Bloggs", instant, instant, true, None, List.empty, None, EmailPreferences.noPreferences, userId, 0, None)
   }
 
   "SubmissionsService" when {
@@ -202,9 +216,11 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
           .submission)
 
         SubmissionsDAOMock.Fetch.thenReturn(samplePassSubmittedSubmission)
+        ThirdPartyDeveloperConnectorMock.FetchDeveloper.succeeds(Some(testUser))
         OrganisationServiceMock.CreateOrganisation.thenReturn(standardOrg)
         SubmissionsDAOMock.Update.thenReturn()
         SubmissionReviewServiceMock.ApproveSubmissionReview.thenReturn(approvedSubmissionReview)
+        EmailConnectorMock.SendOrganisationApprovedNotification.succeeds()
         AuditServiceMock.AuditApproveOrganisationSubmission.thenReturn()
 
         val result: Either[String, Submission] = await(underTest.approve(submissionId, "bob@example.com", Some("comment")))
@@ -219,6 +235,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         )
         val updatedSubmission: Submission = SubmissionsDAOMock.Update.verifyCalledWith()
         updatedSubmission.organisationId shouldBe Some(standardOrg.id)
+        EmailConnectorMock.SendOrganisationApprovedNotification.verifyCalledWith(OrganisationName("Company name"), "Joe Bloggs", startedByEmail)
       }
 
       "approve a submission with no extra organisation data" in new Setup {
@@ -229,9 +246,11 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
         val submission                                       = submissionAnsweredWith(soleTraderAnswers).copy(id = completedSubmissionId).withSubmittedProgress().submission
 
         SubmissionsDAOMock.Fetch.thenReturn(submission)
+        ThirdPartyDeveloperConnectorMock.FetchDeveloper.succeeds(Some(testUser))
         OrganisationServiceMock.CreateOrganisation.thenReturn(standardOrg)
         SubmissionsDAOMock.Update.thenReturn()
         SubmissionReviewServiceMock.ApproveSubmissionReview.thenReturn(approvedSubmissionReview)
+        EmailConnectorMock.SendOrganisationApprovedNotification.succeeds()
         AuditServiceMock.AuditApproveOrganisationSubmission.thenReturn()
 
         val result: Either[String, Submission] = await(underTest.approve(submissionId, "bob@example.com", Some("comment")))
@@ -244,6 +263,7 @@ class SubmissionsServiceSpec extends AsyncHmrcSpec with Inside with FixedClock {
           submission.startedBy,
           ExtraOrganisationData()
         )
+        EmailConnectorMock.SendOrganisationApprovedNotification.verifyCalledWith(OrganisationName("Bob Roberts"), "Joe Bloggs", startedByEmail)
       }
 
       "fail to approve a submission that hasn't been submitted" in new Setup {
